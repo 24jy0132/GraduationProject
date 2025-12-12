@@ -130,9 +130,9 @@ button.btn-primary:hover {
 							value="<%=request.getAttribute("staffnamefurigana") != null ? request.getAttribute("staffnamefurigana")
 		: (temp != null ? temp.getStaffNameFurigana() : "")%>">
 					</div>
-					<label for="stafftype" class="form-label">従業員種類</label>
-					<select class="form-select" name="stafftype"
-						aria-label="Default select example"　id="stafftype">
+					<label for="stafftype" class="form-label">従業員種類</label> <select
+						class="form-select" name="stafftype"
+						aria-label="Default select example" 　id="stafftype">
 						<option value="staff"
 							<%="staff".equals(request.getAttribute("stafftype")) || (temp != null && "admin".equals(temp.getStaffType()))
 		? "selected"
@@ -181,7 +181,9 @@ button.btn-primary:hover {
 					<button type="submit" class="btn btn-primary">Submit</button>
 				</form>
 			</div>
-
+			<div class="buttons">
+				<a href="Admin_emp_manage.jsp"><button>戻る</button></a>
+			</div>
 		</div>
 	</div>
 </body>
