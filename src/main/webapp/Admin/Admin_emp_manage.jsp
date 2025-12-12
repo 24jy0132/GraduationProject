@@ -19,7 +19,7 @@
 
 	<main>
 		<p>〇従業員管理</p>
-		<p>サーバに接続し、登録されている従業員の一覧を出力</p>
+		<p>サーバに接続し、登録されている従業員の一覧を出力する</p>
 
 <div><button onclick="location.href='Admin_add_emp.jsp'">従業員追加</button></div>
 		<button onclick="history.back()">戻る</button>
