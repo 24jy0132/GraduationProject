@@ -92,7 +92,7 @@ button.btn-primary:hover {
 					<a href="<%=request.getContextPath()%>/Adminlogoutservlet"><button>ログアウト</button></a>
 				</div>
 
-<<<<<<< HEAD
+
 				<!-- Display errors if any -->
 				<%
 				List<String> errors = (List<String>) request.getAttribute("errors");
@@ -114,14 +114,6 @@ button.btn-primary:hover {
 				// Pre-fill from session if exists
 				Staff temp = (Staff) session.getAttribute("tempStaff");
 				%>
-=======
-			<!-- Top right buttons -->
-			<div class="buttons">
-				<a href="adminhome.jsp"><button>管理TOP</button></a> <a
-					href="https://example.com"><button>ログアウト</button></a>
-			</div>
->>>>>>> branch 'choose_remote_name/houmura' of ローカル・リポジトリー
-
 				<!-- Form -->
 				<div class="staffhero">
 					<form

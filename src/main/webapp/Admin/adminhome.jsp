@@ -75,8 +75,8 @@ h1 {
 	background: #f0f0f0;
 }
 
-.topcontainer{
-	display:flex;
+.topcontainer {
+	display: flex;
 	justify-content: flex-end;
 }
 
@@ -140,18 +140,14 @@ h1 {
 							<i class="fa-solid fa-user"></i>
 						</div>
 
-<<<<<<< HEAD
+
 						<div class="user-details">
 							<div class="user-name"><%=admin.getStaffName()%></div>
 							<div class="user-role"><%=admin.getStaffType()%></div>
 						</div>
-=======
-            <!-- Top right buttons -->
-            <div class="buttons">
-                <a href="adminhome.jsp"><button>管理TOP</button></a>
-                <a href="https://example.com"><button>ログアウト</button></a>
-            </div>
->>>>>>> branch 'choose_remote_name/houmura' of ローカル・リポジトリー
+
+
+
 
 					</div>
 					<%
@@ -172,13 +168,9 @@ h1 {
 
 					<li class="nav-item"><a class="nav-link" href="#">メニュー管理</a></li>
 
-<<<<<<< HEAD
+
 					<li class="nav-item"><a class="nav-link" href="#">割引管理</a></li>
-=======
-                    <li class="nav-item">
-                        <a class="nav-link" href="Admin_emp_manage.jsp">従業員管理</a>
-                    </li>
->>>>>>> branch 'choose_remote_name/houmura' of ローカル・リポジトリー
+
 
 					<li class="nav-item dropdown"><a
 						class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
