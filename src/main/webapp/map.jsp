@@ -24,20 +24,20 @@
 				</button>
 
 				<!-- Navbar links and login -->
-				<div class="collapse navbar-collapse justify-content-end"
-					id="navbarSupportedContent">
-					<ul class="navbar-nav mb-2 mb-lg-0 d-flex gap-4">
-						<li class="nav-item"><a class="nav-link active text-white"
-							href="#"><i class="bi bi-house-fill me-1"></i>Home</a></li>
-						<li class="nav-item"><a class="nav-link text-white"
-							href="Menucontrollers"><i class="bi bi-menu-down me-1"></i>Menu</a></li>
-						<li class="nav-item"><a class="nav-link text-white" href="#"><i
-								class="bi bi-calendar-check me-1"></i>Reservation</a></li>
-						<li class="nav-item"><a class="nav-link text-white" href="#"><i
-								class="bi bi-telephone-fill me-1"></i>Contact</a></li>
-						<li class="nav-item"><a class="nav-link text-white" href="#"><i
-								class="bi bi-pin-map-fill me-1"></i>Map</a></li>
-					</ul>
+                <div class="collapse navbar-collapse justify-content-end"
+                    id="navbarSupportedContent">
+                    <ul class="navbar-nav mb-2 mb-lg-0 d-flex gap-4">
+                        <li class="nav-item"><a class="nav-link active text-white"
+                            href="#"><i class="bi bi-house-fill me-1"></i>Home</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="Menucontrollers"><i
+                                class="bi bi-menu-down me-1"></i>Menu</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="#"><i
+                                class="bi bi-calendar-check me-1"></i>Reservation</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="contact.jsp"><i
+                                class="bi bi-telephone-fill me-1"></i>Contact</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="map.jsp"><i
+                                class="bi bi-pin-map-fill me-1"></i>Map</a></li>
+                    </ul>
 
 					<!-- Login link -->
 					<a class="nav-link active text-white fw-bold ms-lg-3 mt-2 mt-lg-0"
