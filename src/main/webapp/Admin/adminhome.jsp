@@ -82,7 +82,7 @@
 
             <!-- Top right buttons -->
             <div class="buttons">
-                <a href="https://example.com"><button>管理TOP</button></a>
+                <a href="adminhome.jsp"><button>管理TOP</button></a>
                 <a href="https://example.com"><button>ログアウト</button></a>
             </div>
 
@@ -114,7 +114,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="staffregisteration.jsp">従業員管理</a>
+                        <a class="nav-link" href="Admin_emp_manage.jsp">従業員管理</a>
                     </li>
 
                 </ul>

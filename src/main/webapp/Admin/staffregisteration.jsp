@@ -86,7 +86,7 @@ button.btn-primary:hover {
 
 			<!-- Top right buttons -->
 			<div class="buttons">
-				<a href="https://example.com"><button>管理TOP</button></a> <a
+				<a href="adminhome.jsp"><button>管理TOP</button></a> <a
 					href="https://example.com"><button>ログアウト</button></a>
 			</div>
 
