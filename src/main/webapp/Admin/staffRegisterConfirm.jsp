@@ -123,7 +123,7 @@ button {
 			<%=temp.getStaffPassword().replaceAll(".", "*")%></p>
 
 		<div class="buttons">
-			<form action="StaffInsertServlet" method="post"
+			<form action="<%= request.getContextPath() %>/Staffinsertionservlet" method="post"
 				style="display: inline;">
 				<button type="submit" class="btn-primary">登録する</button>
 			</form>
