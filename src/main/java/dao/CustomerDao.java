@@ -12,12 +12,19 @@ public class CustomerDao {
 	private Connection connection;
 	public CustomerDao() {
 		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			connection = DriverManager.getConnection( "jdbc:mysql://127.0.0.1:3306/myrestaurant?useSSL=false&serverTimezone=UTC",
-			        "root",
-			        "shadowseeker");
-		}catch(Exception e) {
-			System.out.println(e.getMessage());
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+
+		try {
+			connection = DriverManager.getConnection("jdbc:mysql://10.64.144.5:3306/" + "24jy0234?characterEncoding=UTF-8",
+					"24jy0234", "24jy0234");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 	public Customer findByEmailAndPassword(String email, String password) {
