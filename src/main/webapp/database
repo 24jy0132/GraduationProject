@@ -1,0 +1,15 @@
+userId  //会員
+name
+nameKana
+email
+phone
+password
+
+staffId  //jyugyoin
+staffname
+staffnamefurigana
+stafftype
+staffphone
+staffemail
+staffaddress
+staffpassword
