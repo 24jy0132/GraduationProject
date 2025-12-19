@@ -35,4 +35,24 @@ public class MenuService {
 
 		return menu;
 	}
+	public List<Menu> getMainMenus(){
+		MenuDao dao = new MenuDao();
+		List<Menu>list = dao.findMainMenu();
+		return list;
+	}
+	public List<Menu> getAlaCarteMenus(){
+		MenuDao dao = new MenuDao();
+		List<Menu>list = dao.findAlaCarteMenu();
+		return list;
+	}
+	public List<Menu> getSaladSoup(){
+		MenuDao dao = new MenuDao();
+		List<Menu>list = dao.findSaladSoup();
+		return list;
+	}
+	public List<Menu> getDrinks(){
+		MenuDao dao = new MenuDao();
+		List<Menu>list = dao.findDrinks();
+		return list;
+	}
 }

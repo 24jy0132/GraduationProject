@@ -30,11 +30,19 @@ public class MenuListServlet extends HttpServlet {
 		List<Menu> menus = menuservice.getAllMenus();
 		List<Menu> surveyMenus = menuservice.getSurveyMenus();
 		List<Menu> newMenus = menuservice.getNewMenus();
+		List<Menu> mainMenus = menuservice.getMainMenus();
+		List<Menu> alaCarteMenus = menuservice.getAlaCarteMenus();
+		List<Menu> saladSoup = menuservice.getSaladSoup();
+		List<Menu> drinks = menuservice.getDrinks();
 
 		
 		request.setAttribute("menus", menus);
 		request.setAttribute("surveyMenus", surveyMenus);
 		request.setAttribute("newMenus", newMenus);
+		request.setAttribute("mainMenus", mainMenus);
+		request.setAttribute("alaCarteMenus", alaCarteMenus);
+		request.setAttribute("saladSoup", saladSoup);
+		request.setAttribute("drinks", drinks);
 
 		RequestDispatcher rd = request.getRequestDispatcher("/Menulist.jsp");
 		rd.forward(request, response);
