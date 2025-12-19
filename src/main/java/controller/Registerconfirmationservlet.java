@@ -63,7 +63,7 @@ public class Registerconfirmationservlet extends HttpServlet {
 			errors.add("Furikana must be full-width Katakana.");
 		if (usermail == null || usermail.isBlank())
 			errors.add("Email is required.");
-		if (!cs.mailexists(usermail)) 
+		if (cs.mailexists(usermail)) 
 			errors.add("Email already exists");
 		if (usertel == null || usertel.isBlank())
 			errors.add("Phone is required.");

@@ -1,73 +1,62 @@
 package model;
 
 public class Menu {
-	private int menuId;
-	private String menuname;
-	private String description;
-	private double price;
-	private String category;
-	private String imagePath;
-
-	public Menu() {
-
-	}
-
-	public Menu(int menuId, String menuname, String description, double price, String category, String imagePath) {
-		super();
-		this.menuId = menuId;
-		this.menuname = menuname;
-		this.description = description;
-		this.price = price;
-		this.category = category;
-		this.imagePath = imagePath;
-	}
-
+    private int menuId;          // メニューコード
+    private String menuName;         // メニュー名
+    private String description;  // メニュー説明
+    private int price;           // 値段
+    private String category;        // メニュージャンル
+    private String imagePath;    // メニュー画像
+    private boolean isSurveyTarget;
+    private int surveyId;        // アンケートコード(FK)
 	public int getMenuId() {
 		return menuId;
 	}
-
 	public void setMenuId(int menuId) {
 		this.menuId = menuId;
 	}
-
-	public String getMenuname() {
-		return menuname;
+	public String getMenuName() {
+		return menuName;
 	}
-
-	public void setMenuname(String menuname) {
-		this.menuname = menuname;
+	public void setMenuName(String menuName) {
+		this.menuName = menuName;
 	}
-
 	public String getDescription() {
 		return description;
 	}
-
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	public double getPrice() {
+	public int getPrice() {
 		return price;
 	}
-
-	public void setPrice(double price) {
+	public void setPrice(int price) {
 		this.price = price;
 	}
-
 	public String getCategory() {
 		return category;
 	}
-
 	public void setCategory(String category) {
 		this.category = category;
 	}
-
 	public String getImagePath() {
 		return imagePath;
 	}
-
 	public void setImagePath(String imagePath) {
 		this.imagePath = imagePath;
 	}
+	public boolean isSurveyTarget() {
+		return isSurveyTarget;
+	}
+	public void setSurveyTarget(boolean isSurveyTarget) {
+		this.isSurveyTarget = isSurveyTarget;
+	}
+	public int getSurveyId() {
+		return surveyId;
+	}
+	public void setSurveyId(int surveyId) {
+		this.surveyId = surveyId;
+	}
 
+    
 }
