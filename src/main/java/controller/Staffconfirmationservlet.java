@@ -75,7 +75,7 @@ public class Staffconfirmationservlet extends HttpServlet {
 		if (staffemail == null || staffemail.isBlank())
 			errors.add("Email is required.");
 
-		if (!ss.mailexists(staffemail)) 
+		if (ss.mailexists(staffemail)) 
 			errors.add("Email already exists");
 		
 		if (staffaddress == null || staffaddress.isBlank())

@@ -57,12 +57,12 @@ h1 {
 		<h1>MHP株式会社 営業サポートシステム</h1>
 
 		<div class="container">
-
+		
 			<!-- Top right buttons -->
-			<div class="buttons">
-				<a href="https://example.com"><button>管理TOP</button></a> <a
-					href="https://example.com"><button>ログアウト</button></a>
-			</div>
+			 <div class="buttons">
+                <a href="<%= request.getContextPath() %>/Admin/adminhome.jsp"><button>管理TOP</button></a>
+                <a href="<%= request.getContextPath() %>/Adminlogoutservlet"><button>ログアウト</button></a>
+            </div>
 
 			<div class="confirm-box">
 				<%
