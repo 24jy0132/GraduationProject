@@ -1,21 +1,35 @@
+<%@ include file="header.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-<%@ include file="header.jsp"%>
+<%@ page import="model.Customer"%>
+
+<%
+Customer customer = (Customer) session.getAttribute("customer");
+%>
+<title>会員TOP</title>
 </head>
 <body>
+
 	<div class="container-fluid">
 		<!-- Navbar -->
 		<nav class="navbar navbar-expand-lg bg-danger py-3">
 			<div class="container">
 				<!-- Brand -->
-				<a class="navbar-brand fw-bold text-white" href="index.jsp"> <img
+				<a class="navbar-brand fw-bold text-white" href="member_profile.jsp"> <img
 					src="img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png" height="40"
-					width="40" alt="Logo" class="me-2"> Welcome From Mesa
+					width="40" alt="Logo" class="me-2"> <%
+ if (customer != null) {
+ %> <span class="user-card"> <span class="user-avatar"><i
+							class="fa-solid fa-user"></i> <span><%=customer.getName()%></span> </span>
+							<span style="font-size: x-small"><%=customer.getPoint()%>point</span>
+
+
+
+
+
+				</span> <%
+ }
+ %>
 				</a>
 
 				<!-- Toggler button -->
@@ -26,27 +40,29 @@
 					<span class="navbar-toggler-icon"></span>
 				</button>
 
+				<!--この辺に会員の名前と保有ポイントを表示する項目を作る-->
+				<!--adminhomeを参照-->
+
 				<!-- Navbar links and login -->
 				<div class="collapse navbar-collapse justify-content-end"
 					id="navbarSupportedContent">
 					<ul class="navbar-nav mb-2 mb-lg-0 d-flex gap-4">
 						<li class="nav-item"><a class="nav-link active text-white"
-							href="#"><i class="bi bi-house-fill me-1"></i>Home</a></li>
+							href="member_index.jsp"><i class="bi bi-house-fill me-1"></i>Home</a></li>
 						<li class="nav-item"><a class="nav-link text-white"
-							href="MenuListServlet"><i class="bi bi-menu-down me-1"></i>Menu</a></li>
+							href="Menucontrollers"><i class="bi bi-menu-down me-1"></i>Menu</a></li>
 						<li class="nav-item"><a class="nav-link text-white" href="#"><i
 								class="bi bi-calendar-check me-1"></i>Reservation</a></li>
 						<li class="nav-item"><a class="nav-link text-white"
 							href="contact.jsp"><i class="bi bi-telephone-fill me-1"></i>Contact</a></li>
 						<li class="nav-item"><a class="nav-link text-white"
 							href="map.jsp"><i class="bi bi-pin-map-fill me-1"></i>Map</a></li>
+						<li class="nav-item"><a class="nav-link text-white"
+							href="<%=request.getContextPath()%>/Customer_LogOut"> <i
+								class="bi bi-box-arrow-right me-1"></i>LogOut
+						</a></li>
 					</ul>
 
-					<!-- Login link -->
-					<a class="nav-link active text-white fw-bold ms-lg-3 mt-2 mt-lg-0"
-						href="MemberProfileServlet"> <i
-						class="bi bi-person-circle me-1"></i>My Profile
-					</a> 
 
 				</div>
 			</div>
@@ -85,4 +101,5 @@
 	</div>
 
 </body>
+
 </html>

@@ -26,7 +26,7 @@
                     id="navbarSupportedContent">
                     <ul class="navbar-nav mb-2 mb-lg-0 d-flex gap-4">
                         <li class="nav-item"><a class="nav-link active text-white"
-                            href="#"><i class="bi bi-house-fill me-1"></i>Home</a></li>
+                            href="index.jsp"><i class="bi bi-house-fill me-1"></i>Home</a></li>
                         <li class="nav-item"><a class="nav-link text-white" href="MenuListServlet"><i
                                 class="bi bi-menu-down me-1"></i>Menu</a></li>
                         <li class="nav-item"><a class="nav-link text-white" href="#"><i
