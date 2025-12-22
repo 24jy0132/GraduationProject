@@ -52,6 +52,7 @@ public class Registerconfirmationservlet extends HttpServlet {
 		String usertel = request.getParameter("usertel");
 		String userpass = request.getParameter("userpass");
 		String repassword = request.getParameter("repassword");
+		int userpoint=0;
 
 		CustomerService cs = new CustomerService();
 		List<String> errors = new ArrayList<>();
@@ -84,7 +85,7 @@ public class Registerconfirmationservlet extends HttpServlet {
 
 		// Save user temporarily in session
 		HttpSession session = request.getSession();
-		Customer temp = new Customer(username, furikana, usermail, usertel, userpass);
+		Customer temp = new Customer(username, furikana, usermail, usertel, userpass,userpoint);
 		session.setAttribute("tempUser", temp);
 
 		// Forward to confirmation page

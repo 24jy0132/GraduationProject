@@ -8,16 +8,18 @@ public class Customer {
 	private String email;
 	private String phone;
 	private String password;
+	private int point;
 	public Customer() {
 		
 	}
-	public Customer(String name,String nameKana,String email,String phone,String password) {
+	public Customer(String name,String nameKana,String email,String phone,String password,int point) {
 		super();
 		this.name = name;
 		this.nameKana = nameKana;
 		this.email = email;
 		this.phone = phone;
 		this.password = password;
+		this.point=point;
 		}
 	public String getPassword() {
 		return password;
@@ -54,6 +56,12 @@ public class Customer {
 	}
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+	public int getPoint() {
+		return point;
+	}
+	public void setPoint(int point) {
+		this.point=point;
 	}
 	
 }

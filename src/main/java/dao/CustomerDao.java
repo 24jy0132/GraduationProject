@@ -67,7 +67,7 @@ public class CustomerDao {
 	}
 	public int insert(Customer customer) {
 	    int result = 0;
-	    String sql = "INSERT INTO customers (name, nameKana, email, phone, password) VALUES (?, ?, ?, ?, ?)";
+	    String sql = "INSERT INTO customers (name, nameKana, email, phone, password,point) VALUES (?, ?, ?, ?, ?,?)";
 
 	    try (PreparedStatement ps = connection.prepareStatement(sql)) {
 	        ps.setString(1, customer.getName());
@@ -75,6 +75,7 @@ public class CustomerDao {
 	        ps.setString(3, customer.getEmail());
 	        ps.setString(4, customer.getPhone());
 	        ps.setString(5, customer.getPassword());
+	        ps.setInt(6, customer.getPoint());
 
 	        result = ps.executeUpdate();
 	        System.out.println("Inserted user: " + customer.getEmail() + " result=" + result);

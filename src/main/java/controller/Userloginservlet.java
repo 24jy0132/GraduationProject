@@ -7,8 +7,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-import service.CustomerService;
+import dao.CustomerDao;
+import model.Customer;
 
 /**
  * Servlet implementation class Userloginservlet
@@ -43,14 +45,19 @@ public class Userloginservlet extends HttpServlet {
 		response.setContentType("text/html");
 		String mail = request.getParameter("usermail");
 		String password = request.getParameter("userpassword");
-		CustomerService cs = new CustomerService();
-		boolean pass = cs.accountExists(mail, password);
 
-		if (pass) {
+		CustomerDao cd = new CustomerDao();
+		Customer customer = cd.findByEmailAndPassword(mail, password);
 
-			response.sendRedirect("member.jsp");
+		HttpSession session = request.getSession();
+
+		if (customer != null) {
+			session.setAttribute("customer", customer);
+			request.getRequestDispatcher("member_index.jsp").forward(request, response);
 		} else {
-			response.sendRedirect("error.jsp");
+			request.setAttribute("error", "メールアドレスまたはパスワードが正しくありません");
+		    request.getRequestDispatcher("login.jsp")
+		           .forward(request, response);
 		}
 	}
 
