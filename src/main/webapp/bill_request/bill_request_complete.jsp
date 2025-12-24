@@ -1,7 +1,7 @@
 <%@ include file="/header.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<title>A1卓 会計依頼</title>
+<title>会計依頼完了</title>
 </head>
 <body>
 
@@ -56,17 +56,16 @@
 		</div>
 
 		<div>
-			<h3>A1卓 会計依頼</h3>
-			<p>会計を依頼後、従業員が伝票を作成し、テーブルまでお持ちします。</p>
-			<p>また会計依頼から10分以内のご退席をお願いしております。よろしければ、以下のボタンを押して会計を依頼してください。</p>
-
-			<form action="<%=request.getContextPath()%>/Bill_request_Servlet"
-				method="post">
-				<input type="hidden" name="table_id" value="A1">
-				<button type="submit">会計依頼</button>
-			</form>
+			<h3>会計依頼が完了しました！</h3>
+			<p>
+				テーブル番号 <strong>${table_id}</strong> の会計依頼を受け付けました。
+			</p>
+			<p>従業員が伝票を作成し、テーブルまでお持ちします。受領後は速やかな会計にご協力ください。</p>
+			<p>また対象商品をご注文いただいた方は、お得なポイントがたまるアンケートへ回答いただけますと幸いです。</p>
+			<p><a href="<%=request.getContextPath()%>/login.jsp">会員登録/ログイン</a>>後、メニューページ内からお願いいたします。</p>
 
 		</div>
+
 		<%@ include file="/footer.jsp"%>
 	</div>
 
