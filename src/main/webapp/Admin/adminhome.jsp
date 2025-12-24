@@ -164,7 +164,9 @@ h1 {
 			<div class="point">
 				<ul class="nav nav-pills">
 
-					<li class="nav-item"><a class="nav-link" href="#">予約確認</a></li>
+					<li class="nav-item"><a class="nav-link"
+						href="<%=request.getContextPath()%>/reservation/success.jsp">
+							予約確認 </a></li>
 
 					<li class="nav-item"><a class="nav-link" href="#">メニュー管理</a></li>
 

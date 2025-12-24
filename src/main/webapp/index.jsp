@@ -29,7 +29,7 @@
                             href="#"><i class="bi bi-house-fill me-1"></i>Home</a></li>
                         <li class="nav-item"><a class="nav-link text-white" href="MenuListServlet"><i
                                 class="bi bi-menu-down me-1"></i>Menu</a></li>
-                        <li class="nav-item"><a class="nav-link text-white" href="#"><i
+                        <li class="nav-item"><a class="nav-link text-white" href=""><i
                                 class="bi bi-calendar-check me-1"></i>Reservation</a></li>
                         <li class="nav-item"><a class="nav-link text-white" href="contact.jsp"><i
                                 class="bi bi-telephone-fill me-1"></i>Contact</a></li>
