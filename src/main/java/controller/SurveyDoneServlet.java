@@ -7,8 +7,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import dao.SurveyAnswerDao;
+import model.Customer;
 
 @WebServlet("/SurveyDoneServlet")
 public class SurveyDoneServlet extends HttpServlet {
@@ -30,8 +32,11 @@ public class SurveyDoneServlet extends HttpServlet {
         String comment = request.getParameter("comment"); // can be null
 
         int surveyId = 1;
-        int userId = 1; // ★ test user (later: from session after login)
-
+        
+        HttpSession session = request.getSession();
+        Customer customer = (Customer)session.getAttribute("customer"); // ★ test user (later: from session after login)
+        int userId = customer.getUserId();
+        
         SurveyAnswerDao dao = new SurveyAnswerDao();
         dao.insertAnswers(surveyId, menuId, userId, taste, volume, price, comment);
         dao.connectionClose();

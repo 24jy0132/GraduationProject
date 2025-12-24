@@ -1,6 +1,7 @@
+<%@ page import="model.Customer" %>
 <%@ include file="header.jsp"%>
 <%
-Customer custome = (Customer) session.getAttribute("customer");
+Customer customer = (Customer) session.getAttribute("customer");
 %>
 <title>Top Page</title>
 </head>

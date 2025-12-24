@@ -3,6 +3,7 @@ package dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SurveyAnswerDao {
@@ -64,5 +65,18 @@ public class SurveyAnswerDao {
         ps.setInt(4, questionId);
         ps.setString(5, answerText);
         ps.executeUpdate();
+    }
+    
+    public boolean alreadyAnswered(int userId,int menuId) {
+    	String sql = "select* from survey_answer where userId=? && menuId = ?";
+    	try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setInt(1, userId);
+			ps.setInt(2, menuId);
+			ResultSet rs = ps.executeQuery();
+			return rs.next(); 
+    	}catch (SQLException e) {
+            e.printStackTrace();
+        }
+    	return false;
     }
 }
