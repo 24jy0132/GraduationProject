@@ -8,7 +8,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
+import dao.SurveyAnswerDao;
+import model.Customer;
 import model.Menu;      // ✅ correct
 import service.MenuService;
 
@@ -18,21 +21,39 @@ public class SurveyServlet extends HttpServlet {
    
     public SurveyServlet() {
         super();
-        // TODO Auto-generated constructor stub
+       
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		HttpSession session = request.getSession();
+		Customer customer = (Customer)session.getAttribute("customer");
+		SurveyAnswerDao sad = new SurveyAnswerDao();
 		int menuId =Integer.parseInt(request.getParameter("menuId"));
 		
-		MenuService menuservice = new MenuService();
-		Menu menu = menuservice.getMenuById(menuId);
+		if(customer == null) {
+			response.sendRedirect("login_required.jsp");
+			
+		}else if(sad.alreadyAnswered(customer.getUserId(), menuId)){
+			response.sendRedirect("alreadyAnswered.jsp");
+		}else {
+			MenuService menuservice = new MenuService();
+			Menu menu = menuservice.getMenuById(menuId);
+			
+			request.setAttribute("menu", menu);
+			
+			RequestDispatcher rd = request.getRequestDispatcher("/survey.jsp");
+	        rd.forward(request, response);
+		}
 		
-		request.setAttribute("menu", menu);
 		
-		RequestDispatcher rd = request.getRequestDispatcher("/survey.jsp");
-        rd.forward(request, response);
+		
+		
+		
+		
+		
+		
+		
+		
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
