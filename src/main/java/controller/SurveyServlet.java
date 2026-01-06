@@ -33,6 +33,7 @@ public class SurveyServlet extends HttpServlet {
 		if(customer == null) {
 			response.sendRedirect("login_required.jsp");
 			
+			
 		}else if(sad.alreadyAnswered(customer.getUserId(), menuId)){
 			response.sendRedirect("alreadyAnswered.jsp");
 		}else {

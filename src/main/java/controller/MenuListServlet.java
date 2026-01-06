@@ -45,6 +45,7 @@ public class MenuListServlet extends HttpServlet {
 		request.setAttribute("drinks", drinks);
 
 		RequestDispatcher rd = request.getRequestDispatcher("/Menulist.jsp");
+
 		rd.forward(request, response);
 		
 		

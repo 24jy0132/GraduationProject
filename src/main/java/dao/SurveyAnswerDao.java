@@ -5,6 +5,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import model.Menu;
 
 public class SurveyAnswerDao {
     private Connection con = null;
@@ -78,5 +84,35 @@ public class SurveyAnswerDao {
             e.printStackTrace();
         }
     	return false;
+    }
+    
+    public void addPoints(int userId) {
+    	String sql = "update customers set point=point+10 where userId = ?";
+    	try(PreparedStatement ps = con.prepareStatement(sql)){
+    		ps.setInt(1, userId);
+    		ps.executeUpdate();
+    	}catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public Map<String,Integer> getTasteSummaryForMenus(int menuId ,int questionId) {
+		Map<String,Integer> map = new LinkedHashMap<>();
+
+    	String sql = "select answerText,count(*)as cnt from survey_answer where menuId=? and questionId =? group by answerText order by cnt desc";
+    	try(PreparedStatement ps = con.prepareStatement(sql)){
+    		ps.setInt(1, menuId);
+    		ps.setInt(2, questionId);
+    		ResultSet rs = ps.executeQuery();
+    		
+    		while (rs.next()) {
+    			map.put(rs.getString("answerText"),rs.getInt("cnt"));
+    		}
+    	}catch (SQLException e) {
+            e.printStackTrace();
+        }
+    	return map;
+    			
+    	
     }
 }

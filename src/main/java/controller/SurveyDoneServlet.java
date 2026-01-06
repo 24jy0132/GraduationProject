@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpSession;
 
 import dao.SurveyAnswerDao;
 import model.Customer;
+import service.SurveyService;
 
 @WebServlet("/SurveyDoneServlet")
 public class SurveyDoneServlet extends HttpServlet {
@@ -37,10 +38,9 @@ public class SurveyDoneServlet extends HttpServlet {
         Customer customer = (Customer)session.getAttribute("customer"); // ★ test user (later: from session after login)
         int userId = customer.getUserId();
         
-        SurveyAnswerDao dao = new SurveyAnswerDao();
-        dao.insertAnswers(surveyId, menuId, userId, taste, volume, price, comment);
-        dao.connectionClose();
-
+        SurveyService service= new SurveyService();
+        service.submitSurvey(surveyId, menuId, userId, taste, volume, price, comment);
+        
         response.sendRedirect("SurveyDone.jsp");
     }
 

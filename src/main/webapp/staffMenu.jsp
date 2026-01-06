@@ -11,12 +11,12 @@ List<Menu> saladSoup = (List<Menu>) request.getAttribute("saladSoup");
 List<Menu> drinks = (List<Menu>) request.getAttribute("drinks");
 %>
 
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>メニュー一覧</title>
-
+<title>Insert title here</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
@@ -29,10 +29,28 @@ List<Menu> drinks = (List<Menu>) request.getAttribute("drinks");
     height: 80px;
     object-fit: cover;
   }
+  
 </style>
-
 </head>
 <body>
+<!-- ===== Header (管理TOP / ログアウト) ===== -->
+<div class="container-fluid py-3 border-bottom">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="fw-bold fs-4">
+      MHP株式会社　営業サポートシステム
+    </div>
+
+    <div class="d-flex gap-2">
+      <a href="" class="btn btn-outline-secondary btn-sm">管理TOP</a>
+      <a href="" class="btn btn-outline-secondary btn-sm">ログアウト</a>
+    </div>
+  </div>
+
+  <div class="fw-bold fs-5 mt-2">メニュー管理</div>
+</div>
+
+
+<button type="button">メニューを編集する</button>
 
 <div class="container py-4">
 
@@ -53,21 +71,6 @@ List<Menu> drinks = (List<Menu>) request.getAttribute("drinks");
           <img src="<%= sm.getImagePath() %>" class="card-img-top" alt="">
           <div class="card-body p-2">
             <div class="fw-bold small"><%= sm.getMenuName() %></div>
-            
-            <%
-Map<Integer, Map<String,Integer>> tasteSummaryByMenu =
-    (Map<Integer, Map<String,Integer>>) request.getAttribute("tasteSummaryByMenu");
-
-Map<String,Integer> tasteMap = tasteSummaryByMenu.get(sm.getMenuId());
-if (tasteMap != null) {
-    for (Map.Entry<String,Integer> entry : tasteMap.entrySet()) {
-%>
-    <small class="text-muted d-block"><%= entry.getKey() %> × <%= entry.getValue() %></small>
-<%
-    }
-}
-%>
-
             <div class="menu-desc"><%= sm.getDescription() %></div>
             <div class="fw-bold mt-1">¥<%= sm.getPrice() %></div>
             <a class="small link-primary"
@@ -204,7 +207,8 @@ if (tasteMap != null) {
   </div>
 
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>

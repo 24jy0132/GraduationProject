@@ -21,7 +21,7 @@ Customer customer = (Customer) session.getAttribute("customer");
  if (customer != null) {
  %> <span class="user-card"> <span class="user-avatar"><i
 							class="fa-solid fa-user"></i> <span><%=customer.getName()%></span> </span>
-							<span style="font-size: x-small"><%=customer.getPoint()%>point</span>
+							<span style="font-size: x-small"><%=customer.getPoint()%>points</span>
 
 
 

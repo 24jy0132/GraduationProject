@@ -40,6 +40,7 @@ public class CustomerDao {
 	            c.setName(rs.getString("name"));
 	            c.setEmail(rs.getString("email"));
 	            c.setPassword(rs.getString("password"));
+	            c.setPoint(rs.getInt("point"));
 	            System.out.println("User found: " + c.getEmail());
 	            return c;
 	        } else {
