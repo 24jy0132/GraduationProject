@@ -18,13 +18,13 @@ import java.util.Map;
  * Servlet implementation class StaffMenuListServlet
  */
 @WebServlet("/StaffMenuListServlet")
-public class StaffMenuListServlet extends HttpServlet {
+public class AdminMenuListServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public StaffMenuListServlet() {
+    public AdminMenuListServlet() {
         super();
         // TODO Auto-generated constructor stub
     }

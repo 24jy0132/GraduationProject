@@ -55,4 +55,10 @@ public class MenuService {
 		List<Menu>list = dao.findDrinks();
 		return list;
 	}
+	
+	public void insertNewMenu(String menuName,String description,int price,String category,String imagePath,int isSurveyTarget,int surveyId,int isNew) {
+		MenuDao dao = new MenuDao();
+		dao.insertNewMenu(menuName,description,price,category,imagePath,isSurveyTarget,surveyId,isNew);
+		
+	}
 }

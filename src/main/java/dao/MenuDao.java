@@ -248,4 +248,14 @@ public class MenuDao {
 		}
 		return ar;
 	}
+	
+	public void insertNewMenu(String menuName,String description,int price,String category,String imagePath,int isSurveyTarget,int surveyId,int isNew) {
+		String sql = "insert into menu(menuName,description,price,category,imagePath,isSurveyTarget,surveyId,isNew) "
+				+ "values (menuName,description,price,category,imagePath,isSurveyTarget,surveyId,isNew)";
+		try(PreparedStatement state = con.prepareStatement(sql)){
+			state.executeQuery();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

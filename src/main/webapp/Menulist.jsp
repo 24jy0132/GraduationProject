@@ -29,10 +29,14 @@ Map<Integer, Map<String,Integer>> tasteSummary =
   color: #777;
   line-height: 1.3;
 }
-.menu-card img {
-  height: 80px;
+.menu-card img{
+  width: 100%;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
+  border-radius: 10px;
 }
+
+
 .review-wrap {
   margin: 4px 0;
 }
@@ -111,7 +115,7 @@ if (surveyMenus != null) {
 }
 %>
 </div>
-
+<hr>
 <!-- ================= New ================= -->
 <h4 class="fw-bold mb-3">新商品 <span class="badge bg-primary">NEW</span></h4>
 <div class="row g-3 mb-5">
@@ -134,7 +138,7 @@ if (newMenus != null) {
 }
 %>
 </div>
-
+<hr>
 <!-- ================= Main ================= -->
 <h4 class="fw-bold mb-3">メイン商品</h4>
 <div class="row g-3 mb-5">
@@ -157,7 +161,7 @@ if (mainMenus != null) {
 }
 %>
 </div>
-
+<hr>
 <!-- ================= Ala Carte ================= -->
 <h4 class="fw-bold mb-3">アラカルト</h4>
 <div class="row g-3 mb-5">
@@ -180,7 +184,7 @@ if (alaCarteMenus != null) {
 }
 %>
 </div>
-
+<hr>
 <!-- ================= Salad / Soup ================= -->
 <h4 class="fw-bold mb-3">サラダ・スープ・その他</h4>
 <div class="row g-3 mb-5">
@@ -204,7 +208,7 @@ if (saladSoup != null) {
 }
 %>
 </div>
-
+<hr>
 <!-- ================= Drinks ================= -->
 <h4 class="fw-bold mb-3">ドリンク商品</h4>
 <div class="row g-3 mb-5">

@@ -26,9 +26,11 @@ List<Menu> drinks = (List<Menu>) request.getAttribute("drinks");
     line-height: 1.3;
   }
   .menu-card img{
-    height: 80px;
-    object-fit: cover;
-  }
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 10px;
+}
   
 </style>
 </head>
