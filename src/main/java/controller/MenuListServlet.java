@@ -2,6 +2,7 @@ package controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import model.Menu;
 import service.MenuService;
+import service.SurveyService;
 
 @WebServlet("/MenuListServlet")
 public class MenuListServlet extends HttpServlet {
@@ -35,7 +37,7 @@ public class MenuListServlet extends HttpServlet {
 		List<Menu> saladSoup = menuservice.getSaladSoup();
 		List<Menu> drinks = menuservice.getDrinks();
 
-		
+
 		request.setAttribute("menus", menus);
 		request.setAttribute("surveyMenus", surveyMenus);
 		request.setAttribute("newMenus", newMenus);
@@ -43,6 +45,11 @@ public class MenuListServlet extends HttpServlet {
 		request.setAttribute("alaCarteMenus", alaCarteMenus);
 		request.setAttribute("saladSoup", saladSoup);
 		request.setAttribute("drinks", drinks);
+		
+		 SurveyService surveyService = new SurveyService();
+		 Map<Integer, Map<String, Integer>> tasteSummary = surveyService.getTasteSummaryForMenus(surveyMenus);
+		 
+		 request.setAttribute("tasteSummary",tasteSummary );
 
 		RequestDispatcher rd = request.getRequestDispatcher("/Menulist.jsp");
 
