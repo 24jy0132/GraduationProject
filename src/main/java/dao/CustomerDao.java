@@ -72,6 +72,53 @@ public class CustomerDao {
 		    }
 		    return null;
 	}
+	
+	public Customer findByEmailAndPhone(String email, String phone) {
+	    String sql = "SELECT * FROM customers WHERE email = ? AND phone = ?";
+	    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+	        ps.setString(1, email.trim());
+	        ps.setString(2, phone.trim());
+
+	        System.out.println("Executing SQL: email=[" + email + "] phone=[" + phone + "]");
+
+	        ResultSet rs = ps.executeQuery();
+	        if (rs.next()) {
+	            Customer c = new Customer();
+	            c.setUserId(rs.getInt("user_id"));
+	            c.setName(rs.getString("name"));
+	            c.setEmail(rs.getString("email"));
+	            c.setPhone(rs.getString("phone"));
+	            return c;
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+	
+	public Customer findById(int userId) {
+	    String sql = "SELECT * FROM customers WHERE user_id = ?";
+
+	    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+	        ps.setInt(1, userId);
+
+	        ResultSet rs = ps.executeQuery();
+	        if (rs.next()) {
+	            Customer c = new Customer();
+	            c.setUserId(rs.getInt("user_id"));
+	            c.setName(rs.getString("name"));
+	            c.setEmail(rs.getString("email"));
+	            c.setPhone(rs.getString("phone"));
+	            // パスワードは原則セットしない（必要な場合のみ）
+	            return c;
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+	
 	public int insert(Customer customer) {
 	    int result = 0;
 	    String sql = "INSERT INTO customers (name, nameKana, email, phone, password,point) VALUES (?, ?, ?, ?, ?,?)";
@@ -92,4 +139,18 @@ public class CustomerDao {
 
 	    return result;
 	}
+	
+	public void updatePassword(int userId, String hashedPassword) {
+	    String sql = "UPDATE customers SET password = ? WHERE user_id = ?";
+	    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+	        ps.setString(1, hashedPassword);
+	        ps.setInt(2, userId);
+	        ps.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+
+
 }
