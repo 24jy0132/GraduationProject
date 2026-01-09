@@ -55,6 +55,7 @@ public class AdminMenuEditServlet extends HttpServlet {
 		String description = request.getParameter("description");
 		String imagePath = request.getParameter("imagePath");
 		
+		
 		int isSurveyTarget = Integer.parseInt(request.getParameter("isSurveyTarget"));
 		int surveyId = 1;
 		int isNew = 1;
