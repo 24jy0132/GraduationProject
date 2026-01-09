@@ -6,12 +6,15 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Time;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,210 +23,594 @@ import service.Constants;
 
 public class ReservationDao {
 
-    private Connection con;
+	private static final String URL = "jdbc:mysql://127.0.0.1:3306/myrestaurant?serverTimezone=UTC";
 
-    public ReservationDao() {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+	private static final String USER = "root";
+	private static final String PASS = "shadowseeker";
 
-            con = DriverManager.getConnection(
-                "jdbc:mysql://10.64.144.5:3306/24jy0234"
-                + "?characterEncoding=UTF-8&serverTimezone=Asia/Tokyo",
-                "24jy0234",
-                "24jy0234"
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
+	static {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver"); // ✅ correct driver
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    public void close() {
-        try { if (con != null) con.close(); }
-        catch (SQLException e) { e.printStackTrace(); }
-    }
+	private Connection getConn() throws SQLException {
+		return DriverManager.getConnection(URL, USER, PASS);
+	}
 
-    // 🔴 AUTO ASSIGN TABLE (A/T/Z + 2-hour overlap check)
-    public String assignTable(LocalDate date, LocalTime start, int totalPeople)
-            throws SQLException {
+	// =========================
+	// AUTO ASSIGN TABLE
+	// =========================
+	public List<String> assignTables(
+			LocalDate date,
+			LocalTime start,
+			int totalPeople) throws SQLException {
 
-        LocalTime end = start.plusMinutes(Constants.DURATION_MINUTES);
+		LocalTime end = start.plusMinutes(Constants.DURATION_MINUTES);
 
-        String[] tables;
-        if (totalPeople <= 2)
-            tables = new String[]{"A1","A2"};
-        else if (totalPeople <= 4)
-            tables = new String[]{"T1","T2","T3","T4"};
-        else
-            tables = new String[]{"Z1","Z2","Z3","Z4"};
+		String[] candidates = totalPeople <= 2 ? new String[] { "A1", "A2" }
+				: totalPeople <= 4 ? new String[] { "T1", "T2", "T3", "T4" } : new String[] { "Z1", "Z2", "Z3", "Z4" };
 
-        for (String table : tables) {
-            String sql =
-              "SELECT COUNT(*) FROM reservations " +
-              "WHERE reservationDate=? AND tableId=? " +
-              "AND startTime < ? AND endTime > ?";
+		List<String> result = new ArrayList<>();
 
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setDate(1, Date.valueOf(date));
-            ps.setString(2, table);
-            ps.setTime(3, Time.valueOf(end));
-            ps.setTime(4, Time.valueOf(start));
+		for (String table : candidates) {
+			if (isTableAvailable(date, start, end, table)) {
+				result.add(table);
+				break; // customer can choose only ONE table
+			}
+		}
 
-            ResultSet rs = ps.executeQuery();
-            rs.next();
+		return result; // empty = 満席
+	}
 
-            if (rs.getInt(1) == 0) {
-                return table; // available
-            }
-        }
-        return null; // all tables full
-    }
+	public boolean areTablesAvailable(
+			LocalDate date,
+			LocalTime start,
+			LocalTime end,
+			String[] tableIds) throws SQLException {
 
-    // INSERT
-    public void insert(Reservation r) throws SQLException {
+		String sql = "SELECT COUNT(*) " +
+				"FROM reservation_table rt " +
+				"JOIN reservations r ON rt.reservationId = r.reservationId " +
+				"WHERE rt.table_id = ? " + // ✅ FIXED HERE
+				"AND r.reservationDate = ? " +
+				"AND r.startTime < ? " +
+				"AND r.endTime > ?";
 
-        r.setEndTime(
-            r.getStartTime().plusMinutes(Constants.DURATION_MINUTES)
-        );
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
 
-        String sql =
-          "INSERT INTO reservations " +
-          "(reservationDate,startTime,endTime,adultCount,childCount,tableId,customer_name,customerEmail) " +
-          "VALUES (?,?,?,?,?,?,?,?)";
+			for (String tableId : tableIds) {
 
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setDate(1, Date.valueOf(r.getReservationDate()));
-        ps.setTime(2, Time.valueOf(r.getStartTime()));
-        ps.setTime(3, Time.valueOf(r.getEndTime()));
-        ps.setInt(4, r.getAdultCount());
-        ps.setInt(5, r.getChildCount());
-        ps.setString(6, r.getTableId());
-        ps.setString(7, r.getCustomerName());
-        ps.setString(8, r.getCustomerEmail());
+				ps.setString(1, tableId);
+				ps.setDate(2, Date.valueOf(date));
+				ps.setTime(3, Time.valueOf(end));
+				ps.setTime(4, Time.valueOf(start));
 
-        ps.executeUpdate();
-    }
+				ResultSet rs = ps.executeQuery();
+				rs.next();
 
-    public Map<LocalDate,Integer> countByMonth(YearMonth ym) {
-        Map<LocalDate,Integer> map = new HashMap<>();
+				if (rs.getInt(1) > 0) {
+					return false; // ❌ at least one table busy
+				}
+			}
+		}
 
-        String sql =
-          "SELECT reservationDate, COUNT(*) cnt " +
-          "FROM reservations " +
-          "WHERE reservationDate BETWEEN ? AND ? " +
-          "GROUP BY reservationDate";
+		return true; // ✅ all tables free
+	}
 
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setDate(1, java.sql.Date.valueOf(ym.atDay(1)));
-            ps.setDate(2, java.sql.Date.valueOf(ym.atEndOfMonth()));
+	public boolean isTableAvailable(
+			LocalDate date,
+			LocalTime start,
+			LocalTime end,
+			String tableId) throws SQLException {
 
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                map.put(
-                    rs.getDate("reservationDate").toLocalDate(),
-                    rs.getInt("cnt")
-                );
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return map;
-    }
-    
-    public List<Reservation> findByDate(LocalDate date) {
-        List<Reservation> list = new ArrayList<>();
+		String sql = "SELECT COUNT(*) " +
+				"FROM reservations r " +
+				"JOIN reservation_table rt " +
+				"ON r.reservationId = rt.reservationId " +
+				"WHERE r.reservationDate = ? " +
+				"AND rt.table_id = ? " +
+				"AND r.startTime < ? " +
+				"AND r.endTime > ? " +
+				"AND r.status IN ('RESERVED', 'CONFIRMED')";
 
-        String sql =
-          "SELECT * FROM reservations " +
-          "WHERE reservationDate = ? " +
-          "ORDER BY tableId, startTime";
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
 
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setDate(1, java.sql.Date.valueOf(date));
-            ResultSet rs = ps.executeQuery();
+			ps.setDate(1, Date.valueOf(date));
+			ps.setString(2, tableId);
+			ps.setTime(3, Time.valueOf(end));
+			ps.setTime(4, Time.valueOf(start));
 
-            while (rs.next()) {
-                Reservation r = new Reservation();
-                r.setReservationId(rs.getInt("reservationId"));
-                r.setReservationDate(rs.getDate("reservationDate").toLocalDate());
-                r.setStartTime(rs.getTime("startTime").toLocalTime());
-                r.setEndTime(rs.getTime("endTime").toLocalTime());
-                r.setTableId(rs.getString("tableId"));
-                r.setCustomerName(rs.getString("customer_name"));
-                r.setAdultCount(rs.getInt("adultCount"));
-                r.setChildCount(rs.getInt("childCount"));
-                list.add(r);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-    
-    public List<Reservation> findAll() {
+			ResultSet rs = ps.executeQuery();
+			rs.next();
+			return rs.getInt(1) == 0;
+		}
+	}
 
-        List<Reservation> list = new ArrayList<>();
+	public void insertCustomerReservation(Reservation r) throws SQLException {
 
-        String sql = """
-            SELECT *
-            FROM reservations
-            ORDER BY reservationDate, startTime
-        """;
+		Connection con = getConn();
 
-        try (PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+		try {
+			con.setAutoCommit(false); // 🔴 START TRANSACTION
 
-            while (rs.next()) {
-                Reservation r = new Reservation();
+			// =========================
+			// 1️⃣ LOCK (double booking)
+			// =========================
+			String lockSql = "SELECT 1 FROM reservation_table rt " +
+					"JOIN reservations r ON r.reservationId = rt.reservationId " +
+					"WHERE rt.table_id = ? " +
+					"AND r.reservationDate = ? " +
+					"AND r.startTime < ? " +
+					"AND r.endTime > ? " +
+					"AND r.status NOT IN ('FINISHED','CANCELLED') " +
+					"FOR UPDATE";
 
-                r.setReservationId(rs.getInt("reservationId"));
-                r.setReservationDate(rs.getDate("reservationDate").toLocalDate());
-                r.setStartTime(rs.getTime("startTime").toLocalTime());
-                r.setEndTime(rs.getTime("endTime").toLocalTime());
-                r.setTableId(rs.getString("tableId"));
-                r.setCustomerName(rs.getString("customer_name"));
-                list.add(r);
-            }
+			try (PreparedStatement lockPs = con.prepareStatement(lockSql)) {
+				for (String tableId : r.getTableIds()) {
+					lockPs.setString(1, tableId);
+					lockPs.setDate(2, Date.valueOf(r.getReservationDate()));
+					lockPs.setTime(3, Time.valueOf(r.getEndTime()));
+					lockPs.setTime(4, Time.valueOf(r.getStartTime()));
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+					try (ResultSet rs = lockPs.executeQuery()) {
+						if (rs.next()) {
+							throw new SQLException("選択した席は既に予約されています");
+						}
+					}
+				}
+			}
 
-        return list;
-    }
-    
-    public List<Reservation> findByDatelist(LocalDate date) {
-        List<Reservation> list = new ArrayList<>();
+			// =========================
+			// 2️⃣ INSERT reservations
+			// =========================
+			String insertReservationSql = "INSERT INTO reservations " +
+					"(customerId, reservationDate, startTime, endTime, adultCount, childCount, " +
+					"reservationType, courseId, customerEmail, customer_name, status) " +
+					"VALUES (?,?,?,?,?,?,?,?,?,?, 'RESERVED')";
 
-        String sql = """
-            SELECT *
-            FROM reservations
-            WHERE reservationDate = ?
-            ORDER BY startTime
-        """;
+			int reservationId;
 
-        try (
-             PreparedStatement ps = con.prepareStatement(sql)) {
+			try (PreparedStatement ps = con.prepareStatement(insertReservationSql, Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setDate(1, java.sql.Date.valueOf(date));
-            ResultSet rs = ps.executeQuery();
+				// ✅ FIX: customerId NULL-safe
+				if (r.getCustomerId() != null) {
+					ps.setInt(1, r.getCustomerId());
+				} else {
+					ps.setNull(1, Types.INTEGER);
+				}
 
-            while (rs.next()) {
-                Reservation r = new Reservation();
-                r.setReservationId(rs.getInt("reservationId"));
-                r.setReservationDate(rs.getDate("reservationDate").toLocalDate());
-                r.setStartTime(rs.getTime("startTime").toLocalTime());
-                r.setEndTime(rs.getTime("endTime").toLocalTime());
-                r.setTableId(rs.getString("tableId"));
-                r.setCustomerName(rs.getString("customer_name"));
-                r.setAdultCount(rs.getInt("adultCount"));
-                r.setChildCount(rs.getInt("childCount"));
-                list.add(r);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
+				ps.setDate(2, Date.valueOf(r.getReservationDate()));
+				ps.setTime(3, Time.valueOf(r.getStartTime()));
+				ps.setTime(4, Time.valueOf(r.getEndTime()));
+				ps.setInt(5, r.getAdultCount());
+				ps.setInt(6, r.getChildCount());
+				ps.setString(7, r.getReservationType());
+
+				if (r.getCourseId() != null) {
+					ps.setInt(8, r.getCourseId());
+				} else {
+					ps.setNull(8, Types.INTEGER);
+				}
+
+				ps.setString(9, r.getCustomerEmail());
+				ps.setString(10, r.getCustomerName());
+
+				ps.executeUpdate();
+
+				try (ResultSet keys = ps.getGeneratedKeys()) {
+					keys.next();
+					reservationId = keys.getInt(1);
+				}
+			}
+
+			// =========================
+			// 3️⃣ INSERT reservation_table
+			// =========================
+			String insertTableSql = "INSERT INTO reservation_table (reservationId, table_id) VALUES (?,?)";
+
+			try (PreparedStatement ps = con.prepareStatement(insertTableSql)) {
+				for (String tableId : r.getTableIds()) {
+					ps.setInt(1, reservationId);
+					ps.setString(2, tableId);
+					ps.addBatch();
+				}
+				ps.executeBatch();
+			}
+
+			// =========================
+			// 4️⃣ COMMIT
+			// =========================
+			con.commit();
+
+		} catch (Exception e) {
+			con.rollback(); // 🔴 FULL ROLLBACK
+			throw e;
+		} finally {
+			con.setAutoCommit(true);
+			con.close();
+		}
+	}
+
+	public void insertWithTables(Reservation r, String[] tableIds) throws SQLException {
+
+		String sqlRes = "INSERT INTO reservations (reservationDate,startTime,endTime," +
+				"adultCount,childCount,customer_name,customerEmail,status) " +
+				"VALUES (?,?,?,?,?,?,?,?)";
+
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sqlRes, Statement.RETURN_GENERATED_KEYS)) {
+
+			ps.setDate(1, Date.valueOf(r.getReservationDate()));
+			ps.setTime(2, Time.valueOf(r.getStartTime()));
+			ps.setTime(3, Time.valueOf(r.getEndTime()));
+			ps.setInt(4, r.getAdultCount());
+			ps.setInt(5, r.getChildCount());
+			ps.setString(6, r.getCustomerName());
+			ps.setString(7, r.getCustomerEmail());
+			ps.setString(8, r.getStatus());
+
+			ps.executeUpdate();
+
+			ResultSet rs = ps.getGeneratedKeys();
+			rs.next();
+			int reservationId = rs.getInt(1);
+
+			String sqlTable = "INSERT INTO reservation_table (reservationId, table_id) VALUES (?, ?)";
+
+			try (PreparedStatement ps2 = con.prepareStatement(sqlTable)) {
+				for (String t : tableIds) {
+					ps2.setInt(1, reservationId);
+					ps2.setString(2, t);
+					ps2.addBatch();
+				}
+				ps2.executeBatch();
+			}
+		}
+	}
+
+	public void insertWithTables(Reservation r) throws SQLException {
+
+		String sqlReservation = "INSERT INTO reservations " +
+				"(reservationDate,startTime,endTime,adultCount,childCount,customer_name,customerEmail,status) " +
+				"VALUES (?,?,?,?,?,?,?,?)";
+
+		String sqlTable = "INSERT INTO reservation_table (reservationId, table_id) VALUES (?,?)";
+
+		try (Connection con = getConn()) {
+			con.setAutoCommit(false);
+
+			// insert reservation
+			try (PreparedStatement ps = con.prepareStatement(sqlReservation, Statement.RETURN_GENERATED_KEYS)) {
+
+				ps.setDate(1, Date.valueOf(r.getReservationDate()));
+				ps.setTime(2, Time.valueOf(r.getStartTime()));
+				ps.setTime(3, Time.valueOf(r.getEndTime()));
+				ps.setInt(4, r.getAdultCount());
+				ps.setInt(5, r.getChildCount());
+				ps.setString(6, r.getCustomerName());
+				ps.setString(7, r.getCustomerEmail());
+				ps.setString(8, r.getStatus());
+
+				ps.executeUpdate();
+
+				ResultSet rs = ps.getGeneratedKeys();
+				rs.next();
+				r.setReservationId(rs.getInt(1));
+			}
+
+			// insert tables
+			try (PreparedStatement ps2 = con.prepareStatement(sqlTable)) {
+				for (String t : r.getTableIds()) {
+					ps2.setInt(1, r.getReservationId());
+					ps2.setString(2, t);
+					ps2.addBatch();
+				}
+				ps2.executeBatch();
+			}
+
+			con.commit();
+		}
+	}
+
+	public List<Reservation> findByDate(LocalDate date) {
+
+		Map<Integer, Reservation> map = new LinkedHashMap<>();
+
+		String sql = "SELECT r.*, rt.table_id " +
+				"FROM reservations r " +
+				"JOIN reservation_table rt ON r.reservationId = rt.reservationId " +
+				"WHERE r.reservationDate = ?";
+
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setDate(1, Date.valueOf(date));
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				int id = rs.getInt("reservationId");
+
+				Reservation r = map.get(id);
+				if (r == null) {
+					r = map(rs); // your existing mapper
+					r.setTableIds(new ArrayList<>());
+					map.put(id, r);
+				}
+				r.getTableIds().add(rs.getString("table_id"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return new ArrayList<>(map.values());
+	}
+
+	public Reservation findById(int id) {
+
+		Reservation r = null;
+
+		String sql = "SELECT r.*, rt.table_id " +
+				"FROM reservations r " +
+				"LEFT JOIN reservation_table rt " +
+				"ON r.reservationId = rt.reservationId " +
+				"WHERE r.reservationId = ?";
+
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				if (r == null) {
+					r = map(rs);
+					r.setTableIds(new ArrayList<>());
+				}
+				String tableId = rs.getString("table_id");
+				if (tableId != null) {
+					r.getTableIds().add(tableId);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return r;
+	}
+
+	public List<Reservation> findAll() {
+
+		Map<Integer, Reservation> map = new LinkedHashMap<>();
+
+		String sql = "SELECT r.*, rt.table_id " +
+				"FROM reservations r " +
+				"LEFT JOIN reservation_table rt " +
+				"ON r.reservationId = rt.reservationId " +
+				"ORDER BY r.reservationDate DESC, r.startTime DESC";
+
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql);
+				ResultSet rs = ps.executeQuery()) {
+
+			while (rs.next()) {
+				int id = rs.getInt("reservationId");
+
+				Reservation r = map.get(id);
+				if (r == null) {
+					r = map(rs);
+					r.setTableIds(new ArrayList<>());
+					map.put(id, r);
+				}
+
+				String tableId = rs.getString("table_id");
+				if (tableId != null) {
+					r.getTableIds().add(tableId);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return new ArrayList<>(map.values());
+	}
+
+	// =========================
+	// FIND BY DATE (ADMIN DASH)
+	// =========================
+	public List<Reservation> findByDatelist(LocalDate date) {
+
+		Map<Integer, Reservation> map = new LinkedHashMap<>();
+
+		String sql = "SELECT r.*, rt.table_id " +
+				"FROM reservations r " +
+				"LEFT JOIN reservation_table rt " +
+				"ON r.reservationId = rt.reservationId " +
+				"WHERE r.reservationDate = ? " +
+				"ORDER BY r.startTime, rt.table_id";
+
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setDate(1, Date.valueOf(date));
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				int id = rs.getInt("reservationId");
+
+				Reservation r = map.get(id);
+				if (r == null) {
+					r = map(rs); // basic reservation info
+					r.setTableIds(new ArrayList<>());
+					map.put(id, r);
+				}
+
+				String tableId = rs.getString("table_id");
+				if (tableId != null) {
+					r.getTableIds().add(tableId);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return new ArrayList<>(map.values());
+	}
+
+	// =========================
+	// COUNT BY MONTH
+	// =========================
+	public Map<LocalDate, Integer> countByMonth(YearMonth ym) {
+
+		Map<LocalDate, Integer> map = new HashMap<>();
+
+		String sql = "SELECT reservationDate, COUNT(*) cnt " +
+				"FROM reservations " +
+				"WHERE reservationDate BETWEEN ? AND ? " +
+				"GROUP BY reservationDate";
+
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setDate(1, Date.valueOf(ym.atDay(1)));
+			ps.setDate(2, Date.valueOf(ym.atEndOfMonth()));
+
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				map.put(
+						rs.getDate("reservationDate").toLocalDate(),
+						rs.getInt("cnt"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return map;
+	}
+
+	// =========================
+	// UPDATE (ADMIN EDIT)
+	// =========================
+	public void update(Reservation r) {
+
+		String sqlUpdate = "UPDATE reservations SET " +
+				"reservationDate=?, startTime=?, endTime=?, " +
+				"adultCount=?, childCount=?, customer_name=?, customerEmail=? " +
+				"WHERE reservationId=?";
+
+		String sqlDeleteTables = "DELETE FROM reservation_table WHERE reservationId=?";
+
+		String sqlInsertTable = "INSERT INTO reservation_table (reservationId, table_id) VALUES (?, ?)";
+
+		try (Connection con = getConn()) {
+
+			con.setAutoCommit(false);
+
+			// 1️⃣ update reservation
+			try (PreparedStatement ps = con.prepareStatement(sqlUpdate)) {
+
+				ps.setDate(1, Date.valueOf(r.getReservationDate()));
+				ps.setTime(2, Time.valueOf(r.getStartTime()));
+				ps.setTime(3, Time.valueOf(r.getEndTime()));
+				ps.setInt(4, r.getAdultCount());
+				ps.setInt(5, r.getChildCount());
+				ps.setString(6, r.getCustomerName());
+				ps.setString(7, r.getCustomerEmail());
+				ps.setInt(8, r.getReservationId());
+
+				ps.executeUpdate();
+			}
+
+			// 2️⃣ delete old tables
+			try (PreparedStatement ps = con.prepareStatement(sqlDeleteTables)) {
+				ps.setInt(1, r.getReservationId());
+				ps.executeUpdate();
+			}
+
+			// 3️⃣ insert new tables (single OR multiple)
+			try (PreparedStatement ps = con.prepareStatement(sqlInsertTable)) {
+				for (String tableId : r.getTableIds()) {
+					ps.setInt(1, r.getReservationId());
+					ps.setString(2, tableId);
+					ps.addBatch();
+				}
+				ps.executeBatch();
+			}
+
+			con.commit();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void updateStatus(int id, String status) {
+
+		String sql = "UPDATE reservations SET status=? WHERE reservationId=?";
+
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setString(1, status);
+			ps.setInt(2, id);
+			ps.executeUpdate();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// =========================
+	// DELETE (ADMIN)
+	// =========================
+	public void delete(int reservationId) {
+
+		String sql1 = "DELETE FROM reservation_table WHERE reservationId = ?";
+		String sql2 = "DELETE FROM reservations WHERE reservationId = ?";
+
+		try (Connection con = getConn()) {
+
+			con.setAutoCommit(false); // transaction
+
+			try (PreparedStatement ps1 = con.prepareStatement(sql1);
+					PreparedStatement ps2 = con.prepareStatement(sql2)) {
+
+				ps1.setInt(1, reservationId);
+				ps1.executeUpdate();
+
+				ps2.setInt(1, reservationId);
+				ps2.executeUpdate();
+
+				con.commit();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// =========================
+	// MAPPER
+	// =========================
+	private Reservation map(ResultSet rs) throws SQLException {
+		Reservation r = new Reservation();
+		r.setReservationId(rs.getInt("reservationId"));
+		r.setReservationDate(rs.getDate("reservationDate").toLocalDate());
+		r.setStartTime(rs.getTime("startTime").toLocalTime());
+		r.setEndTime(rs.getTime("endTime").toLocalTime());
+		r.setCustomerName(rs.getString("customer_name"));
+		r.setAdultCount(rs.getInt("adultCount"));
+		r.setChildCount(rs.getInt("childCount"));
+		r.setStatus(rs.getString("status"));
+		r.setCustomerName(rs.getString("customer_name"));
+		r.setCustomerEmail(rs.getString("customerEmail"));
+		return r;
+	}
 
 }

@@ -14,10 +14,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import dao.ReservationDao;
 import model.Reservation;
+
 @WebServlet("/admin")
 public class AdminServlet extends HttpServlet {
 
-    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -28,19 +28,15 @@ public class AdminServlet extends HttpServlet {
         LocalDate selectedDate;
         YearMonth ym;
 
-        // 1️⃣ year + month dropdown
         if (yearParam != null && monthParam != null) {
-            int y = Integer.parseInt(yearParam);
-            int m = Integer.parseInt(monthParam);
-            ym = YearMonth.of(y, m);
+            ym = YearMonth.of(Integer.parseInt(yearParam),
+                              Integer.parseInt(monthParam));
             selectedDate = ym.atDay(1);
         }
-        // 2️⃣ calendar click
         else if (dateParam != null) {
             selectedDate = LocalDate.parse(dateParam);
             ym = YearMonth.from(selectedDate);
         }
-        // 3️⃣ default
         else {
             selectedDate = LocalDate.now();
             ym = YearMonth.from(selectedDate);
@@ -48,7 +44,7 @@ public class AdminServlet extends HttpServlet {
 
         ReservationDao dao = new ReservationDao();
 
-        List<Reservation> list = dao.findByDate(selectedDate);
+        List<Reservation> list = dao.findByDatelist(selectedDate);
         Map<LocalDate,Integer> monthCount = dao.countByMonth(ym);
 
         request.setAttribute("date", selectedDate);

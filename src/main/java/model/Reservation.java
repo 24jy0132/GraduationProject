@@ -2,6 +2,8 @@ package model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Reservation {
 
@@ -13,8 +15,36 @@ public class Reservation {
     private int adultCount;
     private int childCount;
     private String tableId;
+    private String status;
+    private Integer customerId;
+    private String reservationType; // SEAT_ONLY or COURSE
+    private Integer courseId;        // nullable
 
-    private String customerName;
+    public String getReservationType() {
+		return reservationType;
+	}
+	public void setReservationType(String reservationType) {
+		this.reservationType = reservationType;
+	}
+	public Integer getCourseId() {
+		return courseId;
+	}
+	public void setCourseId(Integer courseId) {
+		this.courseId = courseId;
+	}
+	public Integer getCustomerId() {
+		return customerId;
+	}
+	public void setCustomerId(Integer customerId) {
+		this.customerId = customerId;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	private String customerName;
     private String customerEmail;
 
     // getters & setters
@@ -44,4 +74,13 @@ public class Reservation {
 
     public String getCustomerEmail() { return customerEmail; }
     public void setCustomerEmail(String customerEmail) { this.customerEmail = customerEmail; }
+    
+    private List<String> tableIds = new ArrayList<>();
+
+	public List<String> getTableIds() {
+		return tableIds;
+	}
+	public void setTableIds(List<String> tableIds) {
+		this.tableIds = tableIds;
+	}
 }

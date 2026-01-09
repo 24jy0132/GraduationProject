@@ -51,7 +51,9 @@ public class Adminloginpageservlet extends HttpServlet {
 		HttpSession session = request.getSession();
 		if (staff != null && "admin".equalsIgnoreCase(staff.getStaffType())) {
 			session.setAttribute("admin", staff);
-			request.getRequestDispatcher("/Admin/adminhome.jsp").forward(request, response);
+			 response.sendRedirect(
+			            request.getContextPath() + "/Admin/adminhome.jsp"
+			        );
 		} else {
 			request.setAttribute("error", "Invalid login");
 			request.getRequestDispatcher("/Admin/adminlogin.jsp").forward(request, response);

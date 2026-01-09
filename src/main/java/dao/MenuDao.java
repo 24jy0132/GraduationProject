@@ -23,8 +23,9 @@ public class MenuDao {
 		}
 
 		try {
-			con = DriverManager.getConnection("jdbc:mysql://10.64.144.5:3306/" + "24jy0234?characterEncoding=UTF-8",
-					"24jy0234", "24jy0234");
+			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/" + "myrestaurant?characterEncoding=UTF-8",
+					"root", "shadowseeker");
+
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -248,4 +249,46 @@ public class MenuDao {
 		}
 		return ar;
 	}
+	
+	public List<Menu> findCourses() throws SQLException {
+
+	    String sql = "SELECT * FROM menu WHERE category = 'コース'";
+
+	    List<Menu> list = new ArrayList<>();
+
+	    try (
+	         PreparedStatement ps = con.prepareStatement(sql);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        while (rs.next()) {
+	            Menu m = new Menu();
+	            m.setMenuId(rs.getInt("menuId"));
+	            m.setMenuName(rs.getString("menuName"));
+	            m.setPrice(rs.getInt("price"));
+	            m.setDescription(rs.getString("description"));
+	            list.add(m);
+	        }
+	    }
+	    return list;
+	}
+	public Menu findById1(int menuId) throws SQLException {
+
+	    String sql = "SELECT menuId, menuName, price FROM menu WHERE menuId = ?";
+	    try (
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+
+	        ps.setInt(1, menuId);
+
+	        ResultSet rs = ps.executeQuery();
+	        if (rs.next()) {
+	            Menu m = new Menu();
+	            m.setMenuId(rs.getInt("menuId"));
+	            m.setMenuName(rs.getString("menuName"));
+	            m.setPrice(rs.getInt("price"));
+	            return m;
+	        }
+	    }
+	    return null;
+	}
+
 }

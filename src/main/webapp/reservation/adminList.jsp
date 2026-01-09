@@ -227,7 +227,9 @@ List<Reservation> list = (List<Reservation>) request.getAttribute("list");
 
 					<td><%=r.getStartTime()%> – <%=r.getEndTime()%></td>
 
-					<td><span class="badge bg-secondary"> <%=r.getTableId()%>
+					<td><span class="badge bg-secondary"> <%=r.getTableIds() == null || r.getTableIds().isEmpty()
+		? "-"
+		: String.join(" + ", r.getTableIds())%>
 					</span></td>
 
 					<td><%=r.getCustomerName()%></td>

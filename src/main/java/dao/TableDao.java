@@ -58,4 +58,22 @@ public class TableDao {
         ps.setInt(1, tableId);
         ps.executeUpdate();
     }
+    
+    public boolean requestCheckout(String table_id) {
+
+        String sql = "UPDATE tables SET table_status = ? WHERE table_id = ?";
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, "会計依頼中");
+            ps.setString(2, table_id);
+
+            int result = ps.executeUpdate();
+            return result == 1; // 1件更新されたら成功
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

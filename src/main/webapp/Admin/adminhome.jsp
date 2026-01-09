@@ -126,7 +126,7 @@ h1 {
 </head>
 <body>
 	<div class="container-fluid">
-		<h1>MHP株式会社 営業サポートシステム</h1>
+		<h1 class="text-center">MHP株式会社 営業サポートシステム</h1>
 
 		<div class="container">
 			<div class="topcontainer">
