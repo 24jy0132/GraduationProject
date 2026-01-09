@@ -13,3 +13,6 @@ Thumbs.db
 
 # logs
 *.log
+
+# temp
+_tmp_jars/
