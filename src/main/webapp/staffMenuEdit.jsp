@@ -26,17 +26,23 @@
 </div>
 
 <h4>新規登録</h4>
+
 <form action="AdminMenuEditServlet" method="post">
 <label>メニュー名</label>
-<input type="text" name="menuName">
+<input type="text" name="menuName"> <br>
 <label>メニュージャンル</label>
-<input type="text" name="category">
+<input type="text" name="category"> <br>
 <label>値段</label>
-<input type="number" name="price">
+<input type="number" name="price"> <br>
 <label>メニュー説明</label>
-<input type="text" name="description">
+<input type="text" name="description"> <br>
 <label>メニュー画像</label>
-<input type="text" name="imagePath">
+<input type="text" name="imagePath"> <br>
+<label>アンケート対象</label><br>
+<input type="radio" name="isSurveyTarget" value="1">
+<label>する</label>
+<input type="radio" name ="isSurveyTarget" value="0">
+<label>しない</label>
 <button type="submit">登録</button>
 </form>
 

@@ -1,1 +1,15 @@
-/build/
+# Eclipse / workspace
+.metadata/
+.settings/
+.classpath
+.project
+
+# build output
+build/
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# logs
+*.log

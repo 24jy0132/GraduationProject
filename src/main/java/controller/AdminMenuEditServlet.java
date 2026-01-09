@@ -1,16 +1,17 @@
 package controller;
 
+import java.io.IOException;
+import java.util.List;
+
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import model.Menu;
 import service.MenuService;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Servlet implementation class AdminMenuServlet
@@ -53,7 +54,8 @@ public class AdminMenuEditServlet extends HttpServlet {
 		int price = Integer.parseInt(request.getParameter("price"));
 		String description = request.getParameter("description");
 		String imagePath = request.getParameter("imagePath");
-		int isSurveyTarget = 1;
+		
+		int isSurveyTarget = Integer.parseInt(request.getParameter("isSurveyTarget"));
 		int surveyId = 1;
 		int isNew = 1;
 		MenuService menuService = new MenuService();
