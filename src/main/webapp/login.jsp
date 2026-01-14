@@ -20,7 +20,7 @@
 			type="submit" value="login">
 
 	</form>
-	<a href="passwordResetForm.jsp">Forgot Password?</a>
+	<a href="passwordResetMailForm.jsp">Forgot Password?</a>
 	<br>
 	<a href="registerForm.jsp">Create Account?</a>
 </body>
