@@ -85,7 +85,7 @@ public class CustomerDao {
 	        ResultSet rs = ps.executeQuery();
 	        if (rs.next()) {
 	            Customer c = new Customer();
-	            c.setUserId(rs.getInt("user_id"));
+	            c.setUserId(rs.getInt("userId"));
 	            c.setName(rs.getString("name"));
 	            c.setEmail(rs.getString("email"));
 	            c.setPhone(rs.getString("phone"));
@@ -98,7 +98,7 @@ public class CustomerDao {
 	}
 	
 	public Customer findById(int userId) {
-	    String sql = "SELECT * FROM customers WHERE user_id = ?";
+	    String sql = "SELECT * FROM customers WHERE userId = ?";
 
 	    try (PreparedStatement ps = connection.prepareStatement(sql)) {
 	        ps.setInt(1, userId);
@@ -106,7 +106,7 @@ public class CustomerDao {
 	        ResultSet rs = ps.executeQuery();
 	        if (rs.next()) {
 	            Customer c = new Customer();
-	            c.setUserId(rs.getInt("user_id"));
+	            c.setUserId(rs.getInt("userId"));
 	            c.setName(rs.getString("name"));
 	            c.setEmail(rs.getString("email"));
 	            c.setPhone(rs.getString("phone"));
@@ -141,7 +141,7 @@ public class CustomerDao {
 	}
 	
 	public void updatePassword(int userId, String hashedPassword) {
-	    String sql = "UPDATE customers SET password = ? WHERE user_id = ?";
+	    String sql = "UPDATE customers SET password = ? WHERE user_Id = ?";
 	    try (PreparedStatement ps = connection.prepareStatement(sql)) {
 	        ps.setString(1, hashedPassword);
 	        ps.setInt(2, userId);

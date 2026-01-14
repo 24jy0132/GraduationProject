@@ -38,7 +38,7 @@ public class PasswordReset_MailSender {
         try {
             // --- 4. メールメッセージ作成 ---
             Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress("your_email@example.com", "サイト運営者")); // 送信元
+            msg.setFrom(new InternetAddress("t.h3733@gmail.com", "サイト運営者")); // 送信元
             msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to));        // 宛先
             msg.setSubject(subject);                                                    // 件名
             msg.setText(body);                                                          // 本文（プレーンテキスト）
