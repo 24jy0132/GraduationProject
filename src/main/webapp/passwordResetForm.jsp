@@ -5,7 +5,7 @@
 </head>
 <h2>パスワード再設定</h2>
 
-<form action="passwordReset" method="post">
+<form action="PasswordResetServlet" method="post">
     <!-- tokenを引き継ぐ -->
     <input type="hidden" name="token" value="${token}">
 

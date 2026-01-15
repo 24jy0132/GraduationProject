@@ -64,7 +64,7 @@ public class passwordResetMailServlet extends HttpServlet {
 	                + request.getServerName() + ":"
 	                + request.getServerPort()
 	                + request.getContextPath()
-	                + "/passwordResetForm?token=" + token;
+	                + "/PasswordResetFormServlet?token=" + token;
 
 	         //メール送信
 	        try {

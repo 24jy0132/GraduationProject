@@ -1,7 +1,7 @@
 <%@ include file="header.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<title>パスワード再設定メール送信完了画面</title>
+<title>パスワード再設定完了画面</title>
 </head>
 <body>
 
@@ -18,20 +18,14 @@
 		</nav>
 
 
-		<h1>パスワード再設定メール送信完了</h1>
+		<h1>パスワード再設定完了</h1>
 
-    <p>
-        <%= request.getAttribute("message") %>
-    </p>
+		
 
-    <p>
-        ※メールが届かない場合は、迷惑メールフォルダをご確認ください。<br>
-        しばらく待っても届かない場合は、再度お手続きを行ってください。
-    </p>
+		<p>パスワードの再設定が完了しました。ログイン画面からログインしてください。</p>
 
-    <a href="<%= request.getContextPath() %>/login.jsp" class="btn">
-        ログイン画面へ戻る
-    </a>
+		<a href="<%=request.getContextPath()%>/login.jsp" class="btn">
+			ログイン画面へ戻る </a>
 		<%@ include file="footer.jsp"%>
 	</div>
 

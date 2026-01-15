@@ -1,7 +1,7 @@
 <%@ include file="header.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<title>パスワード再設定メール送信完了画面</title>
+<title>パスワード再設定エラー画面</title>
 </head>
 <body>
 
@@ -18,15 +18,14 @@
 		</nav>
 
 
-		<h1>パスワード再設定メール送信完了</h1>
+		<h1>パスワード再設定に関するエラー</h1>
 
     <p>
-        <%= request.getAttribute("message") %>
+        <%= request.getAttribute("error") %>
     </p>
 
     <p>
-        ※メールが届かない場合は、迷惑メールフォルダをご確認ください。<br>
-        しばらく待っても届かない場合は、再度お手続きを行ってください。
+        ※ログイン画面から再度お手続きを行ってください。
     </p>
 
     <a href="<%= request.getContextPath() %>/login.jsp" class="btn">

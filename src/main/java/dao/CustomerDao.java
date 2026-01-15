@@ -141,7 +141,7 @@ public class CustomerDao {
 	}
 	
 	public void updatePassword(int userId, String hashedPassword) {
-	    String sql = "UPDATE customers SET password = ? WHERE user_Id = ?";
+	    String sql = "UPDATE customers SET password = ? WHERE userId = ?";
 	    try (PreparedStatement ps = connection.prepareStatement(sql)) {
 	        ps.setString(1, hashedPassword);
 	        ps.setInt(2, userId);

@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 
 import dao.CustomerDao;
 import model.Customer;
+import service.Registration_MailSender;
 
 /**
  * Servlet implementation class registerinsertionservlet
@@ -57,6 +58,17 @@ public class Registerinsertionservlet extends HttpServlet {
 		int result = dao.insert(temp);
 
 		if (result == 1) {
+			 // ★ メール送信処理を追加
+	        try {
+	        	Registration_MailSender.send(
+	                    temp.getEmail(),
+	                    temp.getName()
+	            );
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            // メール失敗しても登録は成功扱いにする
+	        }
+
 			session.removeAttribute("tempUser");
 			session.setAttribute("message", "Registered successfully!");
 			request.getRequestDispatcher("registerComplete.jsp").forward(request, response);
