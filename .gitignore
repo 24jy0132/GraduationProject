@@ -1,8 +1,8 @@
 # Eclipse / workspace
 .metadata/
 .settings/
-.classpath
-.project
+
+
 
 # build output
 build/
