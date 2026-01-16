@@ -13,3 +13,4 @@ Thumbs.db
 
 # logs
 *.log
+_tmp_jars/ 
