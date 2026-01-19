@@ -8,7 +8,15 @@ public class Menu {
     private String category;        // メニュージャンル
     private String imagePath;    // メニュー画像
     private boolean isSurveyTarget;
-    private int surveyId;        // アンケートコード(FK)
+    private int surveyId;    
+    private int durationMinutes ;
+    public int getDurationMinutes() {
+		return durationMinutes;
+	}
+	public void setDurationMinutes(int durationMinutes) {
+		this.durationMinutes = durationMinutes;
+	}
+	// アンケートコード(FK)
 	public int getMenuId() {
 		return menuId;
 	}

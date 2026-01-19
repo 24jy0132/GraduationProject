@@ -9,4 +9,6 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 <link rel="stylesheet"
     href="${pageContext.request.contextPath}/css/bootstrap.min.css">
+
+    
 <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>

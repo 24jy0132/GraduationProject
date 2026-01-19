@@ -126,7 +126,7 @@ h1 {
 </head>
 <body>
 	<div class="container-fluid">
-		<h1>MHP株式会社 営業サポートシステム</h1>
+		<h1 class="text-center">MHP株式会社 営業サポートシステム</h1>
 
 		<div class="container">
 			<div class="topcontainer">
@@ -164,7 +164,9 @@ h1 {
 			<div class="point">
 				<ul class="nav nav-pills">
 
-					<li class="nav-item"><a class="nav-link" href="#">予約確認</a></li>
+					<li class="nav-item"><a class="nav-link"
+						href="<%=request.getContextPath()%>/reservation/success.jsp">
+							予約確認 </a></li>
 
 					<li class="nav-item"><a class="nav-link" href="#">メニュー管理</a></li>
 
