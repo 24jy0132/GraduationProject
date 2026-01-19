@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpSession;
 
 import dao.ReservationDao;
 import model.Reservation;
+import service.ReserveRegistration_MailSender;
 @WebServlet("/reserve/complete")
 public class ReserveCompleteServlet extends HttpServlet {
 
@@ -29,6 +30,16 @@ public class ReserveCompleteServlet extends HttpServlet {
 
         try {
             new ReservationDao().insertCustomerReservation(r);
+            boolean mailFailed = false;
+
+            // ★ 追加：メール送信
+          try {
+        	  ReserveRegistration_MailSender.send(r.getCustomerEmail(), r);
+            } catch (Exception mailEx) {
+                mailEx.printStackTrace();
+                mailFailed = true;
+            }
+
             session.removeAttribute("pendingReservation");
             res.sendRedirect(req.getContextPath() + "/complete.jsp");
 
