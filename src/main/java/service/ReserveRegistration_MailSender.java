@@ -11,6 +11,8 @@ import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
+import dao.MenuDao;
+import model.Menu;
 import model.Reservation;
 
 public class ReserveRegistration_MailSender {
@@ -41,13 +43,26 @@ public class ReserveRegistration_MailSender {
 			msg.setFrom(new InternetAddress("t.h3733@gmail.com", "サイト運営者")); // 送信元
 			msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to)); // 宛先
 			msg.setSubject("【予約完了】ご予約ありがとうございます");// 件名
+			String rt=r.getReservationType();
 			String body = r.getCustomerName() + " 様\n\n"
-					+ "この度はご予約ありがとうございます。\n"
-					+ "以下の内容で予約を受け付けました。\n\n"
-					+ "予約日：" + r.getReservationDate()
-					+ "  予約時間："+ r.getStartTime() + "\n"
-					+ "人数　大人：" + r.getAdultCount() + "名　子供：" + r.getChildCount() + "名 \n\n"
-					+ "今後ともよろしくお願いいたします。";
+			        + "この度はご予約ありがとうございます。\n"
+			        + "以下の内容で予約を受け付けました。\n\n"
+			        + "予約日：" + r.getReservationDate()
+			        + "  予約時間：" + r.getStartTime() + "\n"
+			        + "人数　大人：" + r.getAdultCount() + "名　子供：" + r.getChildCount() + "名 \n"
+			        + "予約タイプ：" + rt + "\n";
+
+			if ("COURSE".equals(rt)) {
+			    int menuId = r.getCourseId();
+			    MenuDao md = new MenuDao();
+			    Menu m = md.findById1(menuId);
+
+			    if (m != null) {
+			        body += "コース名：" + m.getMenuName() + "\n";
+			    }
+			}
+
+			body += "\n今後ともよろしくお願いいたします。";
 
 			msg.setText(body); // 本文（プレーンテキスト）
 

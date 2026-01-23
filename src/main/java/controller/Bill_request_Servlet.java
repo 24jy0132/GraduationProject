@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import dao.TableDao;
+import dao.ReservationDao;
 
 /**
  * Servlet implementation class Bill_request_Servlet
@@ -48,8 +48,8 @@ public class Bill_request_Servlet extends HttpServlet {
         }
 
         // ② DAOを使って会計依頼処理
-        TableDao tableDao = new TableDao();
-        boolean success = tableDao.requestCheckout(table_id);
+        ReservationDao rd = new ReservationDao();
+        boolean success = rd.requestCheckout(table_id);
 
         // ③ 結果に応じて画面遷移
         if (success) {

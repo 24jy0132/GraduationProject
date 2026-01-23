@@ -316,6 +316,29 @@ public class ReservationDao {
 			con.commit();
 		}
 	}
+	
+	public boolean requestCheckout(String table_id) {
+
+        String sql = "UPDATE reservations r "
+        		+ "JOIN reservation_table rt "
+        		+ "ON r.reservationId = rt.reservationId "
+        		+ "SET r.status = ? "
+        		+ "WHERE rt.table_id = ? AND r.status = 'ARRIVED'";
+
+        try (Connection con=getConn();
+        		PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, "BILL_REQUESTED");
+            ps.setString(2, table_id);
+
+            int result = ps.executeUpdate();
+            return result == 1; // 1件更新されたら成功
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 	public List<Reservation> findByDate(LocalDate date) {
 
