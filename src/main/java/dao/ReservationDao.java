@@ -154,8 +154,8 @@ public class ReservationDao {
 				for (String tableId : r.getTableIds()) {
 					lockPs.setString(1, tableId);
 					lockPs.setDate(2, Date.valueOf(r.getReservationDate()));
-					lockPs.setTime(3, Time.valueOf(r.getEndTime()));
-					lockPs.setTime(4, Time.valueOf(r.getStartTime()));
+					lockPs.setTime(3, Time.valueOf(r.getStartTime()));
+					lockPs.setTime(4, Time.valueOf(r.getEndTime()));
 
 					try (ResultSet rs = lockPs.executeQuery()) {
 						if (rs.next()) {
@@ -166,18 +166,17 @@ public class ReservationDao {
 			}
 
 			// =========================
-			// 2️⃣ INSERT reservations
+			// 2️⃣ INSERT reservations (Updated with couponId)
 			// =========================
 			String insertReservationSql = "INSERT INTO reservations " +
 					"(customerId, reservationDate, startTime, endTime, adultCount, childCount, " +
-					"reservationType, courseId, customerEmail, customer_name, status) " +
-					"VALUES (?,?,?,?,?,?,?,?,?,?, 'RESERVED')";
+					"reservationType, courseId, couponId, customerEmail, customer_name, status) " + // Added couponId
+					"VALUES (?,?,?,?,?,?,?,?,?,?,?, 'RESERVED')"; // 11 placeholders before 'RESERVED'
 
 			int reservationId;
 
 			try (PreparedStatement ps = con.prepareStatement(insertReservationSql, Statement.RETURN_GENERATED_KEYS)) {
 
-				// ✅ FIX: customerId NULL-safe
 				if (r.getCustomerId() != null) {
 					ps.setInt(1, r.getCustomerId());
 				} else {
@@ -197,14 +196,25 @@ public class ReservationDao {
 					ps.setNull(8, Types.INTEGER);
 				}
 
-				ps.setString(9, r.getCustomerEmail());
-				ps.setString(10, r.getCustomerName());
+				// ✅ NEW: couponId logic
+				if (r.getCouponId() != null && r.getCouponId() != 0) {
+					ps.setInt(9, r.getCouponId());
+				} else {
+					ps.setNull(9, Types.INTEGER);
+				}
+
+				// Shifts to 10 and 11
+				ps.setString(10, r.getCustomerEmail());
+				ps.setString(11, r.getCustomerName());
 
 				ps.executeUpdate();
 
 				try (ResultSet keys = ps.getGeneratedKeys()) {
-					keys.next();
-					reservationId = keys.getInt(1);
+					if (keys.next()) {
+						reservationId = keys.getInt(1);
+					} else {
+						throw new SQLException("Failed to retrieve reservation ID.");
+					}
 				}
 			}
 
@@ -228,11 +238,14 @@ public class ReservationDao {
 			con.commit();
 
 		} catch (Exception e) {
-			con.rollback(); // 🔴 FULL ROLLBACK
+			if (con != null)
+				con.rollback(); // 🔴 FULL ROLLBACK
 			throw e;
 		} finally {
-			con.setAutoCommit(true);
-			con.close();
+			if (con != null) {
+				con.setAutoCommit(true);
+				con.close();
+			}
 		}
 	}
 
@@ -593,6 +606,49 @@ public class ReservationDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	// =========================
+	// MEMBER: RESERVATION HISTORY
+	// =========================
+	public List<Reservation> findByCustomerId(int customerId) {
+
+	    Map<Integer, Reservation> map = new LinkedHashMap<>();
+
+	    String sql =
+	        "SELECT r.*, rt.table_id " +
+	        "FROM reservations r " +
+	        "LEFT JOIN reservation_table rt " +
+	        "ON r.reservationId = rt.reservationId " +
+	        "WHERE r.customerId = ? " +
+	        "ORDER BY r.reservationDate DESC, r.startTime DESC";
+
+	    try (Connection con = getConn();
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+
+	        ps.setInt(1, customerId);
+	        ResultSet rs = ps.executeQuery();
+
+	        while (rs.next()) {
+	            int id = rs.getInt("reservationId");
+
+	            Reservation r = map.get(id);
+	            if (r == null) {
+	                r = map(rs);
+	                r.setTableIds(new ArrayList<>());
+	                map.put(id, r);
+	            }
+
+	            String tableId = rs.getString("table_id");
+	            if (tableId != null) {
+	                r.getTableIds().add(tableId);
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return new ArrayList<>(map.values());
 	}
 
 	// =========================

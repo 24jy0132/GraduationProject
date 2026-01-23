@@ -171,7 +171,7 @@ h1 {
 					<li class="nav-item"><a class="nav-link" href="#">メニュー管理</a></li>
 
 
-					<li class="nav-item"><a class="nav-link" href="#">割引管理</a></li>
+					<li class="nav-item"><a class="nav-link" href="<%=request.getContextPath()%>/admin/coupon/list">割引管理</a></li>
 
 
 					<li class="nav-item dropdown"><a

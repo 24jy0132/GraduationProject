@@ -2,9 +2,12 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ page import="model.Reservation"%>
 <%@ page import="model.Menu"%>
+<%@ page import="model.Customer"%>
+<%@ page import="model.Coupon"%>
 
 
 <%
+Customer loginCustomer = (Customer) session.getAttribute("customer");
 Reservation r = (Reservation) session.getAttribute("pendingReservation");
 if (r == null || r.getTableIds() == null || r.getTableIds().isEmpty()) {
 	response.sendRedirect(request.getContextPath() + "/reserve/form");
@@ -131,26 +134,66 @@ main {
 			<div class="collapse navbar-collapse justify-content-end"
 				id="navbarSupportedContent">
 				<ul class="navbar-nav gap-4">
+					<%
+					if (loginCustomer == null) {
+					%>
 					<li class="nav-item"><a class="nav-link active text-white"
-						href="<%=request.getContextPath()%>/index.jsp"><i
-							class="bi bi-house-fill me-1"></i>Home</a></li>
+						href="<%=request.getContextPath()%>/index.jsp"> <i
+							class="bi bi-house-fill me-1"></i>Home
+					</a></li>
+					<%
+					} else {
+					%>
+					<li class="nav-item"><a class="nav-link active text-white"
+						href="<%=request.getContextPath()%>/member_index.jsp"> <i
+							class="bi bi-house-fill me-1"></i>Home
+					</a></li>
+					<%
+					}
+					%>
 					<li class="nav-item"><a class="nav-link text-white"
-						href="MenuListServlet"><i class="bi bi-menu-down me-1"></i>Menu</a></li>
+						href="MenuListServlet"> <i class="bi bi-menu-down me-1"></i>Menu
+					</a></li>
+
+					<%
+					if (loginCustomer == null) {
+					%>
 					<li class="nav-item"><a class="nav-link text-white"
 						href="<%=request.getContextPath()%>/reserve/form"> <i
 							class="bi bi-calendar-check me-1"></i>Reservation
 					</a></li>
+					<%
+					}
+					%>
+
 					<li class="nav-item"><a class="nav-link text-white"
-						href="<%=request.getContextPath()%>/contact.jsp"><i
-							class="bi bi-telephone-fill me-1"></i>Contact</a></li>
+						href="<%=request.getContextPath()%>/contact.jsp"> <i
+							class="bi bi-telephone-fill me-1"></i>Contact
+					</a></li>
 					<li class="nav-item"><a class="nav-link text-white"
-						href="<%=request.getContextPath()%>/map.jsp"><i
-							class="bi bi-pin-map-fill me-1"></i>Map</a></li>
+						href="<%=request.getContextPath()%>/map.jsp"> <i
+							class="bi bi-pin-map-fill me-1"></i>Map
+					</a></li>
+
+					<%
+					if (loginCustomer == null) {
+					%>
+					<li class="nav-item"><a
+						class="nav-link active text-white fw-bold ms-lg-3"
+						href="<%=request.getContextPath()%>/login.jsp"> <i
+							class="bi bi-box-arrow-in-right me-1"></i>Login
+					</a></li>
+					<%
+					} else {
+					%>
+					<li class="nav-item"><a class="nav-link text-white ms-lg-3"
+						href="<%=request.getContextPath()%>/Customer_LogOut"> <i
+							class="bi bi-box-arrow-right me-1"></i>LogOut
+					</a></li>
+					<%
+					}
+					%>
 				</ul>
-				<a class="nav-link active text-white fw-bold ms-lg-3 mt-2 mt-lg-0"
-					href="<%=request.getContextPath()%>/login.jsp"> <i
-					class="bi bi-box-arrow-in-right me-1"></i>Login
-				</a>
 			</div>
 		</div>
 	</nav>
@@ -239,6 +282,23 @@ main {
 				<%
 				}
 				%>
+
+				<%
+				Coupon coupon = (Coupon) session.getAttribute("selectedCoupon");
+				if (coupon != null) {
+				%>
+				<div class="confirm-row row">
+					<div class="col-4 label">クーポン</div>
+					<div class="col-8 value">
+						<%=coupon.getTitle()%>
+						（<%=coupon.getDiscountAmount()%>円OFF）
+					</div>
+				</div>
+				<%
+}
+%>
+
+
 
 
 				<div class="confirm-row row">

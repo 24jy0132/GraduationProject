@@ -1,8 +1,8 @@
 package controller;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import model.Customer;
 import model.Reservation;
 import service.Constants;
+
 @WebServlet("/reserve/input")
 public class ReserveInputServlet extends HttpServlet {
 
@@ -35,17 +36,25 @@ public class ReserveInputServlet extends HttpServlet {
                 throw new IllegalArgumentException("6名を超える場合はお電話ください");
             }
 
-            Reservation r = new Reservation();
+            // ✅ DO NOT recreate reservation
+            Reservation r = (Reservation) session.getAttribute("pendingReservation");
+            if (r == null) {
+                r = new Reservation();
+                r.setTableIds(new ArrayList<>());
+            }
+
             r.setReservationDate(date);
             r.setStartTime(start);
             r.setEndTime(end);
             r.setAdultCount(adult);
             r.setChildCount(child);
+
+            // guest input
             r.setCustomerName(req.getParameter("name"));
             r.setCustomerEmail(req.getParameter("email"));
 
-            Customer loginCustomer =
-                (Customer) session.getAttribute("loginCustomer");
+            // member override
+            Customer loginCustomer = (Customer) session.getAttribute("customer");
             if (loginCustomer != null) {
                 r.setCustomerId(loginCustomer.getUserId());
                 r.setCustomerName(loginCustomer.getName());
@@ -54,11 +63,15 @@ public class ReserveInputServlet extends HttpServlet {
 
             session.setAttribute("pendingReservation", r);
 
+            // ✅ always go forward
             res.sendRedirect(req.getContextPath() + "/reserve/table");
 
         } catch (Exception e) {
             req.setAttribute("error", e.getMessage());
-            req.getRequestDispatcher(req.getContextPath() + "/reservationForm.jsp").forward(req, res);
+
+            // ✅ FIX: NO contextPath here
+            req.getRequestDispatcher("/reserveForm.jsp")
+               .forward(req, res);
         }
     }
 }

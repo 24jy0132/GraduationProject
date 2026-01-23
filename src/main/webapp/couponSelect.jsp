@@ -1,18 +1,28 @@
-<%@ include file="header.jsp"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
+<%@ include file="header.jsp"%>
+
+<%@ page import="java.util.*"%>
+<%@ page import="model.Coupon"%>
+<%@ page import="model.Reservation"%>
 <%@ page import="model.Customer"%>
+
 <%
 Customer loginCustomer = (Customer) session.getAttribute("customer");
+Reservation r = (Reservation) session.getAttribute("pendingReservation");
+List<Coupon> couponList = (List<Coupon>) request.getAttribute("couponList");
+
+if (loginCustomer == null || r == null) {
+	response.sendRedirect(request.getContextPath() + "/reserve/form");
+	return;
+}
 %>
+
 <!DOCTYPE html>
 <html>
 <head>
-<title>予約完了</title>
+<title>Coupon Selection</title>
 
 <style>
-/* =====================
-   PAGE LAYOUT
-===================== */
 html, body {
 	height: 100%;
 }
@@ -23,36 +33,25 @@ body {
 	flex-direction: column;
 }
 
-/* =====================
-   MAIN CENTER AREA
-===================== */
 main {
 	flex: 1;
 	display: flex;
-	align-items: center; /* vertical center */
-	justify-content: center; /* horizontal center */
-	padding: 20px;
+	align-items: center;
+	justify-content: center;
+	padding: 40px 15px;
 }
 
-/* wrapper for stepper + message */
-.complete-wrapper {
-	text-align: center;
-}
-
-/* =====================
-   STEPPER
-===================== */
+/* ===== STEPPER ===== */
 .stepper {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	margin-bottom: 40px;
+	margin-bottom: 30px;
 }
 
 .step {
 	text-align: center;
 	color: #adb5bd;
-	font-size: 0.9rem;
 }
 
 .step .circle {
@@ -65,6 +64,11 @@ main {
 	justify-content: center;
 	margin: auto;
 	font-weight: bold;
+}
+
+.step.done .circle {
+	background: #198754;
+	color: #fff;
 }
 
 .step.active {
@@ -84,28 +88,39 @@ main {
 	margin: 0 12px;
 }
 
-/* =====================
-   COMPLETE MESSAGE
-===================== */
-.complete-title {
-	font-size: 1.6rem;
-	font-weight: 600;
-	margin-bottom: 20px;
+/* ===== COUPON CARD ===== */
+.coupon-card {
+	border: 2px solid #dee2e6;
+	border-radius: 14px;
+	padding: 20px;
+	cursor: pointer;
+	transition: .2s;
 }
 
-.complete-message {
-	font-size: 1rem;
-	line-height: 1.8;
-	color: #333;
+.coupon-card:hover {
+	transform: translateY(-3px);
+}
+
+.coupon-card.active {
+	border-color: #0d6efd;
+	background: #f8f9ff;
+}
+
+.coupon-title {
+	font-weight: 700;
+}
+
+.coupon-price {
+	color: #dc3545;
+	font-size: 1.2rem;
+	font-weight: bold;
 }
 </style>
 </head>
 
 <body>
 
-	<!-- =====================
-     NAVBAR (TOP)
-===================== -->
+	<!-- ===== NAVBAR ===== -->
 	<nav class="navbar navbar-expand-lg bg-danger py-3">
 		<div class="container">
 			<a class="navbar-brand fw-bold text-white"
@@ -186,27 +201,30 @@ main {
 		</div>
 	</nav>
 
-	<!-- =====================
-     MAIN (CENTER)
-===================== -->
+	<!-- ===== MAIN ===== -->
 	<main>
-		<div class="complete-wrapper">
+		<div class="container">
 
 			<!-- STEPPER -->
 			<div class="stepper">
-				<div class="step">
+				<div class="step done">
 					<div class="circle">1</div>
 					入力
 				</div>
 				<div class="line"></div>
-				<div class="step">
+				<div class="step done">
 					<div class="circle">2</div>
 					席選択
 				</div>
 				<div class="line"></div>
-				<div class="step">
+				<div class="step done">
 					<div class="circle">3</div>
 					コース
+				</div>
+				<div class="line"></div>
+				<div class="step active">
+					<div class="circle">3</div>
+					クーポン
 				</div>
 				<div class="line"></div>
 				<div class="step">
@@ -214,26 +232,68 @@ main {
 					確認
 				</div>
 				<div class="line"></div>
-				<div class="step active">
+				<div class="step">
 					<div class="circle">5</div>
 					完了
 				</div>
 			</div>
 
-			<!-- MESSAGE -->
-			<div class="complete-title">ご予約ありがとうございます。</div>
+			<!-- CARD -->
+			<div class="card shadow p-4 mx-auto" style="max-width: 760px;">
+				<h3 class="fw-bold text-center mb-4">クーポンを選択してください</h3>
 
-			<div class="complete-message">
-				予約が完了しました。確認メールを送信しました。<br> 当日のご来店を心よりお待ちしております。
+				<form method="post"
+					action="<%=request.getContextPath()%>/reserve/coupon">
+
+					<!-- NO COUPON -->
+					<div class="coupon-card active mb-3"
+						onclick="selectCoupon(this,'')">
+						<div class="coupon-title">クーポンを使用しない</div>
+						<p class="text-muted mb-0">通常料金で予約します</p>
+					</div>
+
+					<!-- COUPON LIST -->
+					<%
+					if (couponList != null && !couponList.isEmpty()) {
+						for (Coupon c : couponList) {
+					%>
+					<div class="coupon-card mb-3"
+						onclick="selectCoupon(this,'<%=c.getCouponId()%>')">
+						<div class="coupon-title"><%=c.getTitle()%></div>
+						<div class="coupon-price">
+							¥<%=c.getDiscountAmount()%>
+							OFF
+						</div>
+						<small class="text-muted"> 必要ポイント: <%=c.getMinPoint()%> pt
+						</small>
+					</div>
+					<%
+					}
+					}
+					%>
+
+					<input type="hidden" name="couponId" id="couponId" value="">
+
+					<div class="text-end mt-4">
+						<button class="btn btn-primary px-4">次へ（確認）</button>
+					</div>
+
+				</form>
 			</div>
 
 		</div>
 	</main>
 
-	<!-- =====================
-     FOOTER (BOTTOM)
-===================== -->
 	<%@ include file="footer.jsp"%>
+
+	<script>
+function selectCoupon(card, id) {
+    document.querySelectorAll('.coupon-card')
+        .forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    document.getElementById('couponId').value = id;
+}
+</script>
 
 </body>
 </html>

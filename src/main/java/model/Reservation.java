@@ -19,6 +19,12 @@ public class Reservation {
     private Integer customerId;
     private String reservationType; // SEAT_ONLY or COURSE
     private Integer courseId;        // nullable
+    
+    private Integer couponId;
+
+    public Integer getCouponId() { return couponId; }
+    public void setCouponId(Integer couponId) { this.couponId = couponId; }
+
 
     public String getReservationType() {
 		return reservationType;
