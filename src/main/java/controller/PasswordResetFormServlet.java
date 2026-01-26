@@ -55,7 +55,7 @@ public class PasswordResetFormServlet extends HttpServlet {
 
 	    // Customerの取得（このServletでは未使用でもOK）
 	    CustomerDao customerDao = new CustomerDao();
-	    Customer customer = customerDao.findById(userId);
+	    Customer customer = customerDao.findById1(userId);
 
 	    if (customer == null) {
 	        request.setAttribute("error", "ユーザーが存在しません。");

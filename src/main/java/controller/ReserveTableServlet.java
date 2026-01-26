@@ -2,6 +2,7 @@ package controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,6 +11,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import dao.ReservationDao;
 import model.Reservation;
@@ -64,20 +66,34 @@ public class ReserveTableServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse res)
-			throws ServletException, IOException {
+	        throws ServletException, IOException {
 
-		Reservation r = (Reservation) req.getSession().getAttribute("pendingReservation");
+	    HttpSession session = req.getSession();
+	    Reservation r = (Reservation) session.getAttribute("pendingReservation");
 
-		String tableId = req.getParameter("tableId");
-		if (tableId == null) {
-			res.sendRedirect(req.getContextPath() + "/reserve/table");
-			return;
-		}
+	    if (r == null) {
+	        res.sendRedirect(req.getContextPath() + "/reserve/form");
+	        return;
+	    }
 
-		r.getTableIds().clear();
-		r.getTableIds().add(tableId);
+	    String tableId = req.getParameter("tableId");
+	    if (tableId == null) {
+	        res.sendRedirect(req.getContextPath() + "/reserve/table");
+	        return;
+	    }
 
-		res.sendRedirect(req.getContextPath() + "/reserve/course");
+	  
+	    if (r.getTableIds() == null) {
+	        r.setTableIds(new ArrayList<>());
+	    }
 
+	    r.getTableIds().clear();
+	    r.getTableIds().add(tableId);
+
+	    
+	    req.getSession().setAttribute("pendingReservation", r);
+
+	    res.sendRedirect(req.getContextPath() + "/reserve/course");
 	}
+
 }

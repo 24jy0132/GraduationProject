@@ -79,6 +79,12 @@ Customer customer = (Customer) session.getAttribute("customer");
 /* =====================
    QUICK ACTIONS
 ===================== */
+.action-link {
+	text-decoration: none;
+	color: inherit;
+	display: block;
+}
+
 .action-card {
 	border-radius: 16px;
 	padding: 25px;
@@ -175,47 +181,58 @@ Customer customer = (Customer) session.getAttribute("customer");
 		<div class="row g-4 text-center">
 
 			<div class="col-md-3">
-				<div class="action-card bg-light">
-					<div class="action-icon mb-2">
-						<i class="bi bi-calendar-check"></i>
+				<a href="<%=request.getContextPath()%>/reserve/form"
+					class="action-link text-decoration-none">
+					<div class="action-card bg-light p-4 h-100 rounded shadow-sm">
+						<div class="action-icon mb-2">
+							<i class="bi bi-calendar-check fs-2 text-danger"></i>
+						</div>
+						<h5 class="text-dark">予約する</h5>
+						<p class="text-muted mb-0">お席・コースの予約</p>
 					</div>
-					<h5>予約する</h5>
-					<p class="text-muted">お席・コースの予約</p>
-				</div>
+				</a>
 			</div>
 
 			<div class="col-md-3">
-				<div class="action-card bg-light">
-					<div class="action-icon mb-2">
-						<i class="bi bi-person"></i>
+				<a href="#" class="action-link text-decoration-none">
+					<div class="action-card bg-light p-4 h-100 rounded shadow-sm">
+						<div class="action-icon mb-2">
+							<i class="bi bi-person fs-2 text-danger"></i>
+						</div>
+						<h5 class="text-dark">会員情報</h5>
+						<p class="text-muted mb-0">プロフィール確認</p>
 					</div>
-					<h5>会員情報</h5>
-					<p class="text-muted">プロフィール確認</p>
-				</div>
+				</a>
 			</div>
 
 			<div class="col-md-3">
-				<div class="action-card bg-light">
-					<div class="action-icon mb-2">
-						<i class="bi bi-star-fill"></i>
+				<a href="<%=request.getContextPath()%>/member/reservations"
+					class="action-link text-decoration-none">
+					<div class="action-card bg-light p-4 h-100 rounded shadow-sm">
+						<div class="action-icon mb-2">
+							<i class="bi bi-star-fill fs-2 text-danger"></i>
+						</div>
+						<h5 class="text-dark">予約履歴</h5>
+						<p class="text-muted mb-0">過去履歴</p>
 					</div>
-					<h5>予約履歴</h5>
-					<p class="text-muted">過去履歴</p>
-				</div>
+				</a>
 			</div>
 
 			<div class="col-md-3">
-				<div class="action-card bg-light">
-					<div class="action-icon mb-2">
-						<i class="fa-solid fa-ticket"></i>
-
+				<a href="<%=request.getContextPath()%>/coupons"
+					class="action-link text-decoration-none">
+					<div class="action-card bg-light p-4 h-100 rounded shadow-sm">
+						<div class="action-icon mb-2">
+							<i class="fa-solid fa-ticket fs-2 text-danger"></i>
+						</div>
+						<h5 class="text-dark">ク―ポン</h5>
+						<p class="text-muted mb-0">特別割引</p>
 					</div>
-					<h5>ク―ポン</h5>
-					<p class="text-muted">特別割引</p>
-				</div>
+				</a>
 			</div>
 
 		</div>
+	</div>
 	</div>
 
 	<%@ include file="footer.jsp"%>
