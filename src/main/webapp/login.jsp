@@ -131,7 +131,7 @@ main {
 			</form>
 
 			<div class="d-flex justify-content-between mt-4">
-				<a href="passwordResetForm.jsp" class="link text-muted">
+				<a href="${pageContext.request.contextPath}/passwordResetMailForm.jsp" class="link text-muted">
 					パスワードを忘れた方 </a> <a href="registerForm.jsp" class="link fw-bold">
 					新規登録 </a>
 			</div>
