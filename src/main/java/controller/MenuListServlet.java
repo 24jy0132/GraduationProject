@@ -36,6 +36,8 @@ public class MenuListServlet extends HttpServlet {
 		List<Menu> alaCarteMenus = menuservice.getAlaCarteMenus();
 		List<Menu> saladSoup = menuservice.getSaladSoup();
 		List<Menu> drinks = menuservice.getDrinks();
+		List<Menu> course = menuservice.getCourse();
+
 
 
 		request.setAttribute("menus", menus);
@@ -45,6 +47,8 @@ public class MenuListServlet extends HttpServlet {
 		request.setAttribute("alaCarteMenus", alaCarteMenus);
 		request.setAttribute("saladSoup", saladSoup);
 		request.setAttribute("drinks", drinks);
+		request.setAttribute("course", course);
+
 		
 		 SurveyService surveyService = new SurveyService();
 		 Map<Integer, Map<String, Integer>> tasteSummary = surveyService.getTasteSummaryForMenus(surveyMenus);

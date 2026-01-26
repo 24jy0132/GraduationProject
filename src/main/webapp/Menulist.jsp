@@ -10,6 +10,8 @@ List<Menu> mainMenus = (List<Menu>) request.getAttribute("mainMenus");
 List<Menu> alaCarteMenus = (List<Menu>) request.getAttribute("alaCarteMenus");
 List<Menu> saladSoup = (List<Menu>) request.getAttribute("saladSoup");
 List<Menu> drinks = (List<Menu>) request.getAttribute("drinks");
+List<Menu> course = (List<Menu>) request.getAttribute("course");
+
 
 Map<Integer, Map<String,Integer>> tasteSummary =
     (Map<Integer, Map<String,Integer>>) request.getAttribute("tasteSummary");
@@ -138,6 +140,31 @@ if (newMenus != null) {
 }
 %>
 </div>
+
+<hr>
+<!-- ================= Drinks ================= -->
+<h4 class="fw-bold mb-3">コース</h4>
+<div class="row g-3 mb-5">
+<%
+if (course != null) {
+  for (Menu c : course) {
+%>
+  <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+    <div class="card h-100 border-0 menu-card">
+      <img src="<%= c.getImagePath() %>" class="card-img-top">
+      <div class="card-body p-2">
+        <div class="fw-bold small"><%= c.getMenuName() %></div>
+        <div class="menu-desc"><%= c.getDescription() %></div>
+        <div class="fw-bold mt-1">¥<%= c.getPrice() %></div>
+      </div>
+    </div>
+  </div>
+<%
+  }
+}
+%>
+</div>
+
 <hr>
 <!-- ================= Main ================= -->
 <h4 class="fw-bold mb-3">メイン商品</h4>

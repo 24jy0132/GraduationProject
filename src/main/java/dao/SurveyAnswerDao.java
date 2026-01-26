@@ -10,8 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import model.Menu;
-
 public class SurveyAnswerDao {
     private Connection con = null;
 
@@ -115,4 +113,25 @@ public class SurveyAnswerDao {
     			
     	
     }
+    
+    public List<String> findSurveyComments(int questionId,int menuId){
+    	List<String> comments = new ArrayList<>();
+    	String sql = "select answerText from survey_answer where questionId = ? and menuId = ? order by createdAt DESC"
+    			+ "";
+    	try(PreparedStatement ps = con.prepareStatement(sql)){
+    		ps.setInt(1, questionId);
+    		ps.setInt(2, menuId);
+
+    		ResultSet rs = ps.executeQuery();
+    		while(rs.next()) {
+    			comments.add(rs.getString("answerText")) ;
+    		}
+    	}catch (SQLException e) {
+            e.printStackTrace();
+        }
+		return comments;
+
+    }
 }
+
+

@@ -39,4 +39,42 @@ public class SurveyService {
 
 		 return result;
 	 }
+	 
+	 public Map<Integer, Map<String,Integer>> getVolumeSummaryForMenus(List<Menu> surveyMenus){
+		 
+			Map<Integer, Map<String, Integer>> result = new HashMap<>();
+			SurveyAnswerDao dao = new SurveyAnswerDao();
+			
+			for(Menu sm:surveyMenus) {
+				Map<String,Integer> tasteMap = dao.getTasteSummaryForMenus(sm.getMenuId(),2);
+				result.put(sm.getMenuId(), tasteMap);
+			}
+			
+			dao.connectionClose();
+
+			 return result;
+		 }
+	 
+	 public Map<Integer, Map<String,Integer>> getPriceSummaryForMenus(List<Menu> surveyMenus){
+		 
+			Map<Integer, Map<String, Integer>> result = new HashMap<>();
+			SurveyAnswerDao dao = new SurveyAnswerDao();
+			
+			for(Menu sm:surveyMenus) {
+				Map<String,Integer> tasteMap = dao.getTasteSummaryForMenus(sm.getMenuId(),3);
+				result.put(sm.getMenuId(), tasteMap);
+			}
+			
+			dao.connectionClose();
+
+			 return result;
+		 }
+	 
+	 public List<String> getSurveyComments(int questionId,int menuId){
+		 SurveyAnswerDao dao = new SurveyAnswerDao();
+		 List<String> comments = dao.findSurveyComments(questionId,menuId);
+		 return comments;
+	 }
 }
+
+
