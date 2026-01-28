@@ -32,28 +32,22 @@ public class CustomerDao {
 	}
 
 	public Customer findByEmailAndPassword(String email, String password) {
-		String sql = "SELECT * FROM customers WHERE email=? AND password=?";
-		try (PreparedStatement ps = connection.prepareStatement(sql)) {
-			ps.setString(1, email.trim());
-			ps.setString(2, password.trim());
-			System.out.println("Executing SQL login: email=[" + email + "] password=[" + password + "]");
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				Customer c = new Customer();
-				c.setUserId(rs.getInt("userId"));
-				c.setName(rs.getString("name"));
-				c.setEmail(rs.getString("email"));
-				c.setPassword(rs.getString("password"));
-				System.out.println("User found: " + c.getEmail());
-				return c;
-			} else {
-				System.out.println("No user found for given credentials.");
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
+	    String sql = "SELECT * FROM customers WHERE email=? AND password=?";
+
+	    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+	        ps.setString(1, email.trim());
+	        ps.setString(2, password.trim());
+
+	        ResultSet rs = ps.executeQuery();
+	        if (rs.next()) {
+	            return map(rs); // ✅ FIX
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return null;
 	}
+
 
 	public Customer findByEmail(String email) {
 		String sql = "SELECT * FROM customers WHERE email=?";

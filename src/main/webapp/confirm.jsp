@@ -291,12 +291,43 @@ main {
 					<div class="col-4 label">クーポン</div>
 					<div class="col-8 value">
 						<%=coupon.getTitle()%>
-						（<%=coupon.getDiscountAmount()%>円OFF）
 					</div>
 				</div>
 				<%
-}
-%>
+				}
+				%>
+
+				<%
+				int usedPoint = (r.getUsedPoint() != null) ? r.getUsedPoint() : 0;
+				int currentPoint = (loginCustomer != null) ? loginCustomer.getPoint() : 0;
+				int remainingPoint = currentPoint - usedPoint;
+				%>
+
+				<div class="confirm-row row">
+					<div class="col-4 label">現在のポイント</div>
+					<div class="col-8 value">
+						<%=currentPoint%>
+						pt
+					</div>
+				</div>
+
+				<div class="confirm-row row text-danger">
+					<div class="col-4 label">使用ポイント</div>
+					<div class="col-8 value">
+						-
+						<%=usedPoint%>
+						pt
+					</div>
+				</div>
+
+				<div class="confirm-row row fw-bold">
+					<div class="col-4 label">予約後のポイント</div>
+					<div class="col-8 value">
+						<%=remainingPoint%>
+						pt
+					</div>
+				</div>
+
 
 
 
