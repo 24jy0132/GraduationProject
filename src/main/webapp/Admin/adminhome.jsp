@@ -168,7 +168,7 @@ h1 {
 						href="<%=request.getContextPath()%>/reservation/success.jsp">
 							予約確認 </a></li>
 
-					<li class="nav-item"><a class="nav-link" href="#">メニュー管理</a></li>
+					<li class="nav-item"><a class="nav-link" href="<%=request.getContextPath()%>/StaffMenuListServlet">メニュー管理</a></li>
 
 
 					<li class="nav-item"><a class="nav-link" href="<%=request.getContextPath()%>/admin/coupon/list">割引管理</a></li>
@@ -178,9 +178,9 @@ h1 {
 						class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
 						href="#"> アンケート管理 </a>
 						<ul class="dropdown-menu">
-							<li><a class="dropdown-item" href="#">アンケート作成</a></li>
-							<li><a class="dropdown-item" href="#">回答一覧表</a></li>
-							<li><a class="dropdown-item" href="#">その他</a></li>
+							<li><a class="dropdown-item" href="<%=request.getContextPath()%>/AdminSurveyCreateServlet">アンケート作成</a></li>
+							<li><a class="dropdown-item" href="<%=request.getContextPath()%>/AdminSurveyAnswerCheckServlet">回答一覧表</a></li>
+				
 						</ul></li>
 
 					<li class="nav-item"><a class="nav-link"
