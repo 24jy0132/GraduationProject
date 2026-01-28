@@ -25,9 +25,9 @@ public class CouponDao {
 
 		try {
 			connection = DriverManager.getConnection(
-	                "jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
-	                "24jy0234",
-	                "24jy0234");
+					"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
+					"24jy0234",
+					"24jy0234");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -100,19 +100,27 @@ public class CouponDao {
 
 	public List<Coupon> findAvailableCoupons(
 			int customerPoint,
-			String reservationType) throws SQLException {
+			String reservationType,
+			int userId) throws SQLException {
 
 		List<Coupon> list = new ArrayList<>();
+
 		String sql = """
-				    SELECT * FROM coupon
-				    WHERE minPoint <= ?
-				      AND startDate <= ?
-				      AND endDate >= ?
-				      AND (reservationType = 'ANY' OR reservationType = ?)
+				    SELECT c.*
+				    FROM coupon c
+				    WHERE c.minPoint <= ?
+				      AND c.startDate <= ?
+				      AND c.endDate >= ?
+				      AND (c.reservationType = 'ANY' OR c.reservationType = ?)
+				      AND NOT EXISTS (
+				          SELECT 1
+				          FROM coupon_usage cu
+				          WHERE cu.userId = ?
+				            AND cu.couponId = c.couponId
+				      )
 				""";
 
-		try (
-				PreparedStatement ps = connection.prepareStatement(sql)) {
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
 			LocalDate today = LocalDate.now();
 
@@ -120,51 +128,45 @@ public class CouponDao {
 			ps.setDate(2, Date.valueOf(today));
 			ps.setDate(3, Date.valueOf(today));
 			ps.setString(4, reservationType);
+			ps.setInt(5, userId);
 
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
-				Coupon c = new Coupon();
-				c.setCouponId(rs.getInt("couponId"));
-				c.setTitle(rs.getString("title"));
-				c.setDescription(rs.getString("description"));
-				c.setDiscountAmount(rs.getInt("discountAmount"));
-				c.setMinPoint(rs.getInt("minPoint"));
-				c.setImagePath(rs.getString("imagePath"));
-				list.add(c);
+				list.add(map(rs));
 			}
 		}
 		return list;
 	}
-	
-	 public Coupon findById(int couponId) throws Exception {
 
-	        String sql = "SELECT * FROM coupon WHERE couponId = ?";
+	public Coupon findById(int couponId) throws Exception {
 
-	        try (
-	             PreparedStatement ps = connection.prepareStatement(sql)) {
+		String sql = "SELECT * FROM coupon WHERE couponId = ?";
 
-	            ps.setInt(1, couponId);
+		try (
+				PreparedStatement ps = connection.prepareStatement(sql)) {
 
-	            try (ResultSet rs = ps.executeQuery()) {
+			ps.setInt(1, couponId);
 
-	                if (rs.next()) {
-	                    Coupon c = new Coupon();
+			try (ResultSet rs = ps.executeQuery()) {
 
-	                    c.setCouponId(rs.getInt("couponId"));
-	                    c.setTitle(rs.getString("title"));
-	                    c.setDescription(rs.getString("description"));
-	                    c.setDiscountAmount(rs.getInt("discountAmount"));
-	                    c.setStartDate(rs.getDate("startDate").toLocalDate());
-	                    c.setEndDate(rs.getDate("endDate").toLocalDate());
-	                    c.setMinPoint(rs.getInt("minPoint"));
-	                    c.setReservationType(rs.getString("reservationType"));
-	                    c.setImagePath(rs.getString("imagePath"));
+				if (rs.next()) {
+					Coupon c = new Coupon();
 
-	                    return c;
-	                }
-	            }
-	        }
+					c.setCouponId(rs.getInt("couponId"));
+					c.setTitle(rs.getString("title"));
+					c.setDescription(rs.getString("description"));
+					c.setDiscountAmount(rs.getInt("discountAmount"));
+					c.setStartDate(rs.getDate("startDate").toLocalDate());
+					c.setEndDate(rs.getDate("endDate").toLocalDate());
+					c.setMinPoint(rs.getInt("minPoint"));
+					c.setReservationType(rs.getString("reservationType"));
+					c.setImagePath(rs.getString("imagePath"));
 
-	        return null; // not found
-	    }
+					return c;
+				}
+			}
+		}
+
+		return null; // not found
+	}
 }

@@ -45,4 +45,15 @@ public class CustomerService {
 		}
 		return pass;
 	}
+	
+	public boolean mailExistsForOtherUser(String email, int currentUserId) {
+	    Customer found = cd.findByEmail(email);
+
+	    if (found == null) {
+	        return false; // email not used at all
+	    }
+
+	    return found.getUserId() != currentUserId;
+	}
+
 }

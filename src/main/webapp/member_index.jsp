@@ -127,7 +127,7 @@ Customer customer = (Customer) session.getAttribute("customer");
 						href="member_index.jsp"> <i class="bi bi-house-fill me-1"></i>Home
 					</a></li>
 					<li class="nav-item"><a class="nav-link text-white"
-						href="Menucontrollers"> <i class="bi bi-menu-down me-1"></i>Menu
+						href="<%=request.getContextPath()%>/MenuListServlet"> <i class="bi bi-menu-down me-1"></i>Menu
 					</a></li>
 					<li class="nav-item"><a class="nav-link text-white"
 						href="contact.jsp"> <i class="bi bi-telephone-fill me-1"></i>Contact
@@ -194,7 +194,7 @@ Customer customer = (Customer) session.getAttribute("customer");
 			</div>
 
 			<div class="col-md-3">
-				<a href="#" class="action-link text-decoration-none">
+				<a href="<%=request.getContextPath()%>/member/profile"  class="action-link text-decoration-none">
 					<div class="action-card bg-light p-4 h-100 rounded shadow-sm">
 						<div class="action-icon mb-2">
 							<i class="bi bi-person fs-2 text-danger"></i>

@@ -21,6 +21,15 @@ public class Reservation {
     private Integer courseId;        // nullable
     
     private Integer couponId;
+    private Integer usedPoint;
+
+    public Integer getUsedPoint() {
+        return usedPoint;
+    }
+
+    public void setUsedPoint(Integer usedPoint) {
+        this.usedPoint = usedPoint;
+    }
 
     public Integer getCouponId() { return couponId; }
     public void setCouponId(Integer couponId) { this.couponId = couponId; }

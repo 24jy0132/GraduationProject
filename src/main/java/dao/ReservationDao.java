@@ -231,6 +231,44 @@ public class ReservationDao {
 				}
 				ps.executeBatch();
 			}
+			// =========================
+			// POINT DEDUCTION (COUPON)
+			// =========================
+			if (r.getCustomerId() != null &&
+					r.getUsedPoint() != null &&
+					r.getUsedPoint() > 0) {
+
+				String sql = "UPDATE customers SET point = point - ? " +
+						"WHERE userId = ? AND point >= ?";
+
+				try (PreparedStatement ps = con.prepareStatement(sql)) {
+
+					ps.setInt(1, r.getUsedPoint());
+					ps.setInt(2, r.getCustomerId());
+					ps.setInt(3, r.getUsedPoint());
+
+					int updated = ps.executeUpdate();
+
+					if (updated == 0) {
+						throw new SQLException("ポイントが不足しています");
+					}
+				}
+			}
+			
+			// =========================
+			// SAVE COUPON USAGE
+			// =========================
+			if (r.getCouponId() != null && r.getCustomerId() != null) {
+
+			    String sql =
+			        "INSERT INTO coupon_usage (userId, couponId) VALUES (?, ?)";
+
+			    try (PreparedStatement ps = con.prepareStatement(sql)) {
+			        ps.setInt(1, r.getCustomerId());
+			        ps.setInt(2, r.getCouponId());
+			        ps.executeUpdate();
+			    }
+			}
 
 			// =========================
 			// 4️⃣ COMMIT
@@ -329,29 +367,29 @@ public class ReservationDao {
 			con.commit();
 		}
 	}
-	
+
 	public boolean requestCheckout(String table_id) {
 
-        String sql = "UPDATE reservations r "
-        		+ "JOIN reservation_table rt "
-        		+ "ON r.reservationId = rt.reservationId "
-        		+ "SET r.status = ? "
-        		+ "WHERE rt.table_id = ? AND r.status = 'ARRIVED'";
+		String sql = "UPDATE reservations r "
+				+ "JOIN reservation_table rt "
+				+ "ON r.reservationId = rt.reservationId "
+				+ "SET r.status = ? "
+				+ "WHERE rt.table_id = ? AND r.status = 'ARRIVED'";
 
-        try (Connection con=getConn();
-        		PreparedStatement ps = con.prepareStatement(sql)) {
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, "BILL_REQUESTED");
-            ps.setString(2, table_id);
+			ps.setString(1, "BILL_REQUESTED");
+			ps.setString(2, table_id);
 
-            int result = ps.executeUpdate();
-            return result == 1; // 1件更新されたら成功
+			int result = ps.executeUpdate();
+			return result == 1; // 1件更新されたら成功
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 
 	public List<Reservation> findByDate(LocalDate date) {
 
@@ -630,48 +668,48 @@ public class ReservationDao {
 			e.printStackTrace();
 		}
 	}
+
 	// =========================
 	// MEMBER: RESERVATION HISTORY
 	// =========================
 	public List<Reservation> findByCustomerId(int customerId) {
 
-	    Map<Integer, Reservation> map = new LinkedHashMap<>();
+		Map<Integer, Reservation> map = new LinkedHashMap<>();
 
-	    String sql =
-	        "SELECT r.*, rt.table_id " +
-	        "FROM reservations r " +
-	        "LEFT JOIN reservation_table rt " +
-	        "ON r.reservationId = rt.reservationId " +
-	        "WHERE r.customerId = ? " +
-	        "ORDER BY r.reservationDate DESC, r.startTime DESC";
+		String sql = "SELECT r.*, rt.table_id " +
+				"FROM reservations r " +
+				"LEFT JOIN reservation_table rt " +
+				"ON r.reservationId = rt.reservationId " +
+				"WHERE r.customerId = ? " +
+				"ORDER BY r.reservationDate DESC, r.startTime DESC";
 
-	    try (Connection con = getConn();
-	         PreparedStatement ps = con.prepareStatement(sql)) {
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
 
-	        ps.setInt(1, customerId);
-	        ResultSet rs = ps.executeQuery();
+			ps.setInt(1, customerId);
+			ResultSet rs = ps.executeQuery();
 
-	        while (rs.next()) {
-	            int id = rs.getInt("reservationId");
+			while (rs.next()) {
+				int id = rs.getInt("reservationId");
 
-	            Reservation r = map.get(id);
-	            if (r == null) {
-	                r = map(rs);
-	                r.setTableIds(new ArrayList<>());
-	                map.put(id, r);
-	            }
+				Reservation r = map.get(id);
+				if (r == null) {
+					r = map(rs);
+					r.setTableIds(new ArrayList<>());
+					map.put(id, r);
+				}
 
-	            String tableId = rs.getString("table_id");
-	            if (tableId != null) {
-	                r.getTableIds().add(tableId);
-	            }
-	        }
+				String tableId = rs.getString("table_id");
+				if (tableId != null) {
+					r.getTableIds().add(tableId);
+				}
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	    return new ArrayList<>(map.values());
+		return new ArrayList<>(map.values());
 	}
 
 	// =========================

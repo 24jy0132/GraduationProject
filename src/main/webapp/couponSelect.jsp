@@ -259,7 +259,18 @@ main {
 					%>
 					<div class="coupon-card mb-3"
 						onclick="selectCoupon(this,'<%=c.getCouponId()%>')">
-						<div class="coupon-title"><%=c.getTitle()%></div>
+						<div class="coupon-title">
+							<%=c.getTitle()%>
+
+							<%
+							if (c.getTitle().contains("新規")) {
+							%>
+							<span class="badge bg-warning text-dark ms-2">初回限定</span>
+							<%
+							}
+							%>
+						</div>
+
 						<div class="coupon-price">
 							¥<%=c.getDiscountAmount()%>
 							OFF
@@ -271,6 +282,7 @@ main {
 					}
 					}
 					%>
+
 
 					<input type="hidden" name="couponId" id="couponId" value="">
 
