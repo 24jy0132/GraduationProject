@@ -1,59 +1,71 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
    pageEncoding="UTF-8" import="model.Customer"%>
-<%@ include file="header.jsp"%>
-<%
- Customer customer = (Customer) session.getAttribute("customer");
-%>
+   <%@ include file="header.jsp"%>
+  
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>アンケート完了</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
- body {
-   background: #f6f7fb;
- }
- .done-wrapper {
-   min-height: 70vh;
- }
- .done-card {
-   background: #ffffff;
-   border-radius: 18px;
-   padding: 40px 32px;
-   box-shadow: 0 12px 30px rgba(0,0,0,.08);
- }
- .done-title {
-   font-weight: 700;
-   font-size: 1.3rem;
- }
- .done-text {
-   color: #666;
-   font-size: 0.95rem;
- }
- /* ✨ Stylish button */
- .btn-elegant {
-   background: linear-gradient(135deg, #d6336c, #9c36b5);
-   color: #fff;
-   border: none;
-   border-radius: 999px;
-   padding: 0.65rem 2.2rem;
-   font-weight: 600;
-   box-shadow: 0 6px 16px rgba(156,54,181,.35);
-   transition: all .2s ease;
- }
- .btn-elegant:hover {
-   transform: translateY(-2px);
-   box-shadow: 0 10px 22px rgba(156,54,181,.45);
-   color: #fff;
- }
- .check-icon {
-   font-size: 3rem;
-   color: #d6336c;
- }
-</style>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <title>回答済み</title>
+ <!-- Bootstrap -->
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+ <style>
+   body{
+     background: #ffffff;
+   }
+   /* central card */
+   .msg-card{
+     max-width: 520px;
+     width: 92%;
+     border-radius: 18px;
+     background: #ffffff;
+     box-shadow: 0 14px 34px rgba(0,0,0,.08);
+     padding: 42px 32px;
+     text-align: center;
+   }
+   /* check icon */
+   .check-icon{
+     font-size: 3.2rem;
+     color: #e64980;   /* pink like screenshot */
+     margin-bottom: 14px;
+   }
+   .msg-title{
+     font-weight: 800;
+     font-size: 1.4rem;
+     color: #212529;
+     margin-bottom: 14px;
+   }
+   .msg-text{
+     color: #666;
+     font-size: 0.95rem;
+     line-height: 1.8;
+     margin-bottom: 26px;
+   }
+   /* elegant pink-purple button */
+   .btn-soft {
+     background: linear-gradient(135deg, #e64980, #ae3ec9);
+     color: #fff;
+     border: none;
+     border-radius: 999px;
+     padding: 0.65rem 2.2rem;
+     font-weight: 600;
+     box-shadow: 0 8px 18px rgba(174,62,201,.35);
+     transition: all .2s ease;
+   }
+   .btn-soft:hover{
+     transform: translateY(-2px);
+     box-shadow: 0 12px 26px rgba(174,62,201,.45);
+     color: #fff;
+   }
+ </style>
 </head>
 <body>
+<!-- if you have header/footer, keep them -->
+<%
+ // ✅ get login user from session (change attribute name if yours is different)
+ Customer customer = (Customer) session.getAttribute("customer");
+%>
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg bg-danger py-3">
  <div class="container">
@@ -122,30 +134,25 @@
       </div>
  </div>
 </nav>
-<div class="container">
- <div class="row justify-content-center align-items-center done-wrapper text-center">
-   <div class="col-12 col-md-8 col-lg-6">
-     <div class="done-card">
-       <!-- icon -->
-       <div class="mb-3">
-         <span class="check-icon">✓</span>
-       </div>
-       <p class="done-title mb-3">
-         ご回答いただきありがとうございました！
-       </p>
-       <p class="done-text mb-4">
-         10ポイントを付与しました。<br>
-         同一商品の重複レビューはできません。
-       </p>
-       <button class="btn btn-elegant"
-               onclick="location.href='MenuListServlet'">
-         メニューに戻る
-       </button>
+ <!-- center -->
+ <div class="min-vh-100 d-flex align-items-center justify-content-center">
+   <div class="msg-card">
+     <!-- icon -->
+     <div class="check-icon">✓</div>
+     <div class="msg-title">
+       このアンケートは回答済みです
      </div>
+     <p class="msg-text">
+       すでに当該商品のアンケートに回答済みのため、<br>
+       再度回答することはできません。
+     </p>
+     <button class="btn btn-soft"
+             onclick="location.href='MenuListServlet'">
+       メニューに戻る
+     </button>
    </div>
  </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 

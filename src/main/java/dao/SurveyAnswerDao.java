@@ -3,7 +3,12 @@ package dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SurveyAnswerDao {
     private Connection con = null;
@@ -65,4 +70,67 @@ public class SurveyAnswerDao {
         ps.setString(5, answerText);
         ps.executeUpdate();
     }
+    
+    public boolean alreadyAnswered(int userId,int menuId) {
+    	String sql = "select* from survey_answer where userId=? && menuId = ?";
+    	try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setInt(1, userId);
+			ps.setInt(2, menuId);
+			ResultSet rs = ps.executeQuery();
+			return rs.next(); 
+    	}catch (SQLException e) {
+            e.printStackTrace();
+        }
+    	return false;
+    }
+    
+    public void addPoints(int userId) {
+    	String sql = "update customers set point=point+10 where userId = ?";
+    	try(PreparedStatement ps = con.prepareStatement(sql)){
+    		ps.setInt(1, userId);
+    		ps.executeUpdate();
+    	}catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public Map<String,Integer> getTasteSummaryForMenus(int menuId ,int questionId) {
+		Map<String,Integer> map = new LinkedHashMap<>();
+
+    	String sql = "select answerText,count(*)as cnt from survey_answer where menuId=? and questionId =? group by answerText order by cnt desc";
+    	try(PreparedStatement ps = con.prepareStatement(sql)){
+    		ps.setInt(1, menuId);
+    		ps.setInt(2, questionId);
+    		ResultSet rs = ps.executeQuery();
+    		
+    		while (rs.next()) {
+    			map.put(rs.getString("answerText"),rs.getInt("cnt"));
+    		}
+    	}catch (SQLException e) {
+            e.printStackTrace();
+        }
+    	return map;
+    			
+    	
+    }
+    
+    public List<String> findSurveyComments(int questionId,int menuId){
+    	List<String> comments = new ArrayList<>();
+    	String sql = "select answerText from survey_answer where questionId = ? and menuId = ? order by createdAt DESC"
+    			+ "";
+    	try(PreparedStatement ps = con.prepareStatement(sql)){
+    		ps.setInt(1, questionId);
+    		ps.setInt(2, menuId);
+
+    		ResultSet rs = ps.executeQuery();
+    		while(rs.next()) {
+    			comments.add(rs.getString("answerText")) ;
+    		}
+    	}catch (SQLException e) {
+            e.printStackTrace();
+        }
+		return comments;
+
+    }
 }
+
