@@ -375,6 +375,28 @@ public class MenuDao {
         }
         return null;
     }
+	
+	public List<Menu> findCourses() throws SQLException {
+
+        String sql = "SELECT * FROM menu WHERE category = 'コース'";
+
+        List<Menu> list = new ArrayList<>();
+
+        try (
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Menu m = new Menu();
+                m.setMenuId(rs.getInt("menuId"));
+                m.setMenuName(rs.getString("menuName"));
+                m.setPrice(rs.getInt("price"));
+                m.setDescription(rs.getString("description"));
+                list.add(m);
+            }
+        }
+        return list;
+    }
 }
 
 
