@@ -356,6 +356,25 @@ public class MenuDao {
 		}
 		return ar;
 	}
+	public Menu findById1(int menuId) throws SQLException {
+
+        String sql = "SELECT menuId, menuName, price FROM menu WHERE menuId = ?";
+        try (
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, menuId);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Menu m = new Menu();
+                m.setMenuId(rs.getInt("menuId"));
+                m.setMenuName(rs.getString("menuName"));
+                m.setPrice(rs.getInt("price"));
+                return m;
+            }
+        }
+        return null;
+    }
 }
 
 
