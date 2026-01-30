@@ -53,7 +53,7 @@ public class PasswordResetFormServlet extends HttpServlet {
 	        return;
 	    }
 
-	    // Customerの取得（このServletでは未使用でもOK）
+	    // Customerの取得
 	    CustomerDao customerDao = new CustomerDao();
 	    Customer customer = customerDao.findById1(userId);
 
