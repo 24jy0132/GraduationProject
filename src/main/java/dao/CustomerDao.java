@@ -197,20 +197,32 @@ public class CustomerDao {
 		}
 	}
 
-	public void delete(int userId) {
+	public void deleteCustomerWithAnswers(int userId) {
 
-		String sql = "DELETE FROM customers WHERE userId=?";
+	    String deleteSurveySql = "DELETE FROM survey_answer WHERE userId=?";
+	    String deleteCustomerSql = "DELETE FROM customers WHERE userId=?";
 
-		try (
-				PreparedStatement ps = connection.prepareStatement(sql)) {
+	    try {
+	        connection.setAutoCommit(false); // 🔒 transaction
 
-			ps.setInt(1, userId);
-			ps.executeUpdate();
+	        try (PreparedStatement ps1 = connection.prepareStatement(deleteSurveySql)) {
+	            ps1.setInt(1, userId);
+	            ps1.executeUpdate();
+	        }
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	        try (PreparedStatement ps2 = connection.prepareStatement(deleteCustomerSql)) {
+	            ps2.setInt(1, userId);
+	            ps2.executeUpdate();
+	        }
+
+	        connection.commit(); // ✅ success
+
+	    } catch (SQLException e) {
+	        try { connection.rollback(); } catch (SQLException ex) {}
+	        e.printStackTrace();
+	    }
 	}
+
 
 	private Customer map(ResultSet rs) throws SQLException {
 
@@ -225,5 +237,18 @@ public class CustomerDao {
 		return c;
 	}
 
+	public int getPointByUserId(int userId) {
+	    String sql = "SELECT point FROM customers WHERE userId = ?";
+	    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+	        ps.setInt(1, userId);
+	        ResultSet rs = ps.executeQuery();
+	        if (rs.next()) {
+	            return rs.getInt("point");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return 0;
+	}
 
 }

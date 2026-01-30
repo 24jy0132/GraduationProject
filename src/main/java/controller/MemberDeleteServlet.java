@@ -29,7 +29,8 @@ public class MemberDeleteServlet extends HttpServlet {
 
         try {
             CustomerDao dao = new CustomerDao();
-            dao.delete(customer.getUserId());
+            dao.deleteCustomerWithAnswers(customer.getUserId());
+           
 
             // 🔴 important: logout completely
             session.invalidate();

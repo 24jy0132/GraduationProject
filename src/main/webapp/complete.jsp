@@ -106,13 +106,40 @@ main {
 	<!-- =====================
      NAVBAR (TOP)
 ===================== -->
+
+	<!-- ===== Navbar ===== -->
 	<nav class="navbar navbar-expand-lg bg-danger py-3">
 		<div class="container">
-			<a class="navbar-brand fw-bold text-white"
-				href="<%=request.getContextPath()%>/index.jsp"> <img
+			<a
+				class="navbar-brand d-flex align-items-center gap-3 fw-bold text-white"
+				href="<%=request.getContextPath()%>/index.jsp"> <!-- Logo --> <img
 				src="<%=request.getContextPath()%>/img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png"
-				height="40" width="40" class="me-2"> Welcome From Mesa
+				height="40" width="40" class="me-1"> <%
+ if (loginCustomer != null) {
+ %> <!-- Logged-in user info -->
+				<div class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill"
+					style="background: rgba(255, 255, 255, 0.15);">
+
+					<!-- User Icon -->
+					<i class="bi bi-person-circle fs-5"></i>
+
+					<!-- User Name -->
+					<span class="small fw-semibold"> <%=loginCustomer.getName()%>
+					</span>
+
+					<!-- Points -->
+					<span id="pointBadge"
+						class="badge bg-light text-danger fw-bold position-relative">
+						<%=loginCustomer.getPoint()%> pt
+					</span>
+
+				</div> <%
+ }
+ %>
+
+
 			</a>
+
 
 			<button class="navbar-toggler" type="button"
 				data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
@@ -126,8 +153,7 @@ main {
 					if (loginCustomer == null) {
 					%>
 					<li class="nav-item"><a class="nav-link active text-white"
-
-						href="<%=request.getContextPath()%>/Userloginservlet"> <i
+						href="<%=request.getContextPath()%>/index.jsp"> <i
 							class="bi bi-house-fill me-1"></i>Home
 					</a></li>
 					<%
@@ -140,9 +166,9 @@ main {
 					<%
 					}
 					%>
-
 					<li class="nav-item"><a class="nav-link text-white"
-						href="MenuListServlet"> <i class="bi bi-menu-down me-1"></i>Menu
+						href="<%=request.getContextPath()%>/MenuListServlet"> <i
+							class="bi bi-menu-down me-1"></i>Menu
 					</a></li>
 
 					<%
@@ -157,13 +183,10 @@ main {
 					%>
 
 					<li class="nav-item"><a class="nav-link text-white"
-
 						href="<%=request.getContextPath()%>/contact.jsp"> <i
 							class="bi bi-telephone-fill me-1"></i>Contact
 					</a></li>
-
 					<li class="nav-item"><a class="nav-link text-white"
-
 						href="<%=request.getContextPath()%>/map.jsp"> <i
 							class="bi bi-pin-map-fill me-1"></i>Map
 					</a></li>
@@ -186,12 +209,10 @@ main {
 					<%
 					}
 					%>
-
 				</ul>
 			</div>
 		</div>
 	</nav>
-
 	<!-- =====================
      MAIN (CENTER)
 ===================== -->
