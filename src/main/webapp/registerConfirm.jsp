@@ -27,11 +27,11 @@
 <p>Password: <%= temp.getPassword().replaceAll(".", "*") %></p>
 
 <form action="Registerinsertionservlet" method="post">
-    <input type="submit" value="Confirm & Register">
+    <input type="submit" value="登録">
 </form>
 
 <form action="registerForm.jsp" method="get">
-    <input type="submit" value="Back to Edit">
+    <input type="submit" value="戻る">
 </form>
 
 <%

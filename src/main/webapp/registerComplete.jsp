@@ -18,7 +18,7 @@
 <h2>No registration information found.</h2>
 <% } %>
 
-<p><a href="login.jsp">Go to Login</a></p>
+<p><a href="login.jsp">Loginページへ</a></p>
 
 </body>
 </html>
