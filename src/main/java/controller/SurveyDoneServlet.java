@@ -14,39 +14,49 @@ import service.SurveyService;
 
 @WebServlet("/SurveyDoneServlet")
 public class SurveyDoneServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
 
-        // required
-        int menuId = Integer.parseInt(request.getParameter("menuId"));
+		int menuId = Integer.parseInt(request.getParameter("menuId"));
+		String taste = request.getParameter("taste");
+		String volume = request.getParameter("volume");
+		String price = request.getParameter("price");
+		String comment = request.getParameter("comment");
 
-        // answers
-        String taste = request.getParameter("taste");
-        String volume = request.getParameter("volume"); // name="volume"
-        String price = request.getParameter("price");
-        String comment = request.getParameter("comment"); // can be null
+		int surveyId = 1;
 
-        int surveyId = 1;
-        
-        HttpSession session = request.getSession();
-        Customer customer = (Customer)session.getAttribute("customer"); // ★ test user (later: from session after login)
-        int userId = customer.getUserId();
-        
-        SurveyService service= new SurveyService();
-        service.submitSurvey(surveyId, menuId, userId, taste, volume, price, comment);
-        
-        response.sendRedirect("SurveyDone.jsp");
-    }
+		HttpSession session = request.getSession();
+		Customer customer = (Customer) session.getAttribute("customer");
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // direct access -> go back to menu list
-        response.sendRedirect("MenuListServlet");
-    }
+		if (customer == null) {
+			response.sendRedirect("login.jsp");
+			return;
+		}
+
+		int userId = customer.getUserId();
+
+		// ✅ DB logic
+		SurveyService service = new SurveyService();
+		service.submitSurvey(surveyId, menuId, userId, taste, volume, price, comment);
+
+		// ✅ SESSION UPDATE (THIS WAS MISSING)
+		customer.setPoint(customer.getPoint() + 10);
+		session.setAttribute("customer", customer);
+
+		// ✅ for animation / UI feedback
+		session.setAttribute("earnedPoint", 10);
+
+		response.sendRedirect("SurveyDone.jsp");
+	}
+
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		response.sendRedirect("MenuListServlet");
+	}
 }

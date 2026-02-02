@@ -110,7 +110,7 @@ Customer customer = (Customer) session.getAttribute("customer");
 ===================== -->
 	<nav class="navbar navbar-expand-lg bg-danger py-3">
 		<div class="container">
-			<a class="navbar-brand fw-bold text-white" href="member_profile.jsp">
+			<a class="navbar-brand fw-bold text-white" href="<%=request.getContextPath()%>/member_index.jsp">
 				<img src="img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png"
 				height="40" width="40" class="me-2"> Welcome From Mesa
 			</a>
