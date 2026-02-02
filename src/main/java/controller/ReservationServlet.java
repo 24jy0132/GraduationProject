@@ -14,7 +14,7 @@ public class ReservationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
-        req.getRequestDispatcher("/reservationForm.jsp")
+        req.getRequestDispatcher("/reserveForm.jsp")
            .forward(req, res);
     }
 }

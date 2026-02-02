@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import dao.CustomerDao;
 import dao.PasswordResetTokenDao;
+import service.CustomerService;
 
 /**
  * Servlet implementation class PasswordResetServlet
@@ -17,60 +18,98 @@ import dao.PasswordResetTokenDao;
 @WebServlet("/PasswordResetServlet")
 public class PasswordResetServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public PasswordResetServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
-	
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public PasswordResetServlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
 
-        String token = request.getParameter("token");
-        String password = request.getParameter("password");
-        String passwordConfirm = request.getParameter("passwordConfirm");
+		String token = request.getParameter("token");
+		String password = request.getParameter("password");
+		String passwordConfirm = request.getParameter("passwordConfirm");
 
-        // 入力チェック
-        if (token == null || token.isEmpty()
-                || password == null || passwordConfirm == null
-                || !password.equals(passwordConfirm)) {
+		CustomerService service = new CustomerService();
 
-            request.setAttribute("error", "入力内容が正しくありません。");
-            request.getRequestDispatcher("passwordResetForm.jsp")
-                   .forward(request, response);
-            return;
-        }
+		// =========================
+		// BASIC INPUT CHECK
+		// =========================
+		if (token == null || token.isEmpty()) {
+			request.setAttribute("error", "無効なリクエストです。");
+			request.getRequestDispatcher("passwordResetError.jsp")
+					.forward(request, response);
+			return;
+		}
 
-        PasswordResetTokenDao tokenDao = new PasswordResetTokenDao();
-        CustomerDao customerDao = new CustomerDao();
+		// =========================
+		// PASSWORD FORMAT CHECK
+		// =========================
+		if (!service.isValidPassword(password)) {
+			request.setAttribute(
+					"error",
+					"パスワードは8文字以上で、数字を1文字以上含めてください。");
+			request.setAttribute("token", token);
+			request.getRequestDispatcher("passwordResetForm.jsp")
+					.forward(request, response);
+			return;
+		}
 
-        // token検証
-        Integer userId = tokenDao.findValidUserIdByToken(token);
-        if (userId == null) {
-            request.setAttribute("error", "URLの有効期限が切れているか、無効です。");
-            request.getRequestDispatcher("passwordResetError.jsp")
-                   .forward(request, response);
-            return;
-        }
+		// =========================
+		// PASSWORD MATCH CHECK
+		// =========================
+		if (!service.passwordsMatch(password, passwordConfirm)) {
+			request.setAttribute(
+					"error",
+					"パスワードと確認用パスワードが一致しません。");
+			request.setAttribute("token", token);
+			request.getRequestDispatcher("passwordResetForm.jsp")
+					.forward(request, response);
+			return;
+		}
 
-        // パスワード更新
-        customerDao.updatePassword(userId, password);
+		PasswordResetTokenDao tokenDao = new PasswordResetTokenDao();
+		CustomerDao customerDao = new CustomerDao();
 
-        // token削除（再利用防止）
-        tokenDao.deleteByToken(token);
+		// =========================
+		// TOKEN VALIDATION
+		// =========================
+		Integer userId = tokenDao.findValidUserIdByToken(token);
 
-        // 完了画面へ
-        request.getRequestDispatcher("passwordResetComplete.jsp")
-               .forward(request, response);
-    }
+		if (userId == null) {
+			request.setAttribute(
+					"error",
+					"URLの有効期限が切れているか、無効です。");
+			request.getRequestDispatcher("passwordResetError.jsp")
+					.forward(request, response);
+			return;
+		}
+
+		// =========================
+		// UPDATE PASSWORD
+		// =========================
+		customerDao.updatePassword(userId, password);
+
+		// =========================
+		// DELETE TOKEN (SECURITY)
+		// =========================
+		tokenDao.deleteByToken(token);
+
+		// =========================
+		// COMPLETE
+		// =========================
+		request.getRequestDispatcher("passwordResetComplete.jsp")
+				.forward(request, response);
+	}
 
 }

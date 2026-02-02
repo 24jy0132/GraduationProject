@@ -7,94 +7,182 @@ import java.util.List;
 
 public class Reservation {
 
-    private int reservationId;
-    private LocalDate reservationDate;
-    private LocalTime startTime;
-    private LocalTime endTime;
+	private int reservationId;
+	private LocalDate reservationDate;
+	private LocalTime startTime;
+	private LocalTime endTime;
 
-    private int adultCount;
-    private int childCount;
-    private String tableId;
-    private String status;
-    private Integer customerId;
-    private String reservationType; // SEAT_ONLY or COURSE
-    private Integer courseId;        // nullable
-    
-    private Integer couponId;
-    private Integer usedPoint;
+	private int adultCount;
+	private int childCount;
+	private String tableId;
+	private String status;
+	private Integer customerId;
+	private String reservationType; // SEAT_ONLY or COURSE
+	private Integer courseId; // nullable
 
-    public Integer getUsedPoint() {
-        return usedPoint;
-    }
+	private Integer couponId;
+	private Integer usedPoint;
+	private String courseName;
+	private String couponTitle;
 
-    public void setUsedPoint(Integer usedPoint) {
-        this.usedPoint = usedPoint;
-    }
+	private String customerPhone; // ✅ Add this
 
-    public Integer getCouponId() { return couponId; }
-    public void setCouponId(Integer couponId) { this.couponId = couponId; }
+	// ... existing getters/setters ...
 
+	public String getCustomerPhone() {
+		return customerPhone;
+	}
 
-    public String getReservationType() {
+	public void setCustomerPhone(String customerPhone) {
+		this.customerPhone = customerPhone;
+	}
+
+	public String getCourseName() {
+		return courseName;
+	}
+
+	public void setCourseName(String courseName) {
+		this.courseName = courseName;
+	}
+
+	public String getCouponTitle() {
+		return couponTitle;
+	}
+
+	public void setCouponTitle(String couponTitle) {
+		this.couponTitle = couponTitle;
+	}
+
+	public Integer getUsedPoint() {
+		return usedPoint;
+	}
+
+	public void setUsedPoint(Integer usedPoint) {
+		this.usedPoint = usedPoint;
+	}
+
+	public Integer getCouponId() {
+		return couponId;
+	}
+
+	public void setCouponId(Integer couponId) {
+		this.couponId = couponId;
+	}
+
+	public String getReservationType() {
 		return reservationType;
 	}
+
 	public void setReservationType(String reservationType) {
 		this.reservationType = reservationType;
 	}
+
 	public Integer getCourseId() {
 		return courseId;
 	}
+
 	public void setCourseId(Integer courseId) {
 		this.courseId = courseId;
 	}
+
 	public Integer getCustomerId() {
 		return customerId;
 	}
+
 	public void setCustomerId(Integer customerId) {
 		this.customerId = customerId;
 	}
+
 	public String getStatus() {
 		return status;
 	}
+
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
 	private String customerName;
-    private String customerEmail;
+	private String customerEmail;
 
-    // getters & setters
-    public int getReservationId() { return reservationId; }
-    public void setReservationId(int reservationId) { this.reservationId = reservationId; }
+	// getters & setters
+	public int getReservationId() {
+		return reservationId;
+	}
 
-    public LocalDate getReservationDate() { return reservationDate; }
-    public void setReservationDate(LocalDate reservationDate) { this.reservationDate = reservationDate; }
+	public void setReservationId(int reservationId) {
+		this.reservationId = reservationId;
+	}
 
-    public LocalTime getStartTime() { return startTime; }
-    public void setStartTime(LocalTime startTime) { this.startTime = startTime; }
+	public LocalDate getReservationDate() {
+		return reservationDate;
+	}
 
-    public LocalTime getEndTime() { return endTime; }
-    public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
+	public void setReservationDate(LocalDate reservationDate) {
+		this.reservationDate = reservationDate;
+	}
 
-    public int getAdultCount() { return adultCount; }
-    public void setAdultCount(int adultCount) { this.adultCount = adultCount; }
+	public LocalTime getStartTime() {
+		return startTime;
+	}
 
-    public int getChildCount() { return childCount; }
-    public void setChildCount(int childCount) { this.childCount = childCount; }
+	public void setStartTime(LocalTime startTime) {
+		this.startTime = startTime;
+	}
 
-    public String getTableId() { return tableId; }
-    public void setTableId(String tableId) { this.tableId = tableId; }
+	public LocalTime getEndTime() {
+		return endTime;
+	}
 
-    public String getCustomerName() { return customerName; }
-    public void setCustomerName(String customerName) { this.customerName = customerName; }
+	public void setEndTime(LocalTime endTime) {
+		this.endTime = endTime;
+	}
 
-    public String getCustomerEmail() { return customerEmail; }
-    public void setCustomerEmail(String customerEmail) { this.customerEmail = customerEmail; }
-    
-    private List<String> tableIds = new ArrayList<>();
+	public int getAdultCount() {
+		return adultCount;
+	}
+
+	public void setAdultCount(int adultCount) {
+		this.adultCount = adultCount;
+	}
+
+	public int getChildCount() {
+		return childCount;
+	}
+
+	public void setChildCount(int childCount) {
+		this.childCount = childCount;
+	}
+
+	public String getTableId() {
+		return tableId;
+	}
+
+	public void setTableId(String tableId) {
+		this.tableId = tableId;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	public String getCustomerEmail() {
+		return customerEmail;
+	}
+
+	public void setCustomerEmail(String customerEmail) {
+		this.customerEmail = customerEmail;
+	}
+
+	private List<String> tableIds = new ArrayList<>();
 
 	public List<String> getTableIds() {
 		return tableIds;
 	}
+
 	public void setTableIds(List<String> tableIds) {
 		this.tableIds = tableIds;
 	}

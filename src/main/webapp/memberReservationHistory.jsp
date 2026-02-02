@@ -5,219 +5,286 @@
 <%
 Customer loginCustomer = (Customer) session.getAttribute("customer");
 List<Reservation> reservations = (List<Reservation>) request.getAttribute("reservations");
+
+// Safety check: if accessed directly without login
+if (loginCustomer == null) {
+	response.sendRedirect(request.getContextPath() + "/login.jsp");
+	return;
+}
 %>
 
+<!DOCTYPE html>
+<html>
+<head>
+<title>Reservation History | Mesa</title>
+
 <style>
-.history-container {
+/* =====================
+   GLOBAL LAYOUT
+===================== */
+html, body {
+	height: 100%;
+}
+
+body {
 	background-color: #f8f9fa;
-	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+main {
+	flex: 1;
 	padding: 50px 0;
 }
 
-.reservation-card {
-	border-radius: 15px;
+/* =====================
+   HISTORY CARDS
+===================== */
+.history-card {
 	border: none;
-	transition: transform .2s ease;
+	border-radius: 12px;
+	background: white;
+	transition: all 0.2s ease;
+	height: 100%;
+	overflow: hidden;
+	position: relative;
 }
 
-.reservation-card:hover {
-	transform: translateY(-6px);
+.history-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
+.card-body {
+	padding: 25px;
+}
+
+/* Status Badges */
 .status-badge {
-	font-size: 0.85rem;
-	padding: 6px 14px;
+	font-size: 0.75rem;
+	padding: 5px 12px;
 	border-radius: 50px;
-	font-weight: bold;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	display: inline-block;
 }
 
 .status-RESERVED {
-	background-color: #0d6efd;
-	color: white;
+	background-color: #e7f1ff;
+	color: #0d6efd;
 }
 
-.status-FINISHED {
-	background-color: #198754;
-	color: white;
+.status-FINISHED, .status-COMPLETED {
+	background-color: #d1e7dd;
+	color: #0f5132;
 }
 
 .status-CANCELLED {
-	background-color: #dc3545;
-	color: white;
+	background-color: #f8d7da;
+	color: #842029;
 }
 
-.table-badge {
-	background-color: #e9ecef;
-	color: #000;
-	padding: 5px 10px;
-	border-radius: 50px;
-	font-size: 0.75rem;
-	margin-right: 5px;
+/* Typography */
+.res-date {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #212529;
+	margin-bottom: 5px;
+}
+
+.res-time {
+	font-size: 1rem;
+	color: #6c757d;
+	font-weight: 500;
+	margin-bottom: 15px;
+}
+
+.info-row {
+	display: flex;
+	align-items: center;
+	margin-bottom: 8px;
+	color: #495057;
+	font-size: 0.95rem;
+}
+
+.info-row i {
+	width: 24px;
+	color: #adb5bd;
+}
+
+/* Table Pills */
+.table-pill {
+	background-color: #f8f9fa;
+	border: 1px solid #dee2e6;
+	color: #495057;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	margin-right: 4px;
 }
 </style>
+</head>
 
-<nav class="navbar navbar-expand-lg bg-danger py-3">
-	<div class="container">
-		<a class="navbar-brand fw-bold text-white"
-			href="<%=request.getContextPath()%>/index.jsp"> <img
-			src="<%=request.getContextPath()%>/img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png"
-			height="40" width="40" class="me-2"> Welcome From Mesa
-		</a>
+<body>
 
-		<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-			data-bs-target="#navbarSupportedContent">
-			<span class="navbar-toggler-icon"></span>
-		</button>
+	<nav class="navbar navbar-expand-lg bg-danger py-3">
+		<div class="container">
+			<a
+				class="navbar-brand d-flex align-items-center gap-3 fw-bold text-white"
+				href="<%=request.getContextPath()%>/index.jsp"> <img
+				src="<%=request.getContextPath()%>/img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png"
+				height="40" width="40" class="me-1" alt="Logo"> <%
+ if (loginCustomer != null) {
+ %>
+				<div class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill"
+					style="background: rgba(255, 255, 255, 0.15);">
+					<i class="bi bi-person-circle fs-5"></i> <span
+						class="small fw-semibold"><%=loginCustomer.getName()%></span> <span
+						class="badge bg-light text-danger fw-bold position-relative"><%=loginCustomer.getPoint()%>
+						pt</span>
+				</div> <%
+ }
+ %>
+			</a>
 
-		<div class="collapse navbar-collapse justify-content-end"
-			id="navbarSupportedContent">
-			<ul class="navbar-nav gap-4">
-				<%
-				if (loginCustomer == null) {
-				%>
-				<li class="nav-item"><a class="nav-link active text-white"
-					href="<%=request.getContextPath()%>/index.jsp"> <i
-						class="bi bi-house-fill me-1"></i>Home
-				</a></li>
-				<%
-				} else {
-				%>
-				<li class="nav-item"><a class="nav-link active text-white"
-					href="<%=request.getContextPath()%>/member_index.jsp"> <i
-						class="bi bi-house-fill me-1"></i>Home
-				</a></li>
-				<%
-				}
-				%>
-				<li class="nav-item"><a class="nav-link text-white"
-					href="MenuListServlet"> <i class="bi bi-menu-down me-1"></i>Menu
-				</a></li>
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+				<span class="navbar-toggler-icon"></span>
+			</button>
 
-				<%
-				if (loginCustomer == null) {
-				%>
-				<li class="nav-item"><a class="nav-link text-white"
-					href="<%=request.getContextPath()%>/reserve/form"> <i
-						class="bi bi-calendar-check me-1"></i>Reservation
-				</a></li>
-				<%
-				}
-				%>
-
-				<li class="nav-item"><a class="nav-link text-white"
-					href="<%=request.getContextPath()%>/contact.jsp"> <i
-						class="bi bi-telephone-fill me-1"></i>Contact
-				</a></li>
-				<li class="nav-item"><a class="nav-link text-white"
-					href="<%=request.getContextPath()%>/map.jsp"> <i
-						class="bi bi-pin-map-fill me-1"></i>Map
-				</a></li>
-
-				<%
-				if (loginCustomer == null) {
-				%>
-				<li class="nav-item"><a
-					class="nav-link active text-white fw-bold ms-lg-3"
-					href="<%=request.getContextPath()%>/login.jsp"> <i
-						class="bi bi-box-arrow-in-right me-1"></i>Login
-				</a></li>
-				<%
-				} else {
-				%>
-				<li class="nav-item"><a class="nav-link text-white ms-lg-3"
-					href="<%=request.getContextPath()%>/Customer_LogOut"> <i
-						class="bi bi-box-arrow-right me-1"></i>LogOut
-				</a></li>
-				<%
-				}
-				%>
-			</ul>
+			<div class="collapse navbar-collapse justify-content-end"
+				id="navbarSupportedContent">
+				<ul class="navbar-nav gap-4">
+					<li class="nav-item"><a class="nav-link active text-white"
+						href="<%=request.getContextPath()%>/member_index.jsp"><i
+							class="bi bi-house-fill me-1"></i>Home</a></li>
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/MenuListServlet"><i
+							class="bi bi-menu-down me-1"></i>Menu</a></li>
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/contact.jsp"><i
+							class="bi bi-telephone-fill me-1"></i>Contact</a></li>
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/map.jsp"><i
+							class="bi bi-pin-map-fill me-1"></i>Map</a></li>
+					<li class="nav-item"><a class="nav-link text-white ms-lg-3"
+						href="<%=request.getContextPath()%>/Customer_LogOut"><i
+							class="bi bi-box-arrow-right me-1"></i>LogOut</a></li>
+				</ul>
+			</div>
 		</div>
-	</div>
-</nav>
-<div class="history-container">
-	<div class="container">
+	</nav>
 
-		<div class="text-center mb-5">
-			<h1 class="fw-bold">予約履歴</h1>
-		</div>
+	<main>
+		<div class="container">
 
-		<div class="row g-4">
+			<div
+				class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-3">
+				<div>
+					<h2 class="fw-bold m-0">予約履歴</h2>
+					<p class="text-muted m-0 small">過去および現在の予約状況を確認できます</p>
+				</div>
+				<a href="<%=request.getContextPath()%>/reserve/form"
+					class="btn btn-primary rounded-pill px-4 shadow-sm"> <i
+					class="bi bi-plus-lg"></i> 新規予約
+				</a>
+			</div>
 
-			<%
-			if (reservations != null && !reservations.isEmpty()) {
-				for (Reservation r : reservations) {
-			%>
+			<div class="row g-4">
+				<%
+				if (reservations != null && !reservations.isEmpty()) {
+					for (Reservation r : reservations) {
+				%>
+				<div class="col-12 col-md-6 col-lg-4">
+					<div class="card history-card shadow-sm">
+						<div class="card-body">
 
-			<div class="col-12 col-md-6 col-lg-4">
-				<div class="card reservation-card shadow-sm h-100">
-					<div class="card-body d-flex flex-column">
+							<div
+								class="d-flex justify-content-between align-items-start mb-3">
+								<span class="text-muted small" style="font-family: monospace;">#<%=r.getReservationId()%></span>
+								<span class="status-badge status-<%=r.getStatus()%>"> <%
+ if ("RESERVED".equals(r.getStatus())) {
+ %>
+									<i class="bi bi-clock-history"></i> 予約中 <%
+									} else if ("FINISHED".equals(r.getStatus())) {
+									%>
+									<i class="bi bi-check-circle"></i> 来店済 <%
+									} else if ("CANCELLED".equals(r.getStatus())) {
+									%>
+									<i class="bi bi-x-circle"></i> 取消済 <%
+									} else {
+									%> <%=r.getStatus()%>
+									<%
+									}
+									%>
+								</span>
+							</div>
 
-						<div class="d-flex justify-content-between mb-2">
-							<strong> <i class="bi bi-calendar-event me-1"></i> <%=r.getReservationDate()%>
-							</strong> <span class="status-badge status-<%=r.getStatus()%>"> <%=r.getStatus()%>
-							</span>
+							<div class="mb-3">
+								<div class="res-date">
+									<i class="bi bi-calendar-event text-danger me-2"></i><%=r.getReservationDate()%>
+								</div>
+								<div class="res-time ps-4">
+									<%=r.getStartTime()%>
+									-
+									<%=r.getEndTime()%>
+								</div>
+							</div>
+
+							<hr class="text-muted opacity-25">
+
+							<div class="info-row">
+								<i class="bi bi-people-fill"></i> <span>大人 <strong><%=r.getAdultCount()%></strong>名
+									/ 子ども <strong><%=r.getChildCount()%></strong>名
+								</span>
+							</div>
+
+							<div class="info-row align-items-start">
+								<i class="bi bi-grid-3x3-gap-fill mt-1"></i>
+								<div>
+									<%
+									if (r.getTableIds() != null && !r.getTableIds().isEmpty()) {
+										for (String t : r.getTableIds()) {
+									%>
+									<span class="table-pill"><%=t%></span>
+									<%
+									}
+									} else {
+									%>
+									<span class="text-muted small">指定なし</span>
+									<%
+									}
+									%>
+								</div>
+							</div>
+
 						</div>
-
-						<p class="mb-2 text-muted">
-							<i class="bi bi-clock me-1"></i>
-							<%=r.getStartTime()%>
-							-
-							<%=r.getEndTime()%>
-						</p>
-
-						<p class="mb-2">
-							👥 Adults: <strong><%=r.getAdultCount()%></strong> / Children: <strong><%=r.getChildCount()%></strong>
-						</p>
-
-						<div class="mb-3">
-							<%
-							if (r.getTableIds() != null) {
-								for (String t : r.getTableIds()) {
-							%>
-							<span class="table-badge"><%=t%></span>
-							<%
-							}
-							}
-							%>
-						</div>
-
-						<div class="mt-auto">
-							<%
-							if ("RESERVED".equals(r.getStatus())) {
-							%>
-							<a
-								href="<%=request.getContextPath()%>/member/reservation/cancel?id=<%=r.getReservationId()%>"
-								class="btn btn-outline-danger btn-sm w-100"> Cancel
-								Reservation </a>
-							<%
-							}
-							%>
-						</div>
-
 					</div>
 				</div>
+				<%
+				}
+				} else {
+				%>
+				<div class="col-12 text-center py-5">
+					<div class="mb-3">
+						<i class="bi bi-calendar-x text-muted opacity-25"
+							style="font-size: 5rem;"></i>
+					</div>
+					<h4 class="text-muted fw-bold">予約履歴がありません</h4>
+					<p class="text-muted">新しい予約を作成して、素敵な時間をお過ごしください。</p>
+					<a href="<%=request.getContextPath()%>/reserve/form"
+						class="btn btn-outline-danger rounded-pill mt-2 px-5">予約する</a>
+				</div>
+				<%
+				}
+				%>
 			</div>
-
-			<%
-			}
-			} else {
-			%>
-
-			<div class="col-12 text-center py-5">
-				<i class="bi bi-calendar-x text-muted" style="font-size: 4rem;"></i>
-				<h3 class="mt-3">No reservations found</h3>
-				<p class="text-muted">You haven’t made any reservations yet.</p>
-				<a href="<%=request.getContextPath()%>/reserve/form"
-					class="btn btn-danger rounded-pill mt-3"> Make a Reservation </a>
-			</div>
-
-			<%
-			}
-			%>
-
 		</div>
-	</div>
-</div>
+	</main>
 
-<%@ include file="footer.jsp"%>
+	<%@ include file="footer.jsp"%>
+
+</body>
+</html>

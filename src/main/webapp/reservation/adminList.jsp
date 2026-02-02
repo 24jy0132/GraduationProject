@@ -1,110 +1,62 @@
-<%@ page contentType="text/html; charset=UTF-8"%>
-<%@ page import="java.util.*"%>
-<%@ page import="java.time.*"%>
-<%@ page import="model.Reservation"%>
-<%@ include file="../header.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ page import="model.Staff"%>
+	pageEncoding="UTF-8"
+	import="java.util.*,java.time.*,model.Reservation,model.Staff"%>
+
 <%
+// 1. DATA RETRIEVAL
 Staff admin = (Staff) session.getAttribute("admin");
+
+// Date & List Logic
+LocalDate selectedDate = (LocalDate) request.getAttribute("date");
+if (selectedDate == null)
+	selectedDate = LocalDate.now();
+
+List<Reservation> list = (List<Reservation>) request.getAttribute("list");
 %>
 
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>予約一覧</title>
+
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
+/* ===== BASE STYLE ===== */
 body {
-	background: #f5f5f5;
-	margin: 0;
-	padding: 0;
-}
-
-h1 {
-	text-align: center;
-	margin-top: 30px;
-	margin-bottom: 40px;
-	font-weight: 700;
+	background: #f5f5f7;
+	font-family: "Roboto", sans-serif;
 	color: #333;
 }
 
-/* Top buttons (管理TOP / ログアウト) */
-.buttons {
-	text-align: right;
-	margin-bottom: 20px;
-}
-
-.buttons a button {
-	background: #007bff;
-	color: white;
-	padding: 8px 25px;
-	font-size: 16px;
-	border: none;
-	border-radius: 6px;
-	margin-left: 10px;
-	cursor: pointer;
-	transition: 0.3s;
-}
-
-.buttons a button:hover {
-	background: #0056b3;
-}
-
-/* Navigation pills styling */
-.nav-pills .nav-link {
-	font-size: 18px;
-	padding: 10px 18px;
-	color: #333;
-	border-radius: 6px;
-	transition: 0.3s;
-}
-
-.nav-pills .nav-link:hover {
-	background: #e0e0e0;
-}
-
-.nav-pills .nav-link.active {
-	background: #007bff;
-	color: white;
-}
-
-/* Dropdown menu styling */
-.dropdown-menu {
-	font-size: 16px;
-}
-
-.dropdown-menu a {
-	padding: 10px 15px;
-}
-
-.dropdown-menu a:hover {
-	background: #f0f0f0;
-}
-
+/* ===== USER CARD & NAV ===== */
 .topcontainer {
 	display: flex;
 	justify-content: flex-end;
-}
-
-.top-bar {
-	display: flex;
-	justify-content: flex-end;
 	margin-bottom: 20px;
 }
 
-/* User Card – tighter width */
 .user-card {
 	display: inline-flex;
-	align-items: flex-end;
+	align-items: center; /* Changed to center for better alignment */
 	background: white;
-	padding: 6px 10px;
+	padding: 6px 15px 6px 8px; /* Adjusted padding */
 	border-radius: 30px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-	gap: 8px;
-	width: 200px;
+	gap: 12px;
+	min-width: 200px;
 }
 
-/* Avatar smaller */
 .user-avatar {
-	width: 50px; /* reduced */
+	width: 50px;
 	height: 50px;
 	background: linear-gradient(135deg, #007bff, #00c6ff);
 	border-radius: 50%;
@@ -112,148 +64,219 @@ h1 {
 	align-items: center;
 	justify-content: center;
 	color: white;
-	font-size: 18px;
+	font-size: 20px;
+	flex-shrink: 0;
 }
 
-/* Text */
+.user-details {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
 .user-name {
-	font-weight: 600;
-	font-size: 18px;
+	font-weight: 700;
+	font-size: 16px;
+	line-height: 1.2;
+	color: #333;
 }
 
 .user-role {
-	font-size: 16px;
+	font-size: 13px;
 	color: #777;
 }
+
+/* ===== BUTTONS (FROSTED) ===== */
+.buttons {
+	text-align: right;
+	margin-bottom: 25px;
+}
+
+.buttons button, .btn-frost {
+	background: rgba(255, 255, 255, .7);
+	backdrop-filter: blur(8px);
+	border-radius: 12px;
+	border: 1px solid rgba(0, 0, 0, .08);
+	padding: 9px 22px;
+	font-size: 14px;
+	font-weight: 500;
+	color: #1c1c1e;
+	margin-left: 10px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+	transition: .25s;
+}
+
+.buttons button:hover, .btn-frost:hover {
+	background: rgba(255, 255, 255, .9);
+	transform: translateY(-1px);
+}
+
+/* ===== TABLE CONTAINER ===== */
+.content-card {
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+	padding: 30px;
+	margin-bottom: 50px;
+}
+
+.table thead th {
+	background: #343a40;
+	color: #fff;
+	border: none;
+}
 </style>
+</head>
 
+<body>
 
-<%
-LocalDate selectedDate = (LocalDate) request.getAttribute("date");
-List<Reservation> list = (List<Reservation>) request.getAttribute("list");
-%>
+	<div class="container mt-4">
 
+		<h2 class="text-center fw-bold text-dark mb-4">MHP株式会社 営業サポートシステム</h2>
 
-
-<body class="container mt-4">
-	<h1>MHP株式会社 営業サポートシステム</h1>
-
-	<div class="container">
 		<div class="topcontainer">
-			<!-- Top right buttons -->
-			<div class="top-bar">
-				<%
-				if (admin != null) {
-				%>
-				<div class="user-card">
-					<div class="user-avatar">
-						<i class="fa-solid fa-user"></i>
-					</div>
-
-
-					<div class="user-details">
-						<div class="user-name"><%=admin.getStaffName()%></div>
-						<div class="user-role"><%=admin.getStaffType()%></div>
-					</div>
-
-
-
-
+			<%
+			if (admin != null) {
+			%>
+			<div class="user-card">
+				<div class="user-avatar">
+					<i class="fa-solid fa-user"></i>
 				</div>
-				<%
-				}
-				%>
+				<div class="user-details">
+					<div class="user-name"><%=admin.getStaffName()%></div>
+					<div class="user-role"><%=admin.getStaffType()%></div>
+				</div>
 			</div>
+			<%
+			}
+			%>
 		</div>
+
 		<div class="buttons">
 			<a href="<%=request.getContextPath()%>/Admin/adminhome.jsp"><button>管理TOP</button></a>
 			<a href="<%=request.getContextPath()%>/Adminlogoutservlet"><button>ログアウト</button></a>
 		</div>
 
-		<h2 class="mb-4">📋 Reservation List</h2>
 
-		<!-- DATE FILTER -->
-		<form method="get"
-			action="<%=request.getContextPath()%>/adminreservation/list"
-			class="row g-3 align-items-end mb-4">
+		<div class="content-card">
 
-			<div class="col-auto">
-				<label class="form-label">Date</label> <input type="date"
-					name="date" value="<%=selectedDate%>" class="form-control">
+			<div
+				class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+				<h4 class="m-0 fw-bold">
+					<i class="bi bi-list-check me-2"></i>予約一覧表
+				</h4>
 			</div>
 
-			<div class="col-auto">
-				<button class="btn btn-primary">
-					<i class="bi bi-funnel"></i> Filter
-				</button>
-			</div>
-		</form>
+			<form method="get"
+				action="<%=request.getContextPath()%>/adminreservation/list"
+				class="row g-2 align-items-end mb-4 bg-light p-3 rounded">
+				<div class="col-auto">
+					<label class="form-label fw-bold small text-muted">表示日付</label> <input
+						type="date" name="date" value="<%=selectedDate%>"
+						class="form-control">
+				</div>
+				<div class="col-auto">
+					<button class="btn btn-primary px-4">
+						<i class="bi bi-search"></i> 検索
+					</button>
+				</div>
+			</form>
 
-		<!-- RESERVATION TABLE -->
-		<table
-			class="table table-bordered table-hover align-middle text-center">
+			<div class="table-responsive">
+				<table class="table table-hover align-middle text-center border">
+					<thead class="table-dark">
+						<tr>
+							<th>ID</th>
+							<th>Date</th>
+							<th>Time</th>
+							<th>Table</th>
+							<th>Customer</th>
+							<th>Phno</th>
+							<th>People</th>
+							<th>Course</th>
+							<th>Coupon</th>
+							<th>Type</th>
+							<th>Action</th>
+						</tr>
+					</thead>
 
-			<thead class="table-dark">
-				<tr>
-					<th>ID</th>
-					<th>Date</th>
-					<th>Time</th>
-					<th>Table</th>
-					<th>Customer</th>
-					<th>People</th>
-					<th>Action</th>
-				</tr>
-			</thead>
+					<tbody>
+						<%
+						if (list == null || list.isEmpty()) {
+						%>
+						<tr>
+							<td colspan="10" class="text-center py-5 text-muted"><i
+								class="bi bi-calendar-x fs-1 d-block mb-2"></i> 予約データが見つかりませんでした
+							</td>
+						</tr>
+						<%
+						} else {
+						for (Reservation r : list) {
+						%>
+						<tr>
+							<td class="fw-bold text-secondary"><%=r.getReservationId()%></td>
 
-			<tbody>
-				<%
-				if (list == null || list.isEmpty()) {
-				%>
-				<tr>
-					<td colspan="7" class="text-muted">No reservations found for
-						this date</td>
-				</tr>
-				<%
-				} else {
-				%>
+							<td><%=r.getReservationDate()%></td>
 
-				<%
-				for (Reservation r : list) {
-				%>
-				<tr>
-					<td><%=r.getReservationId()%></td>
+							<td class="fw-bold text-primary"><%=r.getStartTime()%> – <%=r.getEndTime()%></td>
 
-					<td><%=r.getReservationDate()%></td>
+							<td><span class="badge bg-light text-dark border"> <%=r.getTableIds() == null || r.getTableIds().isEmpty() ? "-" : String.join(", ", r.getTableIds())%>
+							</span></td>
 
-					<td><%=r.getStartTime()%> – <%=r.getEndTime()%></td>
+							<td class="text-start ps-4 fw-bold"><%=r.getCustomerName()%></td>
 
-					<td><span class="badge bg-secondary"> <%=r.getTableIds() == null || r.getTableIds().isEmpty()
+							<td class="text-start ps-4 fw-bold"><%=r.getCustomerPhone()%></td>
+
+							<td><small class="d-block text-muted">大人: <%=r.getAdultCount()%></small>
+								<small class="d-block text-muted">子供: <%=r.getChildCount()%></small>
+							</td>
+
+							<td><%=(r.getCourseName() == null || r.getCourseName().isEmpty()) ? "-" : r.getCourseName()%></td>
+
+							<td><%=(r.getCouponTitle() == null || r.getCouponTitle().isEmpty())
 		? "-"
-		: String.join(" + ", r.getTableIds())%>
-					</span></td>
+		: "<span class='badge bg-warning text-dark'>" + r.getCouponTitle() + "</span>"%></td>
 
-					<td><%=r.getCustomerName()%></td>
+							<td>
+								<%
+								if (r.getCustomerId() != null) {
+								%> <span
+								class="badge bg-success bg-opacity-10 text-success border border-success">会員</span>
+								<%
+								} else {
+								%> <span
+								class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary">非会員</span>
+								<%
+								}
+								%>
+							</td>
 
-					<td>A:<%=r.getAdultCount()%> / C:<%=r.getChildCount()%>
-					</td>
+							<td>
+								<div class="btn-group">
+									<a class="btn btn-sm btn-outline-primary"
+										href="<%=request.getContextPath()%>/admin/edit?id=<%=r.getReservationId()%>">
+										<i class="bi bi-pencil-square"></i>
+									</a> <a class="btn btn-sm btn-outline-danger"
+										href="<%=request.getContextPath()%>/admin/delete?id=<%=r.getReservationId()%>"
+										onclick="return confirm('本当に削除しますか？')"> <i
+										class="bi bi-trash"></i>
+									</a>
+								</div>
+							</td>
+						</tr>
+						<%
+						}
+						}
+						%>
+					</tbody>
+				</table>
+			</div>
 
-					<td><a class="btn btn-sm btn-warning"
-						href="<%=request.getContextPath()%>/admin/edit?id=<%=r.getReservationId()%>">
-							<i class="bi bi-pencil-square"></i>
-					</a> <a class="btn btn-sm btn-danger"
-						href="<%=request.getContextPath()%>/admin/delete?id=<%=r.getReservationId()%>"
-						onclick="return confirm('Cancel this reservation?')"> <i
-							class="bi bi-trash"></i>
-					</a></td>
-				</tr>
-				<%
-				}
-				%>
+		</div>
 
-				<%
-				}
-				%>
-			</tbody>
-		</table>
+	</div>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -23,8 +23,12 @@ public class MenuDao {
 		}
 
 		try {
-			con = DriverManager.getConnection("jdbc:mysql://10.64.144.5:3306/" + "24jy0234?characterEncoding=UTF-8",
-					"24jy0234", "24jy0234");
+			//			connection = DriverManager.getConnection(
+			//			"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
+			//			"24jy0234",
+			//			"24jy0234");
+			con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/" + "myrestaurant?characterEncoding=UTF-8",
+					"root", "shadowseeker");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -176,14 +180,15 @@ public class MenuDao {
 		}
 		return ar;
 	}
-	public List<Menu> findAlaCarteMenu(){
+
+	public List<Menu> findAlaCarteMenu() {
 		List<Menu> ar = new ArrayList<Menu>();
 		Menu menu = null;
 		String sql = "Select* from menu where category = ?";
-		try(PreparedStatement state = con.prepareStatement(sql)){
+		try (PreparedStatement state = con.prepareStatement(sql)) {
 			state.setString(1, "アラカルト");
 			ResultSet rs = state.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				menu = new Menu();
 				menu.setMenuId(rs.getInt("menuId"));
 				menu.setMenuName(rs.getString("menuName"));
@@ -195,19 +200,20 @@ public class MenuDao {
 				menu.setSurveyId(rs.getInt("surveyId"));
 				ar.add(menu);
 			}
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return ar;
 	}
-	public List<Menu> findSaladSoup(){
+
+	public List<Menu> findSaladSoup() {
 		List<Menu> ar = new ArrayList<Menu>();
 		Menu menu = null;
 		String sql = "Select* from menu where category = ?";
-		try(PreparedStatement state = con.prepareStatement(sql)){
+		try (PreparedStatement state = con.prepareStatement(sql)) {
 			state.setString(1, "サラダ．スープ．その他");
 			ResultSet rs = state.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				menu = new Menu();
 				menu.setMenuId(rs.getInt("menuId"));
 				menu.setMenuName(rs.getString("menuName"));
@@ -219,19 +225,20 @@ public class MenuDao {
 				menu.setSurveyId(rs.getInt("surveyId"));
 				ar.add(menu);
 			}
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return ar;
 	}
-	public List<Menu> findDrinks(){
+
+	public List<Menu> findDrinks() {
 		List<Menu> ar = new ArrayList<Menu>();
 		Menu menu = null;
 		String sql = "Select* from menu where category = ?";
-		try(PreparedStatement state = con.prepareStatement(sql)){
+		try (PreparedStatement state = con.prepareStatement(sql)) {
 			state.setString(1, "ドリンク");
 			ResultSet rs = state.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				menu = new Menu();
 				menu.setMenuId(rs.getInt("menuId"));
 				menu.setMenuName(rs.getString("menuName"));
@@ -243,15 +250,16 @@ public class MenuDao {
 				menu.setSurveyId(rs.getInt("surveyId"));
 				ar.add(menu);
 			}
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return ar;
 	}
-	
-	public void insertNewMenu(String menuName,String description,int price,String category,String imagePath,int isSurveyTarget,int surveyId,int isNew) {
+
+	public void insertNewMenu(String menuName, String description, int price, String category, String imagePath,
+			int isSurveyTarget, int surveyId, int isNew) {
 		String sql = "insert into menu(menuName,description,price,category,imagePath,isSurveyTarget,surveyId,isNew) values (?,?,?,?,?,?,?,?)";
-		try(PreparedStatement state = con.prepareStatement(sql)){
+		try (PreparedStatement state = con.prepareStatement(sql)) {
 			state.setString(1, menuName);
 			state.setString(2, description);
 			state.setInt(3, price);
@@ -262,32 +270,32 @@ public class MenuDao {
 			state.setInt(8, isNew);
 
 			state.executeUpdate();
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void deleteMenu(int menuId) {
 		String sql = "delete from menu where menuId=?";
-		try(PreparedStatement state = con.prepareStatement(sql)){
+		try (PreparedStatement state = con.prepareStatement(sql)) {
 			state.setInt(1, menuId);
 			state.executeUpdate();
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public List<Menu> findNotSurveyMenus(){
+
+	public List<Menu> findNotSurveyMenus() {
 		List<Menu> ar = new ArrayList<Menu>();
 		Menu menu = null;
-		
-		String sql= "select* from menu where isSurveyTarget=?";
-		try(PreparedStatement state = con.prepareStatement(sql)){
+
+		String sql = "select* from menu where isSurveyTarget=?";
+		try (PreparedStatement state = con.prepareStatement(sql)) {
 			state.setInt(1, 0);
 			ResultSet rs = state.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				menu = new Menu();
-				
+
 				menu.setMenuId(rs.getInt("menuId"));
 				menu.setMenuName(rs.getString("menuName"));
 				menu.setDescription(rs.getString("description"));
@@ -297,49 +305,49 @@ public class MenuDao {
 				menu.setSurveyId(rs.getInt("surveyId"));
 				ar.add(menu);
 			}
-			
-		}catch (SQLException e) {
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return ar;
 	}
-	
+
 	public void makeSurveyTarget(int menuId) {
 		String sql = "update menu set isSurveyTarget = 1 where menuId =?";
-		try(PreparedStatement state = con.prepareStatement(sql)){
+		try (PreparedStatement state = con.prepareStatement(sql)) {
 			state.setInt(1, menuId);
 			state.executeUpdate();
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void updateMenu(int menuId, String menuName, String category, int price, String description) {
 
-	    String sql = "UPDATE menu SET menuName=?, category=?, price=?, description=? WHERE menuId=?";
+		String sql = "UPDATE menu SET menuName=?, category=?, price=?, description=? WHERE menuId=?";
 
-	    try (PreparedStatement ps = con.prepareStatement(sql)) {
-	        ps.setString(1, menuName);
-	        ps.setString(2, category);
-	        ps.setInt(3, price);
-	        ps.setString(4, description);
-	        ps.setInt(5, menuId);
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setString(1, menuName);
+			ps.setString(2, category);
+			ps.setInt(3, price);
+			ps.setString(4, description);
+			ps.setInt(5, menuId);
 
-	        ps.executeUpdate();
+			ps.executeUpdate();
 
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public List<Menu> findCourse(){
+	public List<Menu> findCourse() {
 		List<Menu> ar = new ArrayList<Menu>();
 		Menu menu = null;
 		String sql = "Select* from menu where category = ?";
-		try(PreparedStatement state = con.prepareStatement(sql)){
+		try (PreparedStatement state = con.prepareStatement(sql)) {
 			state.setString(1, "コース");
 			ResultSet rs = state.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				menu = new Menu();
 				menu.setMenuId(rs.getInt("menuId"));
 				menu.setMenuName(rs.getString("menuName"));
@@ -351,53 +359,51 @@ public class MenuDao {
 				menu.setSurveyId(rs.getInt("surveyId"));
 				ar.add(menu);
 			}
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return ar;
 	}
+
 	public Menu findById1(int menuId) throws SQLException {
 
-        String sql = "SELECT menuId, menuName, price FROM menu WHERE menuId = ?";
-        try (
-             PreparedStatement ps = con.prepareStatement(sql)) {
+		String sql = "SELECT menuId, menuName, price FROM menu WHERE menuId = ?";
+		try (
+				PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setInt(1, menuId);
+			ps.setInt(1, menuId);
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                Menu m = new Menu();
-                m.setMenuId(rs.getInt("menuId"));
-                m.setMenuName(rs.getString("menuName"));
-                m.setPrice(rs.getInt("price"));
-                return m;
-            }
-        }
-        return null;
-    }
-	
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				Menu m = new Menu();
+				m.setMenuId(rs.getInt("menuId"));
+				m.setMenuName(rs.getString("menuName"));
+				m.setPrice(rs.getInt("price"));
+				return m;
+			}
+		}
+		return null;
+	}
+
 	public List<Menu> findCourses() throws SQLException {
 
-        String sql = "SELECT * FROM menu WHERE category = 'コース'";
+		String sql = "SELECT * FROM menu WHERE category = 'コース'";
 
-        List<Menu> list = new ArrayList<>();
+		List<Menu> list = new ArrayList<>();
 
-        try (
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+		try (
+				PreparedStatement ps = con.prepareStatement(sql);
+				ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
-                Menu m = new Menu();
-                m.setMenuId(rs.getInt("menuId"));
-                m.setMenuName(rs.getString("menuName"));
-                m.setPrice(rs.getInt("price"));
-                m.setDescription(rs.getString("description"));
-                list.add(m);
-            }
-        }
-        return list;
-    }
+			while (rs.next()) {
+				Menu m = new Menu();
+				m.setMenuId(rs.getInt("menuId"));
+				m.setMenuName(rs.getString("menuName"));
+				m.setPrice(rs.getInt("price"));
+				m.setDescription(rs.getString("description"));
+				list.add(m);
+			}
+		}
+		return list;
+	}
 }
-
-
-
