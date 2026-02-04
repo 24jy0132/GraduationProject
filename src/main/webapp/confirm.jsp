@@ -547,11 +547,11 @@ main {
 							戻る
 						</a>
 						<button type="submit"
-							class="btn btn-primary px-5 py-2 fw-bold rounded-pill shadow">
-							予約を確定する <i class="bi bi-check-lg"></i>
+							class="btn btn-dark px-5 fw-bold rounded-pill shadow">
+							予約を確定する <i class="bi bi-arrow-right"></i>
 						</button>
 					</div>
-
+					
 				</form>
 			</div>
 

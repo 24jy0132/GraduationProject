@@ -6,26 +6,26 @@
 <%@ page import="service.Constants"%>
 
 <%
-    // 1. Setup Logic
-    Customer loginCustomer = (Customer) session.getAttribute("customer");
-    LocalTime t = Constants.OPEN;
-    
-    // 2. Pre-fill Data
-    String nameVal = "";
-    String emailVal = "";
-    String phoneVal = ""; // ✅ New Variable
-    boolean readOnly = false;
+// 1. Setup Logic
+Customer loginCustomer = (Customer) session.getAttribute("customer");
+LocalTime t = Constants.OPEN;
 
-    if (loginCustomer != null) {
-        nameVal = loginCustomer.getName();
-        emailVal = loginCustomer.getEmail();
-        // Assuming your Customer model has getPhone(). If it's named getTel(), change this.
-        // phoneVal = loginCustomer.getPhone(); 
-        readOnly = true;
-    }
-    
-    // 3. Date Constraints
-    String todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+// 2. Pre-fill Data
+String nameVal = "";
+String emailVal = "";
+String phoneVal = ""; // ✅ New Variable
+boolean readOnly = false;
+
+if (loginCustomer != null) {
+	nameVal = loginCustomer.getName();
+	emailVal = loginCustomer.getEmail();
+	// Assuming your Customer model has getPhone(). If it's named getTel(), change this.
+	// phoneVal = loginCustomer.getPhone(); 
+	readOnly = true;
+}
+
+// 3. Date Constraints
+String todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 %>
 
 <!DOCTYPE html>
@@ -163,51 +163,108 @@ main {
 
 <body>
 
-	<nav class="navbar navbar-expand-lg bg-danger py-3">
+	<nav class="navbar navbar-expand-lg bg-danger py-3 sticky-top">
 		<div class="container">
 			<a
 				class="navbar-brand d-flex align-items-center gap-3 fw-bold text-white"
 				href="<%=request.getContextPath()%>/index.jsp"> <img
 				src="<%=request.getContextPath()%>/img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png"
-				height="40" width="40" class="me-1" alt="Logo"> <% if (loginCustomer != null) { %>
+				height="40" width="40" class="me-1" alt="Logo"> Welcome From
+				Mesa <%
+ if (loginCustomer != null) {
+ %>
 				<div class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill"
 					style="background: rgba(255, 255, 255, 0.15);">
 					<i class="bi bi-person-circle fs-5"></i> <span
 						class="small fw-semibold"><%=loginCustomer.getName()%></span> <span
 						class="badge bg-light text-danger fw-bold position-relative"><%=loginCustomer.getPoint()%>
 						pt</span>
-				</div> <% } else { %> <span>Welcome From Mesa</span> <% } %>
+				</div> <%
+ }
+ %>
 			</a>
+
 			<button class="navbar-toggler" type="button"
 				data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
 				<span class="navbar-toggler-icon"></span>
 			</button>
+
 			<div class="collapse navbar-collapse justify-content-end"
 				id="navbarSupportedContent">
 				<ul class="navbar-nav gap-4">
-					<% if (loginCustomer == null) { %>
+					<%
+					if (loginCustomer == null) {
+					%>
 					<li class="nav-item"><a class="nav-link active text-white"
-						href="<%=request.getContextPath()%>/index.jsp">Home</a></li>
-					<% } else { %>
+						href="<%=request.getContextPath()%>/index.jsp"><i
+							class="bi bi-house-fill me-1"></i>Home</a></li>
+					<%
+					} else {
+					%>
 					<li class="nav-item"><a class="nav-link active text-white"
-						href="<%=request.getContextPath()%>/member_index.jsp">Home</a></li>
-					<% } %>
+						href="<%=request.getContextPath()%>/member_index.jsp"><i
+							class="bi bi-house-fill me-1"></i>Home</a></li>
+					<%
+					}
+					%>
+
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/MenuListServlet"><i
+							class="bi bi-menu-down me-1"></i>Menu</a></li>
+
+					<%
+					if (loginCustomer == null) {
+					%>
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/reserve/form"><i
+							class="bi bi-calendar-check me-1"></i>Reservation</a></li>
+					<%
+					}
+					%>
+
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/contact.jsp"><i
+							class="bi bi-telephone-fill me-1"></i>Contact</a></li>
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/map.jsp"><i
+							class="bi bi-pin-map-fill me-1"></i>Map</a></li>
+
+					<%
+					if (loginCustomer == null) {
+					%>
+					<li class="nav-item"><a
+						class="nav-link active text-white fw-bold ms-lg-3"
+						href="<%=request.getContextPath()%>/login.jsp"><i
+							class="bi bi-box-arrow-in-right me-1"></i>Login</a></li>
+					<%
+					} else {
+					%>
+					<li class="nav-item"><a class="nav-link text-white ms-lg-3"
+						href="<%=request.getContextPath()%>/Customer_LogOut"><i
+							class="bi bi-box-arrow-right me-1"></i>LogOut</a></li>
+					<%
+					}
+					%>
 				</ul>
 			</div>
 		</div>
 	</nav>
-
 	<main>
 		<div class="container">
 
-			<% String error = (String) request.getAttribute("error"); if (error != null) { %>
+			<%
+			String error = (String) request.getAttribute("error");
+			if (error != null) {
+			%>
 			<div
 				class="alert alert-danger d-flex align-items-center shadow-sm mx-auto mb-4"
 				style="max-width: 800px;">
 				<i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
 				<div><%=error%></div>
 			</div>
-			<% } %>
+			<%
+			}
+			%>
 
 			<div class="stepper">
 				<div class="step active">
@@ -225,7 +282,9 @@ main {
 					コース
 				</div>
 				<div class="line"></div>
-				<% if (loginCustomer != null) { %>
+				<%
+				if (loginCustomer != null) {
+				%>
 				<div class="step">
 					<div class="circle">4</div>
 					クーポン
@@ -240,7 +299,9 @@ main {
 					<div class="circle">6</div>
 					完了
 				</div>
-				<% } else { %>
+				<%
+				} else {
+				%>
 				<div class="step">
 					<div class="circle">4</div>
 					確認
@@ -250,7 +311,9 @@ main {
 					<div class="circle">5</div>
 					完了
 				</div>
-				<% } %>
+				<%
+				}
+				%>
 			</div>
 
 			<div class="form-container">
@@ -277,9 +340,14 @@ main {
 									<span class="input-group-text"><i
 										class="bi bi-clock text-danger"></i></span> <select name="startTime"
 										class="form-select">
-										<% while (!t.isAfter(Constants.LAST_START)) { %>
+										<%
+										while (!t.isAfter(Constants.LAST_START)) {
+										%>
 										<option value="<%=t%>"><%=t%></option>
-										<% t = t.plusMinutes(Constants.SLOT_MINUTES); } %>
+										<%
+										t = t.plusMinutes(Constants.SLOT_MINUTES);
+										}
+										%>
 									</select>
 								</div>
 							</div>
@@ -312,9 +380,13 @@ main {
 
 							<div class="col-md-6">
 								<label class="section-label d-flex justify-content-between">
-									お名前 <% if (readOnly) { %> <span
+									お名前 <%
+								if (readOnly) {
+								%> <span
 									class="badge bg-light text-muted border"><i
-										class="bi bi-lock-fill"></i> 会員情報</span> <% } %>
+										class="bi bi-lock-fill"></i> 会員情報</span> <%
+ }
+ %>
 								</label>
 								<div class="input-group input-group-lg">
 									<span class="input-group-text <%=readOnly ? "bg-light" : ""%>"><i
@@ -326,26 +398,34 @@ main {
 
 							<div class="col-md-6">
 								<label class="section-label d-flex justify-content-between">
-									電話番号 <% if (readOnly && !phoneVal.isEmpty()) { %> <span
+									電話番号 <%
+								if (readOnly && !phoneVal.isEmpty()) {
+								%> <span
 									class="badge bg-light text-muted border"><i
-										class="bi bi-lock-fill"></i> 会員情報</span> <% } %>
+										class="bi bi-lock-fill"></i> 会員情報</span> <%
+ }
+ %>
 								</label>
 								<div class="input-group input-group-lg">
 									<span
-										class="input-group-text <%= (readOnly && !phoneVal.isEmpty()) ? "bg-light" : ""%>"><i
+										class="input-group-text <%=(readOnly && !phoneVal.isEmpty()) ? "bg-light" : ""%>"><i
 										class="bi bi-telephone"></i></span> <input type="tel" name="phone"
-										class="form-control <%= (readOnly && !phoneVal.isEmpty()) ? "readonly-field" : ""%>"
+										class="form-control <%=(readOnly && !phoneVal.isEmpty()) ? "readonly-field" : ""%>"
 										value="<%=phoneVal%>"
-										<%= (readOnly && !phoneVal.isEmpty()) ? "readonly" : ""%>
+										<%=(readOnly && !phoneVal.isEmpty()) ? "readonly" : ""%>
 										required placeholder="09012345678">
 								</div>
 							</div>
 
 							<div class="col-12">
 								<label class="section-label d-flex justify-content-between">
-									メールアドレス <% if (readOnly) { %> <span
+									メールアドレス <%
+								if (readOnly) {
+								%> <span
 									class="badge bg-light text-muted border"><i
-										class="bi bi-lock-fill"></i> 会員情報</span> <% } %>
+										class="bi bi-lock-fill"></i> 会員情報</span> <%
+ }
+ %>
 								</label>
 								<div class="input-group input-group-lg">
 									<span class="input-group-text <%=readOnly ? "bg-light" : ""%>"><i
@@ -358,7 +438,7 @@ main {
 
 						<div class="text-end mt-5">
 							<button
-								class="btn btn-primary px-5 py-3 fw-bold rounded-pill shadow">
+								class="btn btn-dark px-5 py-3 fw-bold rounded-pill shadow">
 								次へ（席選択） <i class="bi bi-arrow-right ms-2"></i>
 							</button>
 						</div>

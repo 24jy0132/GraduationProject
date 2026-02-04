@@ -394,7 +394,7 @@ to {
 							戻る
 						</a>
 						<button type="submit"
-							class="btn btn-primary px-5 fw-bold rounded-pill shadow">
+							class="btn btn-dark px-5 fw-bold rounded-pill shadow">
 							次へ（確認） <i class="bi bi-arrow-right"></i>
 						</button>
 					</div>

@@ -123,16 +123,37 @@ keyframes popIn { 0% {
 }
 
 100
+
+
 %
 {
 transform
+
+
 :
-scale(
+
+
+scale
+(
+
+
 1
-);
+
+
+)
+;
+
+
 opacity
+
+
 :
-1;
+
+
+1
+;
+
+
 }
 }
 .complete-title {
@@ -158,7 +179,8 @@ opacity
 				class="navbar-brand d-flex align-items-center gap-3 fw-bold text-white"
 				href="<%=request.getContextPath()%>/index.jsp"> <img
 				src="<%=request.getContextPath()%>/img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png"
-				height="40" width="40" class="me-1" alt="Logo"> Welcome From Mesa <%
+				height="40" width="40" class="me-1" alt="Logo"> Welcome From
+				Mesa <%
  if (loginCustomer != null) {
  %>
 				<div class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill"
@@ -305,7 +327,7 @@ opacity
 			</div>
 
 			<div class="success-card">
-				<i class="bi bi-check-circle-fill success-icon"></i>
+				<i class="bi bi-check-circle-fill success-icon text-dark"></i>
 
 				<div class="complete-title">ご予約ありがとうございます</div>
 
@@ -338,13 +360,13 @@ opacity
 					if (loginCustomer != null) {
 					%>
 					<a href="<%=request.getContextPath()%>/member_index.jsp"
-						class="btn btn-primary px-5 py-3 fw-bold rounded-pill shadow">
+						class="btn btn-dark px-5 py-3 fw-bold rounded-pill shadow">
 						ホームへ戻る </a>
 					<%
 					} else {
 					%>
 					<a href="<%=request.getContextPath()%>/index.jsp"
-						class="btn btn-primary px-5 py-3 fw-bold rounded-pill shadow">
+						class="btn btn-dark px-5 py-3 fw-bold rounded-pill shadow">
 						トップページへ戻る </a>
 					<%
 					}

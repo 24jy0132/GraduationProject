@@ -48,7 +48,7 @@ public class AdminReservationCreateServlet extends HttpServlet {
 				return;
 			}
 
-			dao.insertWithTables(r, tableIds);
+			dao.insertWithTables(r);
 
 			res.sendRedirect(req.getContextPath() + "/admin");
 

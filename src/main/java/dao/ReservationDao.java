@@ -23,9 +23,10 @@ import service.Constants;
 
 public class ReservationDao {
 
-	private static final String URL = "jdbc:mysql://127.0.0.1:3306/myrestaurant?characterEncoding=UTF-8";
-	private static final String USER = "root";
-	private static final String PASS = "shadowseeker";
+	private static final String URL = "jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8";
+
+	private static final String USER = "24jy0234";
+	private static final String PASS = "24jy0234";
 
 	static {
 		try {
@@ -476,33 +477,31 @@ public class ReservationDao {
 		}
 		return new ArrayList<>(map.values());
 	}
-	
+
 	public boolean requestCheckout(String table_id) {
 
-	    String sql =
-	        "UPDATE reservations r " +
-	        "JOIN reservation_table rt " +
-	        "ON r.reservationId = rt.reservationId " +
-	        "SET r.status = ? " +
-	        "WHERE rt.table_id = ? " +
-	        "AND r.status = 'ARRIVED'";
+		String sql = "UPDATE reservations r " +
+				"JOIN reservation_table rt " +
+				"ON r.reservationId = rt.reservationId " +
+				"SET r.status = ? " +
+				"WHERE rt.table_id = ? " +
+				"AND r.status = 'ARRIVED'";
 
-	    try (Connection con = getConn();
-	         PreparedStatement ps = con.prepareStatement(sql)) {
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
 
-	        ps.setString(1, "BILL_REQUESTED");
-	        ps.setString(2, table_id);
+			ps.setString(1, "BILL_REQUESTED");
+			ps.setString(2, table_id);
 
-	        int result = ps.executeUpdate();
+			int result = ps.executeUpdate();
 
-	        return result == 1; // ✅ success if exactly one row updated
+			return result == 1; // ✅ success if exactly one row updated
 
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return false;
-	    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
-
 
 	// =========================
 	// ADMIN: COUNT BY MONTH (For Calendar Badges)

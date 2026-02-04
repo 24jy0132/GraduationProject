@@ -22,13 +22,13 @@ public class SurveyAnswerDao {
 		}
 
 		try {
-			//			connection = DriverManager.getConnection(
-			////					"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
-			////					"24jy0234",
-			////					"24jy0234");
 			con = DriverManager.getConnection(
-					"jdbc:mysql://127.0.0.1:3306/" + "myrestaurant?characterEncoding=UTF-8",
-					"root", "shadowseeker");
+					"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
+					"24jy0234",
+					"24jy0234");
+			//			con = DriverManager.getConnection(
+			//					"jdbc:mysql://127.0.0.1:3306/" + "myrestaurant?characterEncoding=UTF-8",
+			//					"root", "shadowseeker");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
