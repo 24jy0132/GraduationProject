@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 public class SurveyAnswerDao {
-    private Connection con = null;
+	private Connection con = null;
 
-    public SurveyAnswerDao() {
-    	try {
+	public SurveyAnswerDao() {
+		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -22,115 +22,119 @@ public class SurveyAnswerDao {
 		}
 
 		try {
-			con = DriverManager.getConnection("jdbc:mysql://10.64.144.5:3306/" + "24jy0234?characterEncoding=UTF-8",
-					"24jy0234", "24jy0234");
+			con = DriverManager.getConnection(
+					"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
+					"24jy0234",
+					"24jy0234");
+			//			con = DriverManager.getConnection(
+			//					"jdbc:mysql://127.0.0.1:3306/" + "myrestaurant?characterEncoding=UTF-8",
+			//					"root", "shadowseeker");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
-    }
+	}
 
-    public void connectionClose() {
-        try {
-            if (con != null) con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+	public void connectionClose() {
+		try {
+			if (con != null)
+				con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
-    // Inserts 4 rows (taste/volume/price/comment)
-    public void insertAnswers(int surveyId, int menuId, int userId,
-                              String taste, String volume, String price, String comment) {
+	// Inserts 4 rows (taste/volume/price/comment)
+	public void insertAnswers(int surveyId, int menuId, int userId,
+			String taste, String volume, String price, String comment) {
 
-        String sql = "INSERT INTO survey_answer " +
-                     "(surveyId, menuId, userId, questionId, answerText) " +
-                     "VALUES (?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO survey_answer " +
+				"(surveyId, menuId, userId, questionId, answerText) " +
+				"VALUES (?, ?, ?, ?, ?)";
 
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
 
-            insertOne(ps, surveyId, menuId, userId, 1, taste);   // TASTE
-            insertOne(ps, surveyId, menuId, userId, 2, volume);  // VOLUME
-            insertOne(ps, surveyId, menuId, userId, 3, price);   // PRICE
-            insertOne(ps, surveyId, menuId, userId, 4, comment); // COMMENT
+			insertOne(ps, surveyId, menuId, userId, 1, taste); // TASTE
+			insertOne(ps, surveyId, menuId, userId, 2, volume); // VOLUME
+			insertOne(ps, surveyId, menuId, userId, 3, price); // PRICE
+			insertOne(ps, surveyId, menuId, userId, 4, comment); // COMMENT
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
-    private void insertOne(PreparedStatement ps,
-                           int surveyId, int menuId, int userId,
-                           int questionId, String answerText) throws SQLException {
+	private void insertOne(PreparedStatement ps,
+			int surveyId, int menuId, int userId,
+			int questionId, String answerText) throws SQLException {
 
-        ps.setInt(1, surveyId);
-        ps.setInt(2, menuId);
-        ps.setInt(3, userId);
-        ps.setInt(4, questionId);
-        ps.setString(5, answerText);
-        ps.executeUpdate();
-    }
-    
-    public boolean alreadyAnswered(int userId,int menuId) {
-    	String sql = "select* from survey_answer where userId=? && menuId = ?";
-    	try (PreparedStatement ps = con.prepareStatement(sql)) {
+		ps.setInt(1, surveyId);
+		ps.setInt(2, menuId);
+		ps.setInt(3, userId);
+		ps.setInt(4, questionId);
+		ps.setString(5, answerText);
+		ps.executeUpdate();
+	}
+
+	public boolean alreadyAnswered(int userId, int menuId) {
+		String sql = "select* from survey_answer where userId=? && menuId = ?";
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setInt(1, userId);
 			ps.setInt(2, menuId);
 			ResultSet rs = ps.executeQuery();
-			return rs.next(); 
-    	}catch (SQLException e) {
-            e.printStackTrace();
-        }
-    	return false;
-    }
-    
-    public void addPoints(int userId) {
-    	String sql = "update customers set point=point+10 where userId = ?";
-    	try(PreparedStatement ps = con.prepareStatement(sql)){
-    		ps.setInt(1, userId);
-    		ps.executeUpdate();
-    	}catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public Map<String,Integer> getTasteSummaryForMenus(int menuId ,int questionId) {
-		Map<String,Integer> map = new LinkedHashMap<>();
+			return rs.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 
-    	String sql = "select answerText,count(*)as cnt from survey_answer where menuId=? and questionId =? group by answerText order by cnt desc";
-    	try(PreparedStatement ps = con.prepareStatement(sql)){
-    		ps.setInt(1, menuId);
-    		ps.setInt(2, questionId);
-    		ResultSet rs = ps.executeQuery();
-    		
-    		while (rs.next()) {
-    			map.put(rs.getString("answerText"),rs.getInt("cnt"));
-    		}
-    	}catch (SQLException e) {
-            e.printStackTrace();
-        }
-    	return map;
-    			
-    	
-    }
-    
-    public List<String> findSurveyComments(int questionId,int menuId){
-    	List<String> comments = new ArrayList<>();
-    	String sql = "select answerText from survey_answer where questionId = ? and menuId = ? order by createdAt DESC"
-    			+ "";
-    	try(PreparedStatement ps = con.prepareStatement(sql)){
-    		ps.setInt(1, questionId);
-    		ps.setInt(2, menuId);
+	public void addPoints(int userId) {
+		String sql = "update customers set point=point+10 where userId = ?";
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setInt(1, userId);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
-    		ResultSet rs = ps.executeQuery();
-    		while(rs.next()) {
-    			comments.add(rs.getString("answerText")) ;
-    		}
-    	}catch (SQLException e) {
-            e.printStackTrace();
-        }
+	public Map<String, Integer> getTasteSummaryForMenus(int menuId, int questionId) {
+		Map<String, Integer> map = new LinkedHashMap<>();
+
+		String sql = "select answerText,count(*)as cnt from survey_answer where menuId=? and questionId =? group by answerText order by cnt desc";
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setInt(1, menuId);
+			ps.setInt(2, questionId);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				map.put(rs.getString("answerText"), rs.getInt("cnt"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return map;
+
+	}
+
+	public List<String> findSurveyComments(int questionId, int menuId) {
+		List<String> comments = new ArrayList<>();
+		String sql = "select answerText from survey_answer where questionId = ? and menuId = ? order by createdAt DESC"
+				+ "";
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setInt(1, questionId);
+			ps.setInt(2, menuId);
+
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				comments.add(rs.getString("answerText"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return comments;
 
-    }
+	}
 }
-

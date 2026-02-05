@@ -1,39 +1,246 @@
-<%@ include file="header.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<title>パスワード再設定エラー画面</title>
+<%@ include file="header.jsp"%>
+<%@ page import="model.Customer"%>
+
+<%
+// Standard session check for Navbar consistency
+Customer loginCustomer = (Customer) session.getAttribute("customer");
+
+// Retrieve error message
+String errorMsg = (String) request.getAttribute("error");
+if (errorMsg == null || errorMsg.isEmpty()) {
+	errorMsg = "不明なエラーが発生しました。";
+}
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>エラー | Mesa</title>
+
+<style>
+/* =====================
+   GLOBAL LAYOUT
+===================== */
+html, body {
+	height: 100%;
+}
+
+body {
+	background-color: #f8f9fa;
+	display: flex;
+	flex-direction: column;
+}
+
+main {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 40px 15px;
+}
+
+/* =====================
+   ERROR CARD
+===================== */
+.result-card {
+	max-width: 500px;
+	width: 100%;
+	background: white;
+	border: 1px solid #dee2e6;
+	border-radius: 12px;
+	padding: 50px 30px;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+	text-align: center;
+}
+
+.icon-box {
+	width: 100px;
+	height: 100px;
+	background-color: #f8d7da;
+	color: #dc3545;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 30px auto;
+	font-size: 3.5rem;
+	animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@
+keyframes shake { 10%, 90% {
+	transform: translate3d(-1px, 0, 0);
+}
+
+20
+%
+,
+80
+%
+{
+transform
+:
+translate3d(
+2px
+,
+0
+,
+0
+);
+}
+30
+%
+,
+50
+%
+,
+70
+%
+{
+transform
+:
+translate3d(
+-4px
+,
+0
+,
+0
+);
+}
+40
+%
+,
+60
+%
+{
+transform
+:
+translate3d(
+4px
+,
+0
+,
+0
+);
+}
+}
+.result-title {
+	font-weight: 800;
+	color: #212529;
+	margin-bottom: 20px;
+	font-size: 1.5rem;
+}
+
+.result-message {
+	font-size: 1rem;
+	color: #6c757d;
+	margin-bottom: 20px;
+	line-height: 1.6;
+}
+
+.error-details {
+	background-color: #fff5f5;
+	border: 1px dashed #dc3545;
+	color: #b02a37;
+	padding: 15px;
+	border-radius: 8px;
+	font-weight: 600;
+	margin-bottom: 30px;
+	display: inline-block;
+	width: 100%;
+}
+</style>
 </head>
+
 <body>
 
-	<div class="container-fluid">
-		<!-- Navbar -->
-		<nav class="navbar navbar-expand-lg bg-danger py-3">
-			<div class="container">
-				<!-- Brand -->
-				<a class="navbar-brand fw-bold text-white" href="index.jsp"> <img
-					src="img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png" height="40"
-					width="40" alt="Logo" class="me-2"> Welcome From Mesa
-				</a>
+	<nav class="navbar navbar-expand-lg bg-danger py-3">
+		<div class="container">
+			<a
+				class="navbar-brand d-flex align-items-center gap-3 fw-bold text-white"
+				href="<%=request.getContextPath()%>/index.jsp"> <img
+				src="<%=request.getContextPath()%>/img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png"
+				height="40" width="40" class="me-1" alt="Logo"> <span>Welcome
+					From Mesa</span>
+			</a>
+
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse justify-content-end"
+				id="navbarSupportedContent">
+				<ul class="navbar-nav gap-4">
+					<li class="nav-item"><a class="nav-link active text-white"
+						href="<%=request.getContextPath()%>/index.jsp"><i
+							class="bi bi-house-fill me-1"></i>Home</a></li>
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/MenuListServlet"><i
+							class="bi bi-menu-down me-1"></i>Menu</a></li>
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/reserve/form"><i
+							class="bi bi-calendar-check me-1"></i>Reservation</a></li>
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/contact.jsp"><i
+							class="bi bi-telephone-fill me-1"></i>Contact</a></li>
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/map.jsp"><i
+							class="bi bi-pin-map-fill me-1"></i>Map</a></li>
+
+					<%
+					if (loginCustomer == null) {
+					%>
+					<li class="nav-item"><a
+						class="nav-link active text-white fw-bold ms-lg-3"
+						href="<%=request.getContextPath()%>/login.jsp"><i
+							class="bi bi-box-arrow-in-right me-1"></i>Login</a></li>
+					<%
+					} else {
+					%>
+					<li class="nav-item"><a class="nav-link text-white ms-lg-3"
+						href="<%=request.getContextPath()%>/Customer_LogOut"><i
+							class="bi bi-box-arrow-right me-1"></i>LogOut</a></li>
+					<%
+					}
+					%>
+				</ul>
 			</div>
-		</nav>
+		</div>
+	</nav>
 
+	<main>
+		<div class="result-card shadow">
 
-		<h1>パスワード再設定に関するエラー</h1>
+			<div class="icon-box">
+				<i class="bi bi-exclamation-triangle-fill"></i>
+			</div>
 
-    <p>
-        <%= request.getAttribute("error") %>
-    </p>
+			<h2 class="result-title">パスワード再設定エラー</h2>
 
-    <p>
-        ※ログイン画面から再度お手続きを行ってください。
-    </p>
+			<div class="result-message">
+				申し訳ありません。手続き中にエラーが発生しました。<br> 以下の内容をご確認ください。
+			</div>
 
-    <a href="<%= request.getContextPath() %>/login.jsp" class="btn">
-        ログイン画面へ戻る
-    </a>
-		<%@ include file="footer.jsp"%>
-	</div>
+			<div class="error-details">
+				<i class="bi bi-x-circle me-2"></i>
+				<%=errorMsg%>
+			</div>
+
+			<div class="text-muted small mb-4">
+				※有効期限切れ等の可能性があります。<br> お手数ですが、ログイン画面から再度お手続きを行ってください。
+			</div>
+
+			<a href="<%=request.getContextPath()%>/login.jsp"
+				class="btn btn-outline-secondary btn-lg rounded-pill px-5 shadow-sm">
+				ログイン画面へ戻る </a>
+
+		</div>
+	</main>
+
+	<%@ include file="footer.jsp"%>
 
 </body>
-
 </html>

@@ -62,7 +62,7 @@ public class ReserveCompleteServlet extends HttpServlet {
 			// =========================
 			// POINT INSUFFICIENT
 			// =========================
-		    // =========================
+			 // =========================
 		    // POINT INSUFFICIENT
 		    // =========================
 		    if (e instanceof SQLException &&
@@ -75,21 +75,42 @@ public class ReserveCompleteServlet extends HttpServlet {
 		            "errorMessage",
 		            "ポイントが不足しています。クーポンを変更してください。"
 		        );
+
 		        req.getRequestDispatcher("/point_error.jsp")
 		           .forward(req, res);
 		        return;
 		    }
 
 		    // =========================
-		    // OTHER ERROR
+		    // PAST DATE / TIME ERROR
+		    // =========================
+		    if (e instanceof SQLException &&
+		        e.getMessage() != null &&
+		        e.getMessage().contains("過去")) {
+
+		        // clean session so user must retry
+		        session.removeAttribute("pendingReservation");
+		        session.removeAttribute("selectedCoupon");
+
+		        req.setAttribute(
+		            "errorMessage",
+		            e.getMessage()
+		        );
+
+		        req.getRequestDispatcher("/reservation/error.jsp")
+		           .forward(req, res);
+		        return;
+		    }
+
+		    // =========================
+		    // OTHER UNKNOWN ERROR
 		    // =========================
 		    e.printStackTrace();
-		    req.setAttribute("error", "予約登録に失敗しました");
-		    req.getRequestDispatcher("/confirm.jsp")
-		       .forward(req, res);
-			}
 
-		
+		    req.setAttribute("errorMessage", "予約登録に失敗しました。もう一度お試しください。");
+		    req.getRequestDispatcher("/reserve/error.jsp")
+		       .forward(req, res);
 		
 		}
 	}
+}

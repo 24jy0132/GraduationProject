@@ -49,7 +49,7 @@ public class Adminloginpageservlet extends HttpServlet {
 		Staff staff = sd.findStaffByEmailAndPassword(inputemail, inputpassword);
 
 		HttpSession session = request.getSession();
-		if (staff != null && "admin".equalsIgnoreCase(staff.getStaffType())) {
+		if (staff != null && "staff".equalsIgnoreCase(staff.getStaffType())) {
 			session.setAttribute("admin", staff);
 			 response.sendRedirect(
 			            request.getContextPath() + "/Admin/adminhome.jsp"

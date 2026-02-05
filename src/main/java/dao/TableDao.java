@@ -7,73 +7,75 @@ import java.sql.SQLException;
 
 public class TableDao {
 
-    private Connection con;
+	private Connection con;
 
-    public TableDao() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+	public TableDao() {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 
-        try {
-            con = DriverManager.getConnection(
-                "jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
-                "24jy0234",
-                "24jy0234"
-            );
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
+		try {
+			con = DriverManager.getConnection(
+					"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
+					"24jy0234",
+					"24jy0234");
+			//			con = DriverManager.getConnection(
+			//					"jdbc:mysql://127.0.0.1:3306/" + "myrestaurant?characterEncoding=UTF-8",
+			//					"root", "shadowseeker");
 
-    public void connectionClose() {
-        try {
-            if (con != null) con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
 
-    /** テーブルをロックする */
-    public boolean lockTable(int tableId) throws SQLException {
-        String sql =
-            "UPDATE tables SET status='LOCKED' " +
-            "WHERE tableId=? AND status='FREE'";
+	public void connectionClose() {
+		try {
+			if (con != null)
+				con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, tableId);
+	/** テーブルをロックする */
+	public boolean lockTable(int tableId) throws SQLException {
+		String sql = "UPDATE tables SET status='LOCKED' " +
+				"WHERE tableId=? AND status='FREE'";
 
-        return ps.executeUpdate() == 1;
-    }
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setInt(1, tableId);
 
-    /** テーブルを予約済みにする */
-    public void reserveTable(int tableId) throws SQLException {
-        String sql =
-            "UPDATE tables SET status='RESERVED' WHERE tableId=?";
+		return ps.executeUpdate() == 1;
+	}
 
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, tableId);
-        ps.executeUpdate();
-    }
-    
-    public boolean requestCheckout(String table_id) {
+	/** テーブルを予約済みにする */
+	public void reserveTable(int tableId) throws SQLException {
+		String sql = "UPDATE tables SET status='RESERVED' WHERE tableId=?";
 
-        String sql = "UPDATE tables SET table_status = ? WHERE table_id = ?";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setInt(1, tableId);
+		ps.executeUpdate();
+	}
 
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+	public boolean requestCheckout(String table_id) {
 
-            ps.setString(1, "会計依頼中");
-            ps.setString(2, table_id);
+		String sql = "UPDATE tables SET table_status = ? WHERE table_id = ?";
 
-            int result = ps.executeUpdate();
-            return result == 1; // 1件更新されたら成功
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+			ps.setString(1, "会計依頼中");
+			ps.setString(2, table_id);
+
+			int result = ps.executeUpdate();
+			return result == 1; // 1件更新されたら成功
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 }

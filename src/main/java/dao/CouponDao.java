@@ -24,10 +24,13 @@ public class CouponDao {
 		}
 
 		try {
-			connection = DriverManager.getConnection(
-					"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
-					"24jy0234",
-					"24jy0234");
+						connection = DriverManager.getConnection(
+								"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
+								"24jy0234",
+								"24jy0234");
+//			connection = DriverManager.getConnection(
+//					"jdbc:mysql://127.0.0.1:3306/" + "myrestaurant?characterEncoding=UTF-8",
+//					"root", "shadowseeker");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -169,4 +172,31 @@ public class CouponDao {
 
 		return null; // not found
 	}
+
+	public void update(Coupon c) throws SQLException {
+
+		String sql = """
+				    UPDATE coupon
+				    SET title=?, description=?, discountAmount=?,
+				        startDate=?, endDate=?, minPoint=?,
+				        reservationType=?, imagePath=?
+				    WHERE couponId=?
+				""";
+
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+			ps.setString(1, c.getTitle());
+			ps.setString(2, c.getDescription());
+			ps.setInt(3, c.getDiscountAmount());
+			ps.setDate(4, Date.valueOf(c.getStartDate()));
+			ps.setDate(5, Date.valueOf(c.getEndDate()));
+			ps.setInt(6, c.getMinPoint());
+			ps.setString(7, c.getReservationType());
+			ps.setString(8, c.getImagePath());
+			ps.setInt(9, c.getCouponId());
+
+			ps.executeUpdate();
+		}
+	}
+
 }

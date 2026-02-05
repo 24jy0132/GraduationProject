@@ -22,8 +22,13 @@ public class StaffDao {
 		}
 
 		try {
-			connection = DriverManager.getConnection("jdbc:mysql://10.64.144.5:3306/" + "24jy0234?characterEncoding=UTF-8",
-					"24jy0234", "24jy0234");
+					connection = DriverManager.getConnection(
+								"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
+								"24jy0234",
+								"24jy0234");
+					//			connection = DriverManager.getConnection(
+					//					"jdbc:mysql://127.0.0.1:3306/" + "myrestaurant?characterEncoding=UTF-8",
+					//					"root", "shadowseeker");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -116,17 +121,17 @@ public class StaffDao {
 			return false;
 		}
 	}
-	
-	 public void deleteStaff(int staffId) {
-	        String sql = "DELETE FROM staff WHERE staffId = ?";
 
-	        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-	            ps.setInt(1, staffId);
-	            ps.executeUpdate();
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        }
-	 }
+	public void deleteStaff(int staffId) {
+		String sql = "DELETE FROM staff WHERE staffId = ?";
+
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
+			ps.setInt(1, staffId);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public List<Staff> getAllStaff() {
 		List<Staff> staffList = new ArrayList<>();

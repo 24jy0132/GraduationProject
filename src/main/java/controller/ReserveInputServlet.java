@@ -1,4 +1,5 @@
 package controller;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,60 +19,70 @@ import service.Constants;
 @WebServlet("/reserve/input")
 public class ReserveInputServlet extends HttpServlet {
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse res)
+			throws ServletException, IOException {
 
-        try {
-            HttpSession session = req.getSession();
+		try {
+			// Ensure correct encoding
+			req.setCharacterEncoding("UTF-8");
 
-            LocalDate date = LocalDate.parse(req.getParameter("date"));
-            LocalTime start = LocalTime.parse(req.getParameter("startTime"));
-            LocalTime end = start.plusMinutes(Constants.DURATION_MINUTES);
+			HttpSession session = req.getSession();
 
-            int adult = Integer.parseInt(req.getParameter("adult"));
-            int child = Integer.parseInt(req.getParameter("child"));
+			// 1. Parse Basic Reservation Info
+			LocalDate date = LocalDate.parse(req.getParameter("date"));
+			LocalTime start = LocalTime.parse(req.getParameter("startTime"));
+			LocalTime end = start.plusMinutes(Constants.DURATION_MINUTES);
 
-            if (adult + child > 6) {
-                throw new IllegalArgumentException("6名を超える場合はお電話ください");
-            }
+			int adult = Integer.parseInt(req.getParameter("adult"));
+			int child = Integer.parseInt(req.getParameter("child"));
 
-            // ✅ DO NOT recreate reservation
-            Reservation r = (Reservation) session.getAttribute("pendingReservation");
-            if (r == null) {
-                r = new Reservation();
-                r.setTableIds(new ArrayList<>());
-            }
+			if (adult + child > 6) {
+				throw new IllegalArgumentException("6名を超える場合はお電話ください");
+			}
 
-            r.setReservationDate(date);
-            r.setStartTime(start);
-            r.setEndTime(end);
-            r.setAdultCount(adult);
-            r.setChildCount(child);
+			// 2. Get or Create Reservation Object in Session
+			Reservation r = (Reservation) session.getAttribute("pendingReservation");
+			if (r == null) {
+				r = new Reservation();
+				r.setTableIds(new ArrayList<>());
+			}
 
-            // guest input
-            r.setCustomerName(req.getParameter("name"));
-            r.setCustomerEmail(req.getParameter("email"));
+			// 3. Set Dates & Counts
+			r.setReservationDate(date);
+			r.setStartTime(start);
+			r.setEndTime(end);
+			r.setAdultCount(adult);
+			r.setChildCount(child);
 
-            // member override
-            Customer loginCustomer = (Customer) session.getAttribute("customer");
-            if (loginCustomer != null) {
-                r.setCustomerId(loginCustomer.getUserId());
-                r.setCustomerName(loginCustomer.getName());
-                r.setCustomerEmail(loginCustomer.getEmail());
-            }
+			// 4. Set Contact Info (Crucial Step)
+			// We use the FORM parameters for everyone. This allows members 
+			// to edit their details (e.g., use a different phone number for this booking).
+			r.setCustomerName(req.getParameter("name"));
+			r.setCustomerEmail(req.getParameter("email"));
 
-            session.setAttribute("pendingReservation", r);
+			// ✅ CAPTURE PHONE FOR EVERYONE (GUEST & MEMBER)
+			r.setCustomerPhone(req.getParameter("phone"));
 
-            // ✅ always go forward
-            res.sendRedirect(req.getContextPath() + "/reserve/table");
+			// 5. Link Member ID if logged in
+			Customer loginCustomer = (Customer) session.getAttribute("customer");
+			if (loginCustomer != null) {
+				r.setCustomerId(loginCustomer.getUserId());
+			} else {
+				r.setCustomerId(null);
+			}
 
-        } catch (Exception e) {
-            req.setAttribute("error", e.getMessage());
+			// 6. Save back to Session
+			session.setAttribute("pendingReservation", r);
 
-            // ✅ FIX: NO contextPath here
-            req.getRequestDispatcher("/reserveForm.jsp")
-               .forward(req, res);
-        }
-    }
+			// 7. Proceed to next step
+			res.sendRedirect(req.getContextPath() + "/reserve/table");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			req.setAttribute("error", e.getMessage());
+			// Make sure this matches your actual JSP file name
+			req.getRequestDispatcher("/reservation_form.jsp").forward(req, res);
+		}
+	}
 }
