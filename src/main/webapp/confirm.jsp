@@ -458,50 +458,6 @@ main {
 							}
 							%>
 
-							<div class="price-breakdown">
-								<div class="summary-row">
-									<div class="label">小計</div>
-									<div class="value">
-										¥<%=String.format("%,d", subTotal)%></div>
-								</div>
-
-								<%
-								if (couponDiscount > 0) {
-								%>
-								<div class="summary-row">
-									<div class="label">クーポン割引</div>
-									<div class="value discount-text">
-										- ¥<%=String.format("%,d", couponDiscount)%></div>
-								</div>
-								<%
-								}
-								%>
-
-								<%
-								if (usedPoints > 0) {
-								%>
-								<div class="summary-row">
-									<div class="label">ポイント利用</div>
-									<div class="value points-text">
-										-
-										<%=String.format("%,d", usedPoints)%>
-										pt
-									</div>
-								</div>
-								<%
-								}
-								%>
-
-								<div class="total-row">
-									<div class="total-label">お支払い予定額</div>
-									<div class="total-price">
-										¥<%=String.format("%,d", totalPayment)%>
-									</div>
-								</div>
-								<div class="text-end mt-1">
-									<span class="badge bg-light text-secondary border">現地決済</span>
-								</div>
-							</div>
 
 							<%
 							if (loginCustomer != null) {

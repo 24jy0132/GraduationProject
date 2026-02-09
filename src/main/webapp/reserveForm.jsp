@@ -6,26 +6,25 @@
 <%@ page import="service.Constants"%>
 
 <%
-    // 1. Setup Logic
-    Customer loginCustomer = (Customer) session.getAttribute("customer");
-    LocalTime t = Constants.OPEN;
-    
-    // 2. Pre-fill Data
-    String nameVal = "";
-    String emailVal = "";
-    String phoneVal = ""; // ✅ New Variable
-    boolean readOnly = false;
+// 1. Setup Logic
+Customer loginCustomer = (Customer) session.getAttribute("customer");
+LocalTime t = Constants.OPEN;
 
-    if (loginCustomer != null) {
-        nameVal = loginCustomer.getName();
-        emailVal = loginCustomer.getEmail();
-        // Assuming your Customer model has getPhone(). If it's named getTel(), change this.
-        // phoneVal = loginCustomer.getPhone(); 
-        readOnly = true;
-    }
-    
-    // 3. Date Constraints
-    String todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+// 2. Pre-fill Data
+String nameVal = "";
+String emailVal = "";
+String phoneVal = ""; // ✅ New Variable
+boolean readOnly = false;
+
+if (loginCustomer != null) {
+	nameVal = loginCustomer.getName();
+	emailVal = loginCustomer.getEmail();
+	phoneVal = loginCustomer.getPhone(); // ✅ THIS IS THE FIX
+	readOnly = true;
+}
+
+// 3. Date Constraints
+String todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 %>
 
 <!DOCTYPE html>
@@ -169,14 +168,20 @@ main {
 				class="navbar-brand d-flex align-items-center gap-3 fw-bold text-white"
 				href="<%=request.getContextPath()%>/index.jsp"> <img
 				src="<%=request.getContextPath()%>/img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png"
-				height="40" width="40" class="me-1" alt="Logo"> <% if (loginCustomer != null) { %>
+				height="40" width="40" class="me-1" alt="Logo"> <%
+ if (loginCustomer != null) {
+ %>
 				<div class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill"
 					style="background: rgba(255, 255, 255, 0.15);">
 					<i class="bi bi-person-circle fs-5"></i> <span
 						class="small fw-semibold"><%=loginCustomer.getName()%></span> <span
 						class="badge bg-light text-danger fw-bold position-relative"><%=loginCustomer.getPoint()%>
 						pt</span>
-				</div> <% } else { %> <span>Welcome From Mesa</span> <% } %>
+				</div> <%
+ } else {
+ %> <span>Welcome From Mesa</span> <%
+ }
+ %>
 			</a>
 			<button class="navbar-toggler" type="button"
 				data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
@@ -185,13 +190,19 @@ main {
 			<div class="collapse navbar-collapse justify-content-end"
 				id="navbarSupportedContent">
 				<ul class="navbar-nav gap-4">
-					<% if (loginCustomer == null) { %>
+					<%
+					if (loginCustomer == null) {
+					%>
 					<li class="nav-item"><a class="nav-link active text-white"
 						href="<%=request.getContextPath()%>/index.jsp">Home</a></li>
-					<% } else { %>
+					<%
+					} else {
+					%>
 					<li class="nav-item"><a class="nav-link active text-white"
 						href="<%=request.getContextPath()%>/member_index.jsp">Home</a></li>
-					<% } %>
+					<%
+					}
+					%>
 				</ul>
 			</div>
 		</div>
@@ -200,14 +211,19 @@ main {
 	<main>
 		<div class="container">
 
-			<% String error = (String) request.getAttribute("error"); if (error != null) { %>
+			<%
+			String error = (String) request.getAttribute("error");
+			if (error != null) {
+			%>
 			<div
 				class="alert alert-danger d-flex align-items-center shadow-sm mx-auto mb-4"
 				style="max-width: 800px;">
 				<i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
 				<div><%=error%></div>
 			</div>
-			<% } %>
+			<%
+			}
+			%>
 
 			<div class="stepper">
 				<div class="step active">
@@ -225,7 +241,9 @@ main {
 					コース
 				</div>
 				<div class="line"></div>
-				<% if (loginCustomer != null) { %>
+				<%
+				if (loginCustomer != null) {
+				%>
 				<div class="step">
 					<div class="circle">4</div>
 					クーポン
@@ -240,7 +258,9 @@ main {
 					<div class="circle">6</div>
 					完了
 				</div>
-				<% } else { %>
+				<%
+				} else {
+				%>
 				<div class="step">
 					<div class="circle">4</div>
 					確認
@@ -250,7 +270,9 @@ main {
 					<div class="circle">5</div>
 					完了
 				</div>
-				<% } %>
+				<%
+				}
+				%>
 			</div>
 
 			<div class="form-container">
@@ -277,9 +299,14 @@ main {
 									<span class="input-group-text"><i
 										class="bi bi-clock text-danger"></i></span> <select name="startTime"
 										class="form-select">
-										<% while (!t.isAfter(Constants.LAST_START)) { %>
+										<%
+										while (!t.isAfter(Constants.LAST_START)) {
+										%>
 										<option value="<%=t%>"><%=t%></option>
-										<% t = t.plusMinutes(Constants.SLOT_MINUTES); } %>
+										<%
+										t = t.plusMinutes(Constants.SLOT_MINUTES);
+										}
+										%>
 									</select>
 								</div>
 							</div>
@@ -312,9 +339,13 @@ main {
 
 							<div class="col-md-6">
 								<label class="section-label d-flex justify-content-between">
-									お名前 <% if (readOnly) { %> <span
+									お名前 <%
+								if (readOnly) {
+								%> <span
 									class="badge bg-light text-muted border"><i
-										class="bi bi-lock-fill"></i> 会員情報</span> <% } %>
+										class="bi bi-lock-fill"></i> 会員情報</span> <%
+ }
+ %>
 								</label>
 								<div class="input-group input-group-lg">
 									<span class="input-group-text <%=readOnly ? "bg-light" : ""%>"><i
@@ -326,26 +357,34 @@ main {
 
 							<div class="col-md-6">
 								<label class="section-label d-flex justify-content-between">
-									電話番号 <% if (readOnly && !phoneVal.isEmpty()) { %> <span
+									電話番号 <%
+								if (readOnly && !phoneVal.isEmpty()) {
+								%> <span
 									class="badge bg-light text-muted border"><i
-										class="bi bi-lock-fill"></i> 会員情報</span> <% } %>
+										class="bi bi-lock-fill"></i> 会員情報</span> <%
+ }
+ %>
 								</label>
 								<div class="input-group input-group-lg">
 									<span
-										class="input-group-text <%= (readOnly && !phoneVal.isEmpty()) ? "bg-light" : ""%>"><i
+										class="input-group-text <%=(readOnly && !phoneVal.isEmpty()) ? "bg-light" : ""%>"><i
 										class="bi bi-telephone"></i></span> <input type="tel" name="phone"
-										class="form-control <%= (readOnly && !phoneVal.isEmpty()) ? "readonly-field" : ""%>"
+										class="form-control <%=(readOnly && !phoneVal.isEmpty()) ? "readonly-field" : ""%>"
 										value="<%=phoneVal%>"
-										<%= (readOnly && !phoneVal.isEmpty()) ? "readonly" : ""%>
+										<%=(readOnly && !phoneVal.isEmpty()) ? "readonly" : ""%>
 										required placeholder="09012345678">
 								</div>
 							</div>
 
 							<div class="col-12">
 								<label class="section-label d-flex justify-content-between">
-									メールアドレス <% if (readOnly) { %> <span
+									メールアドレス <%
+								if (readOnly) {
+								%> <span
 									class="badge bg-light text-muted border"><i
-										class="bi bi-lock-fill"></i> 会員情報</span> <% } %>
+										class="bi bi-lock-fill"></i> 会員情報</span> <%
+ }
+ %>
 								</label>
 								<div class="input-group input-group-lg">
 									<span class="input-group-text <%=readOnly ? "bg-light" : ""%>"><i

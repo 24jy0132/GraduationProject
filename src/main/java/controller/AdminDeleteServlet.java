@@ -9,20 +9,50 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import dao.ReservationDao;
 
-/**
- * Servlet implementation class AdminDeleteServlet
- */
 @WebServlet("/admin/delete")
 public class AdminDeleteServlet extends HttpServlet {
 
-    protected void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws IOException {
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse res)
+			throws IOException {
 
-        int id = Integer.parseInt(req.getParameter("id"));
+		// ===== 1️⃣ Validate reservation ID =====
+		String idParam = req.getParameter("id");
+		if (idParam == null || idParam.isBlank()) {
+			res.sendRedirect(req.getContextPath() + "/adminreservation/list");
+			return;
+		}
 
-        ReservationDao dao = new ReservationDao();
-        dao.delete(id);
+		int reservationId;
+		try {
+			reservationId = Integer.parseInt(idParam);
+		} catch (NumberFormatException e) {
+			res.sendRedirect(req.getContextPath() + "/adminreservation/list");
+			return;
+		}
 
-        res.sendRedirect(req.getContextPath() + "/admin");
-    }
+		// ===== 2️⃣ Delete reservation =====
+		ReservationDao dao = new ReservationDao();
+		dao.delete(reservationId);
+
+		// ===== 3️⃣ Redirect back correctly =====
+		String backDate = req.getParameter("date");
+		String all = req.getParameter("all");
+
+		// 🔁 Priority:
+		// 1. all=true → 全件表示
+		// 2. date=YYYY-MM-DD → same date list
+		// 3. fallback → list (today)
+
+		if ("true".equals(all)) {
+			res.sendRedirect(req.getContextPath()
+					+ "/adminreservation/list?all=true");
+		} else if (backDate != null && !backDate.isBlank()) {
+			res.sendRedirect(req.getContextPath()
+					+ "/adminreservation/list?date=" + backDate);
+		} else {
+			res.sendRedirect(req.getContextPath()
+					+ "/adminreservation/list");
+		}
+	}
 }

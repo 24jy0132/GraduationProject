@@ -227,47 +227,80 @@ public class ReservationDao {
 		}
 	}
 
+	public boolean isTableAvailable(
+			LocalDate date,
+			LocalTime start,
+			LocalTime end,
+			String tableId,
+			int excludeReservationId) throws Exception {
+
+		String sql = "SELECT COUNT(*) FROM reservations r " +
+				"JOIN reservation_table rt ON r.reservationId = rt.reservationId " +
+				"WHERE r.reservationDate = ? " +
+				"AND rt.table_id = ? " +
+				"AND r.startTime < ? " +
+				"AND r.endTime > ? " +
+				"AND r.reservationId <> ? " +
+				"AND r.status NOT IN ('CANCELLED','FINISHED')";
+
+		try (var con = getConn();
+				var ps = con.prepareStatement(sql)) {
+
+			ps.setDate(1, java.sql.Date.valueOf(date));
+			ps.setString(2, tableId);
+			ps.setTime(3, java.sql.Time.valueOf(end));
+			ps.setTime(4, java.sql.Time.valueOf(start));
+			ps.setInt(5, excludeReservationId);
+
+			var rs = ps.executeQuery();
+			rs.next();
+			return rs.getInt(1) == 0;
+		}
+	}
+
 	// =========================
-	// INSERT WITH TABLES (ADMIN/SIMPLE)
+	// ADMIN TIME CONFLICT CHECK
 	// =========================
-	public void insertWithTables(Reservation r) throws SQLException {
-		// Includes customer_phone
-		String sqlReservation = "INSERT INTO reservations " +
-				"(reservationDate,startTime,endTime,adultCount,childCount,customer_name,customerEmail,customer_phone,status) "
-				+
-				"VALUES (?,?,?,?,?,?,?,?,?)";
+	public boolean hasTimeConflict(
+			LocalDate date,
+			LocalTime start,
+			LocalTime end,
+			List<String> tableIds) {
 
-		String sqlTable = "INSERT INTO reservation_table (reservationId, table_id) VALUES (?,?)";
+		String placeholders = tableIds.stream()
+				.map(t -> "?")
+				.reduce((a, b) -> a + "," + b)
+				.orElse("");
 
-		try (Connection con = getConn()) {
-			con.setAutoCommit(false);
+		String sql = """
+				    SELECT COUNT(*)
+				    FROM reservations r
+				    JOIN reservation_table rt ON r.reservationId = rt.reservationId
+				    WHERE r.reservationDate = ?
+				      AND rt.table_id IN (%s)
+				      AND NOT (r.endTime <= ? OR r.startTime >= ?)
+				""".formatted(placeholders);
 
-			try (PreparedStatement ps = con.prepareStatement(sqlReservation, Statement.RETURN_GENERATED_KEYS)) {
-				ps.setDate(1, Date.valueOf(r.getReservationDate()));
-				ps.setTime(2, Time.valueOf(r.getStartTime()));
-				ps.setTime(3, Time.valueOf(r.getEndTime()));
-				ps.setInt(4, r.getAdultCount());
-				ps.setInt(5, r.getChildCount());
-				ps.setString(6, r.getCustomerName());
-				ps.setString(7, r.getCustomerEmail());
-				ps.setString(8, r.getCustomerPhone()); // ✅ INSERT PHONE
-				ps.setString(9, r.getStatus());
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
 
-				ps.executeUpdate();
-				ResultSet rs = ps.getGeneratedKeys();
-				rs.next();
-				r.setReservationId(rs.getInt(1));
+			int idx = 1;
+			ps.setDate(idx++, Date.valueOf(date));
+
+			for (String t : tableIds) {
+				ps.setString(idx++, t);
 			}
 
-			try (PreparedStatement ps2 = con.prepareStatement(sqlTable)) {
-				for (String t : r.getTableIds()) {
-					ps2.setInt(1, r.getReservationId());
-					ps2.setString(2, t);
-					ps2.addBatch();
-				}
-				ps2.executeBatch();
-			}
-			con.commit();
+			ps.setTime(idx++, Time.valueOf(start));
+			ps.setTime(idx, Time.valueOf(end));
+
+			ResultSet rs = ps.executeQuery();
+			rs.next();
+			return rs.getInt(1) > 0;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return true; // safe-side block
 		}
 	}
 
@@ -307,11 +340,15 @@ public class ReservationDao {
 	// =========================
 	// UPDATE (ADMIN)
 	// =========================
+	// =========================
+	// UPDATE (ADMIN) - FIXED VERSION
+	// =========================
 	public void update(Reservation r) {
-		// Includes customer_phone
+		// 🔴 FIX: Added courseId to the UPDATE statement
 		String sqlUpdate = "UPDATE reservations SET " +
 				"reservationDate=?, startTime=?, endTime=?, " +
-				"adultCount=?, childCount=?, customer_name=?, customerEmail=?, customer_phone=? " +
+				"adultCount=?, childCount=?, customer_name=?, customerEmail=?, customer_phone=?, " +
+				"courseId=? " + // Added this
 				"WHERE reservationId=?";
 
 		String sqlDeleteTables = "DELETE FROM reservation_table WHERE reservationId=?";
@@ -328,11 +365,20 @@ public class ReservationDao {
 				ps.setInt(5, r.getChildCount());
 				ps.setString(6, r.getCustomerName());
 				ps.setString(7, r.getCustomerEmail());
-				ps.setString(8, r.getCustomerPhone()); // ✅ UPDATE PHONE
-				ps.setInt(9, r.getReservationId());
+				ps.setString(8, r.getCustomerPhone());
+
+				// 🔴 FIX: Set courseId (Handle null for "No Course")
+				if (r.getCourseId() != null && r.getCourseId() > 0) {
+					ps.setInt(9, r.getCourseId());
+				} else {
+					ps.setNull(9, Types.INTEGER);
+				}
+
+				ps.setInt(10, r.getReservationId()); // Now index 10
 				ps.executeUpdate();
 			}
 
+			// Table updates (Delete and Re-insert) remain the same
 			try (PreparedStatement ps = con.prepareStatement(sqlDeleteTables)) {
 				ps.setInt(1, r.getReservationId());
 				ps.executeUpdate();
@@ -349,6 +395,7 @@ public class ReservationDao {
 			con.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
+			// Should ideally rethrow or handle rollback here
 		}
 	}
 
@@ -414,10 +461,8 @@ public class ReservationDao {
 
 	public Reservation findById(int id) {
 		Reservation r = null;
-		String sql = "SELECT r.*, rt.table_id " +
-				"FROM reservations r " +
-				"LEFT JOIN reservation_table rt " +
-				"ON r.reservationId = rt.reservationId " +
+		String sql = "SELECT r.*, rt.table_id FROM reservations r " +
+				"LEFT JOIN reservation_table rt ON r.reservationId = rt.reservationId " +
 				"WHERE r.reservationId = ?";
 		try (Connection con = getConn();
 				PreparedStatement ps = con.prepareStatement(sql)) {
@@ -437,6 +482,54 @@ public class ReservationDao {
 			e.printStackTrace();
 		}
 		return r;
+	}
+
+	public void insertWithTables(Reservation r) throws SQLException {
+		// 🔴 FIX: Added courseId to the INSERT statement
+		String sqlReservation = "INSERT INTO reservations " +
+				"(reservationDate,startTime,endTime,adultCount,childCount,customer_name,customerEmail,customer_phone,status,courseId) "
+				+ "VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+		String sqlTable = "INSERT INTO reservation_table (reservationId, table_id) VALUES (?,?)";
+
+		try (Connection con = getConn()) {
+			con.setAutoCommit(false);
+
+			try (PreparedStatement ps = con.prepareStatement(sqlReservation, Statement.RETURN_GENERATED_KEYS)) {
+				ps.setDate(1, Date.valueOf(r.getReservationDate()));
+				ps.setTime(2, Time.valueOf(r.getStartTime()));
+				ps.setTime(3, Time.valueOf(r.getEndTime()));
+				ps.setInt(4, r.getAdultCount());
+				ps.setInt(5, r.getChildCount());
+				ps.setString(6, r.getCustomerName());
+				ps.setString(7, r.getCustomerEmail());
+				ps.setString(8, r.getCustomerPhone());
+				ps.setString(9, r.getStatus());
+
+				// 🔴 FIX: Set courseId
+				if (r.getCourseId() != null && r.getCourseId() > 0) {
+					ps.setInt(10, r.getCourseId());
+				} else {
+					ps.setNull(10, Types.INTEGER);
+				}
+
+				ps.executeUpdate();
+				ResultSet rs = ps.getGeneratedKeys();
+				if (rs.next()) {
+					r.setReservationId(rs.getInt(1));
+				}
+			}
+
+			try (PreparedStatement ps2 = con.prepareStatement(sqlTable)) {
+				for (String t : r.getTableIds()) {
+					ps2.setInt(1, r.getReservationId());
+					ps2.setString(2, t);
+					ps2.addBatch();
+				}
+				ps2.executeBatch();
+			}
+			con.commit();
+		}
 	}
 
 	// =========================
@@ -476,33 +569,31 @@ public class ReservationDao {
 		}
 		return new ArrayList<>(map.values());
 	}
-	
+
 	public boolean requestCheckout(String table_id) {
 
-	    String sql =
-	        "UPDATE reservations r " +
-	        "JOIN reservation_table rt " +
-	        "ON r.reservationId = rt.reservationId " +
-	        "SET r.status = ? " +
-	        "WHERE rt.table_id = ? " +
-	        "AND r.status = 'ARRIVED'";
+		String sql = "UPDATE reservations r " +
+				"JOIN reservation_table rt " +
+				"ON r.reservationId = rt.reservationId " +
+				"SET r.status = ? " +
+				"WHERE rt.table_id = ? " +
+				"AND r.status = 'ARRIVED'";
 
-	    try (Connection con = getConn();
-	         PreparedStatement ps = con.prepareStatement(sql)) {
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
 
-	        ps.setString(1, "BILL_REQUESTED");
-	        ps.setString(2, table_id);
+			ps.setString(1, "BILL_REQUESTED");
+			ps.setString(2, table_id);
 
-	        int result = ps.executeUpdate();
+			int result = ps.executeUpdate();
 
-	        return result == 1; // ✅ success if exactly one row updated
+			return result == 1; // ✅ success if exactly one row updated
 
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return false;
-	    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
-
 
 	// =========================
 	// ADMIN: COUNT BY MONTH (For Calendar Badges)
@@ -546,6 +637,7 @@ public class ReservationDao {
 		r.setCustomerId((Integer) rs.getObject("customerId"));
 		r.setCustomerName(rs.getString("customer_name"));
 		r.setCustomerEmail(rs.getString("customerEmail"));
+		r.setCourseId((Integer) rs.getObject("courseId"));
 
 		// ✅ MAP PHONE
 		try {

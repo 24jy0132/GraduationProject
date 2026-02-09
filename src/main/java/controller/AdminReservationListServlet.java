@@ -22,25 +22,36 @@ public class AdminReservationListServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
 
-		// 1️⃣ Read date parameter
+		String allParam = req.getParameter("all");
 		String dateParam = req.getParameter("date");
-		LocalDate selectedDate;
 
-		if (dateParam == null || dateParam.isEmpty()) {
-			selectedDate = LocalDate.now();
+		List<Reservation> list;
+		LocalDate selectedDate = null;
+
+		// 🔄 SHOW ALL RESERVATIONS
+		if ("true".equals(allParam)) {
+
+			list = dao.findAll(); // ✅ ALL reservations
+			selectedDate = null; // no date filter
+
 		} else {
-			selectedDate = LocalDate.parse(dateParam);
+			// 📅 DATE FILTER (default = today)
+			if (dateParam == null || dateParam.isEmpty()) {
+				selectedDate = LocalDate.now();
+			} else {
+				selectedDate = LocalDate.parse(dateParam);
+			}
+
+			list = dao.findByDatelist(selectedDate);
 		}
 
-		// 2️⃣ Fetch reservations by date
-		List<Reservation> list = dao.findByDatelist(selectedDate);
-
-		// 3️⃣ Set attributes
+		// Set attributes
 		req.setAttribute("date", selectedDate);
 		req.setAttribute("list", list);
 
-		// 4️⃣ Forward to JSP
-		req.getRequestDispatcher(
-				"/reservation/adminList.jsp").forward(req, res);
+		// Forward
+		req.getRequestDispatcher("/reservation/adminList.jsp")
+				.forward(req, res);
 	}
+
 }
