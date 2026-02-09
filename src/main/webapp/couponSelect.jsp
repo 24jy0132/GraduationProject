@@ -204,7 +204,7 @@ main {
 
 <body>
 
-	<nav class="navbar navbar-expand-lg bg-danger py-3">
+	<nav class="navbar navbar-expand-lg bg-danger py-3 sticky-top">
 		<div class="container">
 			<a
 				class="navbar-brand d-flex align-items-center gap-3 fw-bold text-white"
@@ -360,7 +360,7 @@ main {
 							戻る
 						</a>
 						<button type="submit"
-							class="btn btn-primary px-5 fw-bold rounded-pill shadow">
+							class="btn btn-dark px-5 fw-bold rounded-pill shadow">
 							次へ（確認） <i class="bi bi-arrow-right"></i>
 						</button>
 					</div>

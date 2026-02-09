@@ -43,59 +43,74 @@ public class MemberEditServlet extends HttpServlet {
 			return;
 		}
 
+		// Existing fields
 		String name = req.getParameter("name");
 		String email = req.getParameter("email");
 		String phone = req.getParameter("phone");
 
+		// New Password fields
+		String newPassword = req.getParameter("newPassword");
+		String rePassword = req.getParameter("rePassword");
+
 		CustomerService service = new CustomerService();
+		CustomerDao dao = new CustomerDao();
 
 		// =========================
-		// VALIDATION
+		// VALIDATION (Profile)
 		// =========================
-		if (name == null || name.isBlank()
-				|| email == null || email.isBlank()) {
-
+		if (name == null || name.isBlank() || email == null || email.isBlank()) {
 			req.setAttribute("errorMessage", "必須項目を入力してください。");
-			req.getRequestDispatcher("/member_edit.jsp")
-					.forward(req, res);
+			req.getRequestDispatcher("/member_edit.jsp").forward(req, res);
+			return;
+		}
+
+		if (service.mailExistsForOtherUser(email, customer.getUserId())) {
+			req.setAttribute("errorMessage", "このメールアドレスは既に使用されています。");
+			req.getRequestDispatcher("/member_edit.jsp").forward(req, res);
 			return;
 		}
 
 		// =========================
-		// EMAIL DUPLICATE CHECK
+		// VALIDATION (Password) - Only if fields are not empty
 		// =========================
-		if (service.mailExistsForOtherUser(email, customer.getUserId())) {
-			req.setAttribute("errorMessage", "このメールアドレスは既に使用されています。");
-			req.getRequestDispatcher("/member_edit.jsp")
-					.forward(req, res);
-			return;
+		boolean isUpdatingPassword = (newPassword != null && !newPassword.isBlank());
+
+		if (isUpdatingPassword) {
+			if (!service.isValidPassword(newPassword)) {
+				req.setAttribute("errorMessage", "パスワードは8文字以上で数字を含めてください。");
+				req.getRequestDispatcher("/member_edit.jsp").forward(req, res);
+				return;
+			}
+			if (!service.passwordsMatch(newPassword, rePassword)) {
+				req.setAttribute("errorMessage", "確認用パスワードが一致しません。");
+				req.getRequestDispatcher("/member_edit.jsp").forward(req, res);
+				return;
+			}
 		}
 
 		try {
-			// update values
+			// Update basic profile
 			customer.setName(name);
 			customer.setEmail(email);
 			customer.setPhone(phone);
-
-			CustomerDao dao = new CustomerDao();
 			dao.update(customer);
 
-			// refresh session
+			// Update password if requested
+			if (isUpdatingPassword) {
+				dao.updatePassword(customer.getUserId(), newPassword);
+			}
+
+			// Refresh session
 			Customer refreshed = dao.findById(customer.getUserId());
 			session.setAttribute("customer", refreshed);
 
-			// success toast
-			req.setAttribute("successMessage", "会員情報を更新しました。");
+			req.setAttribute("successMessage", "情報を更新しました。");
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			req.setAttribute(
-					"errorMessage",
-					"更新に失敗しました。もう一度お試しください。");
+			req.setAttribute("errorMessage", "更新に失敗しました。");
 		}
 
-		// forward so toast is visible
-		req.getRequestDispatcher("/member_edit.jsp")
-				.forward(req, res);
+		req.getRequestDispatcher("/member_edit.jsp").forward(req, res);
 	}
 }

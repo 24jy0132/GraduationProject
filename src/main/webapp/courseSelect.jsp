@@ -186,7 +186,7 @@ to {
 
 <body>
 
-	<nav class="navbar navbar-expand-lg bg-danger py-3">
+	<nav class="navbar navbar-expand-lg bg-danger py-3 sticky-top">
 		<div class="container">
 			<a
 				class="navbar-brand d-flex align-items-center gap-3 fw-bold text-white"

@@ -226,7 +226,7 @@ body {
 				<div class="dash-icon-box bg-blue">
 					<i class="fa-solid fa-calendar-check"></i>
 				</div>
-				<div class="dash-title">予約確認</div>
+				<div class="dash-title">予約管理</div>
 				<div class="dash-desc">予約状況の確認と管理を行います</div>
 			</a> <a href="<%=request.getContextPath()%>/StaffMenuListServlet"
 				class="dash-card">
