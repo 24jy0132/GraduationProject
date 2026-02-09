@@ -12,6 +12,8 @@ if (selectedDate == null)
 	selectedDate = LocalDate.now();
 
 List<Reservation> list = (List<Reservation>) request.getAttribute("list");
+
+boolean isAll = "true".equals(request.getParameter("all"));
 %>
 
 <!DOCTYPE html>
@@ -170,17 +172,44 @@ body {
 			<form method="get"
 				action="<%=request.getContextPath()%>/adminreservation/list"
 				class="row g-2 align-items-end mb-4 bg-light p-3 rounded">
+
 				<div class="col-auto">
 					<label class="form-label fw-bold small text-muted">表示日付</label> <input
 						type="date" name="date" value="<%=selectedDate%>"
 						class="form-control">
 				</div>
+
 				<div class="col-auto">
-					<button class="btn btn-primary px-4">
+					<button class="btn btn-dark px-4">
 						<i class="bi bi-search"></i> 検索
 					</button>
 				</div>
+
+				<!-- ✅ NEW BUTTON: GO TO DASHBOARD WITH SAME DATE -->
+				<div class="col-auto">
+					<a class="btn btn-outline-dark px-4"
+						href="<%=request.getContextPath()%>/admin?date=<%=selectedDate%>">
+						<i class="bi bi-calendar-week"></i> ダッシュボード
+					</a>
+				</div>
+
+				<div class="col-auto">
+					<a class="btn btn-outline-dark px-4"
+						href="<%=request.getContextPath()%>/reservation/adminReserveForm.jsp">
+						<i class="bi bi-calendar-week"></i> 新規予約登録
+					</a>
+				</div>
+
+				<div class="col-auto">
+					<a class="btn btn-outline-dark px-4"
+						href="<%=request.getContextPath()%>/adminreservation/list?all=true">
+						<i class="bi bi-arrow-clockwise"></i> 全件表示
+					</a>
+				</div>
+
+
 			</form>
+
 
 			<div class="table-responsive">
 				<table class="table table-hover align-middle text-center border">
@@ -257,10 +286,12 @@ body {
 										href="<%=request.getContextPath()%>/admin/edit?id=<%=r.getReservationId()%>">
 										<i class="bi bi-pencil-square"></i>
 									</a> <a class="btn btn-sm btn-outline-danger"
-										href="<%=request.getContextPath()%>/admin/delete?id=<%=r.getReservationId()%>"
+										href="<%=request.getContextPath()%>/admin/delete?id=<%=r.getReservationId()%><%=isAll ? "&all=true" : "&date=" + selectedDate%>"
 										onclick="return confirm('本当に削除しますか？')"> <i
 										class="bi bi-trash"></i>
 									</a>
+
+
 								</div>
 							</td>
 						</tr>

@@ -1,10 +1,21 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"
-	import="java.time.*, model.Staff, service.Constants"%>
+	import="java.time.*, java.util.List, model.Menu, dao.MenuDao, model.Staff, service.Constants"%>
 
 <%
 Staff admin = (Staff) session.getAttribute("admin");
 LocalTime t = Constants.OPEN;
+
+// Fetch courses dynamically from your MenuDao
+MenuDao menuDao = new MenuDao();
+List<Menu> courseList = null;
+try {
+	courseList = menuDao.findCourses();
+} catch (Exception e) {
+	e.printStackTrace();
+} finally {
+	menuDao.connectionClose();
+}
 %>
 
 <!DOCTYPE html>
@@ -21,7 +32,7 @@ LocalTime t = Constants.OPEN;
 	rel="stylesheet">
 
 <style>
-/* ===== BASE STYLE ===== */
+/* ===== BASE STYLE (Your Original MHP Style) ===== */
 body {
 	background: #f5f5f7;
 	font-family: "Helvetica Neue", Arial, sans-serif;
@@ -29,7 +40,6 @@ body {
 	padding-bottom: 50px;
 }
 
-/* ===== HEADER ===== */
 .page-title {
 	text-align: center;
 	font-weight: 700;
@@ -37,7 +47,6 @@ body {
 	color: #1d1d1f;
 }
 
-/* Row 1: User Card */
 .topcontainer {
 	display: flex;
 	justify-content: flex-end;
@@ -46,9 +55,9 @@ body {
 
 .user-card {
 	display: inline-flex;
-	align-items: center; /* Changed to center for better alignment */
+	align-items: center;
 	background: white;
-	padding: 6px 15px 6px 8px; /* Adjusted padding */
+	padding: 6px 15px 6px 8px;
 	border-radius: 30px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 	gap: 12px;
@@ -86,13 +95,12 @@ body {
 	color: #777;
 }
 
-/* ===== BUTTONS (FROSTED) ===== */
 .buttons {
 	text-align: right;
 	margin-bottom: 25px;
 }
 
-.buttons button, .btn-frost {
+.buttons button {
 	background: rgba(255, 255, 255, .7);
 	backdrop-filter: blur(8px);
 	border-radius: 12px;
@@ -106,54 +114,11 @@ body {
 	transition: .25s;
 }
 
-.buttons button:hover, .btn-frost:hover {
+.buttons button:hover {
 	background: rgba(255, 255, 255, .9);
 	transform: translateY(-1px);
 }
-/* ===== BUTTON STYLES ===== */
-.btn-glass {
-	background: rgba(255, 255, 255, 0.8);
-	border: 1px solid #d1d5db;
-	border-radius: 8px;
-	padding: 8px 20px;
-	font-weight: 500;
-	color: #333;
-	text-decoration: none;
-	font-size: 14px;
-	transition: 0.2s;
-	display: inline-flex;
-	align-items: center;
-	gap: 8px;
-	backdrop-filter: blur(4px);
-}
 
-.btn-glass:hover {
-	background: white;
-	transform: translateY(-1px);
-	box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-}
-
-.btn-action {
-	
-	color: white;
-	border: 1px solid #333;
-	padding: 10px 30px; /* Slightly larger for main submit */
-	border-radius: 8px;
-	font-weight: 600;
-}
-
-.btn-action:hover {
-	background: #000;
-	color: white;
-	box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.text-danger:hover {
-	color: #dc3545 !important;
-	background: #fff0f0;
-	border-color: #ffcccc;
-}
-/* ===== FORM CARD ===== */
 .form-card {
 	max-width: 700px;
 	margin: 0 auto;
@@ -177,15 +142,37 @@ body {
 	background-color: #fcfcfc;
 }
 
-.form-control:focus, .form-select:focus {
-	box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-	border-color: #007bff;
-	background-color: #fff;
-}
-
 .section-icon {
 	color: #007bff;
 	margin-right: 8px;
+}
+
+.btn-glass {
+	background: rgba(255, 255, 255, 0.8);
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	padding: 8px 20px;
+	font-weight: 500;
+	color: #333;
+	text-decoration: none;
+	font-size: 14px;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.btn-action {
+	color: white;
+	border: none;
+	padding: 10px 30px;
+	border-radius: 8px;
+	font-weight: 600;
+	transition: 0.2s;
+}
+
+.btn-action:hover {
+	opacity: 0.9;
+	transform: translateY(-1px);
 }
 </style>
 </head>
@@ -219,34 +206,76 @@ body {
 			<a href="<%=request.getContextPath()%>/Adminlogoutservlet"><button>ログアウト</button></a>
 		</div>
 
-
 		<div class="form-card">
 			<h3 class="mb-4 fw-bold text-center">
 				<i class="fa-solid fa-pen-to-square section-icon"></i>管理者予約登録
 			</h3>
+			<%
+			String error = (String) request.getAttribute("error");
+			if (error != null) {
+			%>
+			<div class="alert alert-danger rounded-3 shadow-sm mb-4">
+				<i class="fa-solid fa-triangle-exclamation me-2"></i><%=error%>
+			</div>
+			<%
+			}
+			%>
 
 			<form method="post"
 				action="<%=request.getContextPath()%>/admin/reserve">
 
-				<div class="mb-4">
-					<label class="form-label"><i
-						class="fa-regular fa-calendar me-2"></i>予約日</label> <input type="date"
-						name="date" class="form-control" required>
+				<div class="row mb-4">
+					<div class="col-md-6">
+						<label class="form-label"><i
+							class="fa-regular fa-calendar me-2"></i>予約日</label> <input type="date"
+							name="date" class="form-control" required
+							value="<%=LocalDate.now()%>">
+					</div>
+					<div class="col-md-6">
+						<label class="form-label"><i
+							class="fa-regular fa-clock me-2"></i>開始時間</label> <select
+							name="startTime" class="form-select" required>
+							<%
+							while (!t.isAfter(Constants.LAST_START)) {
+							%>
+							<option value="<%=t%>"><%=t%> ～
+								<%=t.plusMinutes(Constants.DURATION_MINUTES)%></option>
+							<%
+							t = t.plusMinutes(Constants.SLOT_MINUTES);
+							}
+							%>
+						</select>
+					</div>
+				</div>
+
+				<div class="row mb-4">
+					<div class="col-md-6">
+						<label class="form-label"><i
+							class="fa-solid fa-signature me-2"></i>お客様名</label> <input type="text"
+							name="name" class="form-control" placeholder="例：山田 太郎" required>
+					</div>
+					<div class="col-md-6">
+						<label class="form-label"><i
+							class="fa-solid fa-phone me-2"></i>電話番号</label> <input type="tel"
+							name="phone" class="form-control" placeholder="090-0000-0000"
+							required>
+					</div>
 				</div>
 
 				<div class="mb-4">
 					<label class="form-label"><i
-						class="fa-regular fa-clock me-2"></i>開始時間（15分単位）</label> <select
-						name="startTime" class="form-select" required>
+						class="fa-solid fa-utensils me-2"></i>コース選択</label> <select
+						name="courseId" class="form-select">
+						<option value="0">席のみ予約 (コースなし)</option>
 						<%
-						while (!t.isAfter(Constants.LAST_START)) {
+						if (courseList != null) {
+							for (Menu course : courseList) {
 						%>
-						<option value="<%=t%>">
-							<%=t%> ～
-							<%=t.plusMinutes(Constants.DURATION_MINUTES)%>
+						<option value="<%=course.getMenuId()%>">
+							<%=course.getMenuName()%> (+<%=course.getPrice()%>円)
 						</option>
 						<%
-						t = t.plusMinutes(Constants.SLOT_MINUTES);
+						}
 						}
 						%>
 					</select>
@@ -274,8 +303,8 @@ body {
 						</optgroup>
 					</select>
 					<div class="form-text mt-2">
-						<i class="fa-solid fa-circle-info"></i> Ctrl (Windows) または Cmd
-						(Mac) を押しながらクリックで複数選択できます
+						<i class="fa-solid fa-circle-info"></i> Ctrl (Win) / Cmd (Mac)
+						で複数選択
 					</div>
 				</div>
 
@@ -292,12 +321,6 @@ body {
 					</div>
 				</div>
 
-				<div class="mb-4">
-					<label class="form-label"><i
-						class="fa-solid fa-signature me-2"></i>お客様名</label> <input type="text"
-						name="name" class="form-control" placeholder="例：山田 太郎" required>
-				</div>
-
 				<div class="mb-5">
 					<label class="form-label"><i
 						class="fa-regular fa-envelope me-2"></i>メールアドレス</label> <input
@@ -308,7 +331,7 @@ body {
 				<div class="d-flex justify-content-between align-items-center">
 					<a href="<%=request.getContextPath()%>/Admin/adminhome.jsp"
 						class="btn-glass text-muted"> キャンセル </a>
-					<button type="submit" class="btn-action bg-primary">
+					<button type="submit" class="btn-action bg-primary shadow-sm">
 						<i class="fa-solid fa-check me-2"></i>予約を登録する
 					</button>
 				</div>

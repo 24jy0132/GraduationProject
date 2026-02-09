@@ -249,10 +249,15 @@ body {
 				<table class="table table-striped table-hover align-middle mb-0">
 					<thead class="table-secondary text-center">
 						<tr>
+							<th style="width:120px;">画像</th>
+							
 							<th>メニュー名</th>
 							<th>ジャンル</th>
 							<th style="width: 100px;">価格</th>
 							<th>説明</th>
+							<th style="width: 140px;">アンケート対象</th>
+							<th style="width: 140px;">新商品</th>
+
 							<th style="width: 100px;">編集</th>
 							<th style="width: 80px;">削除</th>
 						</tr>
@@ -271,11 +276,61 @@ body {
 							<%
 							if (!editing) {
 							%>
+							<td class="text-center">
+							  <img
+							    src="<%=request.getContextPath()%>/<%=m.getImagePath()%>"
+							    alt="menu"
+							    style="width:100px; height:60px; object-fit:cover; border-radius:10px; border:1px solid #ddd;">
+							</td>
+							
 							<td class="fw-bold"><%=m.getMenuName()%></td>
 							<td class="text-center"><span
 								class="badge bg-light text-dark border"><%=m.getCategory()%></span></td>
 							<td class="text-end pe-4">¥<%=String.format("%,d", m.getPrice())%></td>
 							<td class="small text-muted"><%=m.getDescription()%></td>
+							<td class="text-center">
+							  <% if (m.isSurveyTarget()) { %>
+							    <span class="badge bg-success">対象</span>
+							
+							    <form action="AdminMenuSurveyRemoveServlet" method="post" class="d-inline">
+							      <input type="hidden" name="menuId" value="<%=m.getMenuId()%>">
+							      <button class="btn btn-sm btn-outline-secondary ms-2"
+							              onclick="return confirm('アンケート対象から外しますか？')">
+							        外す
+							      </button>
+							    </form>
+							
+							  <% } else { %>
+							    <span class="badge bg-secondary">対象外</span>
+							  <% } %>
+							</td>
+							
+							<td class="text-center">
+								<%
+								if (m.getIsNew() == 1) {
+								%> <span class="badge bg-warning text-dark">NEW</span>
+
+								<form action="AdminMenuNewToggleServlet" method="post"
+									class="d-inline">
+									<input type="hidden" name="menuId" value="<%=m.getMenuId()%>">
+									<input type="hidden" name="isNew" value="0">
+									<button class="btn btn-sm btn-outline-dark ms-2"
+										onclick="return confirm('新商品対象から外しますか？')">外す</button>
+								</form> <%
+ 								} else {
+ 									%> <span class="badge bg-secondary">通常</span>
+
+								<form action="AdminMenuNewToggleServlet" method="post"
+									class="d-inline">
+									<input type="hidden" name="menuId" value="<%=m.getMenuId()%>">
+									<input type="hidden" name="isNew" value="1">
+									<button class="btn btn-sm btn-outline-warning ms-2"
+										onclick="return confirm('新商品にしますか？')">新商品にする</button>
+								</form> <%
+ 											}
+ 										%>
+							</td>
+
 
 							<td class="text-center"><a
 								class="btn btn-sm btn-outline-primary"
@@ -297,12 +352,22 @@ body {
 							<%
 							} else {
 							%>
-							<td colspan="6" class="p-3">
+							<td colspan="9" class="p-3">
 								<form action="AdminMenuUpdateServlet" method="post"
-									class="row g-2 align-items-center bg-white p-2 rounded shadow-sm border">
+									class="row g-2 align-items-center bg-white p-2 rounded shadow-sm border" enctype="multipart/form-data">
 
 									<input type="hidden" name="menuId" value="<%=m.getMenuId()%>">
 
+									<div class="col-md-3">
+									  <label class="small text-muted">画像</label>
+									  <input type="file"
+									         name="imageFile"
+									         class="form-control form-control-sm"
+									         accept="image/*">
+									  <input type="hidden" name="currentImage"
+									         value="<%=request.getContextPath()%>/<%=m.getImagePath()%>">
+									</div>
+									
 									<div class="col-md-3">
 										<label class="small text-muted">メニュー名</label> <input
 											class="form-control form-control-sm" name="menuName"

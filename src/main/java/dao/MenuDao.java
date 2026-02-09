@@ -61,7 +61,8 @@ public class MenuDao {
 				menu.setImagePath(rs.getString("imagePath"));
 				menu.setSurveyTarget(rs.getBoolean("isSurveyTarget"));
 				menu.setSurveyId(rs.getInt("surveyId"));
-
+				menu.setIsNew(rs.getInt("isNew"));
+				
 				ar.add(menu);
 			}
 		} catch (SQLException e) {
@@ -322,16 +323,17 @@ public class MenuDao {
 		}
 	}
 
-	public void updateMenu(int menuId, String menuName, String category, int price, String description) {
+	public void updateMenu(int menuId, String menuName, String category, int price, String description,String imagePath) {
 
-		String sql = "UPDATE menu SET menuName=?, category=?, price=?, description=? WHERE menuId=?";
+		String sql = "UPDATE menu SET menuName=?, category=?, price=?, description=? , imagePath=? WHERE menuId=?";
 
 		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setString(1, menuName);
 			ps.setString(2, category);
 			ps.setInt(3, price);
 			ps.setString(4, description);
-			ps.setInt(5, menuId);
+			ps.setString(5, imagePath);
+			ps.setInt(6, menuId);
 
 			ps.executeUpdate();
 
@@ -406,4 +408,29 @@ public class MenuDao {
 		}
 		return list;
 	}
+	
+	public void updateIsNew(int menuId, int isNew) {
+	    String sql = "UPDATE menu SET isNew=? WHERE menuId=?";
+
+	    try (
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+
+	        ps.setInt(1, isNew);
+	        ps.setInt(2, menuId);
+	        ps.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	public void removeSurveyTarget(int menuId) {
+	    String sql = "UPDATE menu SET isSurveyTarget = 0 WHERE menuId = ?";
+	    try (PreparedStatement ps = con.prepareStatement(sql)) {
+	        ps.setInt(1, menuId);
+	        ps.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
 }

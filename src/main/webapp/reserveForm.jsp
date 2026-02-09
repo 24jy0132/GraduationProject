@@ -163,14 +163,13 @@ main {
 
 <body>
 
-	<nav class="navbar navbar-expand-lg bg-danger py-3 sticky-top">
+	<nav class="navbar navbar-expand-lg bg-danger py-3">
 		<div class="container">
 			<a
 				class="navbar-brand d-flex align-items-center gap-3 fw-bold text-white"
 				href="<%=request.getContextPath()%>/index.jsp"> <img
 				src="<%=request.getContextPath()%>/img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png"
-				height="40" width="40" class="me-1" alt="Logo"> Welcome From
-				Mesa <%
+				height="40" width="40" class="me-1" alt="Logo"> <%
  if (loginCustomer != null) {
  %>
 				<div class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill"
@@ -180,15 +179,15 @@ main {
 						class="badge bg-light text-danger fw-bold position-relative"><%=loginCustomer.getPoint()%>
 						pt</span>
 				</div> <%
+ } else {
+ %> <span>Welcome From Mesa</span> <%
  }
  %>
 			</a>
-
 			<button class="navbar-toggler" type="button"
 				data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
 				<span class="navbar-toggler-icon"></span>
 			</button>
-
 			<div class="collapse navbar-collapse justify-content-end"
 				id="navbarSupportedContent">
 				<ul class="navbar-nav gap-4">
@@ -196,52 +195,12 @@ main {
 					if (loginCustomer == null) {
 					%>
 					<li class="nav-item"><a class="nav-link active text-white"
-						href="<%=request.getContextPath()%>/index.jsp"><i
-							class="bi bi-house-fill me-1"></i>Home</a></li>
+						href="<%=request.getContextPath()%>/index.jsp">Home</a></li>
 					<%
 					} else {
 					%>
 					<li class="nav-item"><a class="nav-link active text-white"
-						href="<%=request.getContextPath()%>/member_index.jsp"><i
-							class="bi bi-house-fill me-1"></i>Home</a></li>
-					<%
-					}
-					%>
-
-					<li class="nav-item"><a class="nav-link text-white"
-						href="<%=request.getContextPath()%>/MenuListServlet"><i
-							class="bi bi-menu-down me-1"></i>Menu</a></li>
-
-					<%
-					if (loginCustomer == null) {
-					%>
-					<li class="nav-item"><a class="nav-link text-white"
-						href="<%=request.getContextPath()%>/reserve/form"><i
-							class="bi bi-calendar-check me-1"></i>Reservation</a></li>
-					<%
-					}
-					%>
-
-					<li class="nav-item"><a class="nav-link text-white"
-						href="<%=request.getContextPath()%>/contact.jsp"><i
-							class="bi bi-telephone-fill me-1"></i>Contact</a></li>
-					<li class="nav-item"><a class="nav-link text-white"
-						href="<%=request.getContextPath()%>/map.jsp"><i
-							class="bi bi-pin-map-fill me-1"></i>Map</a></li>
-
-					<%
-					if (loginCustomer == null) {
-					%>
-					<li class="nav-item"><a
-						class="nav-link active text-white fw-bold ms-lg-3"
-						href="<%=request.getContextPath()%>/login.jsp"><i
-							class="bi bi-box-arrow-in-right me-1"></i>Login</a></li>
-					<%
-					} else {
-					%>
-					<li class="nav-item"><a class="nav-link text-white ms-lg-3"
-						href="<%=request.getContextPath()%>/Customer_LogOut"><i
-							class="bi bi-box-arrow-right me-1"></i>LogOut</a></li>
+						href="<%=request.getContextPath()%>/member_index.jsp">Home</a></li>
 					<%
 					}
 					%>
@@ -249,6 +208,7 @@ main {
 			</div>
 		</div>
 	</nav>
+
 	<main>
 		<div class="container">
 
@@ -438,7 +398,7 @@ main {
 
 						<div class="text-end mt-5">
 							<button
-								class="btn btn-dark px-5 py-3 fw-bold rounded-pill shadow">
+								class="btn btn-primary px-5 py-3 fw-bold rounded-pill shadow">
 								次へ（席選択） <i class="bi bi-arrow-right ms-2"></i>
 							</button>
 						</div>

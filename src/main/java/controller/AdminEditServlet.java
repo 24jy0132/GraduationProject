@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.List;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -11,81 +12,129 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import dao.MenuDao;
 import dao.ReservationDao;
+import model.Menu;
 import model.Reservation;
-import service.Constants;
 
 @WebServlet("/admin/edit")
 public class AdminEditServlet extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse res)
+			throws ServletException, IOException {
 
-        try {
-            int id = Integer.parseInt(req.getParameter("id"));
+		try {
+			String idParam = req.getParameter("id");
 
-            ReservationDao dao = new ReservationDao();
-            Reservation r = dao.findById(id);   // 🔴 MUST EXIST
+			if (idParam == null || idParam.isBlank()) {
+				res.sendRedirect(req.getContextPath() + "/admin");
+				return;
+			}
 
-            req.setAttribute("reservation", r);
-            req.getRequestDispatcher("/Admin/edit.jsp")
-               .forward(req, res);
+			int id = Integer.parseInt(idParam);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            res.sendRedirect(req.getContextPath() + "/admin");
-        }
-    }
+			ReservationDao rdao = new ReservationDao();
+			Reservation r = rdao.findById(id);
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+			if (r == null) {
+				res.sendRedirect(req.getContextPath() + "/admin");
+				return;
+			}
 
-        try {
-            int reservationId =
-                Integer.parseInt(req.getParameter("reservationId"));
+			MenuDao mdao = new MenuDao();
+			List<Menu> courseList = mdao.findCourses(); // ✅ ONLY courses
 
-            LocalDate date =
-                LocalDate.parse(req.getParameter("date"));
+			req.setAttribute("res", r);
+			req.setAttribute("courseList", courseList);
 
-            LocalTime startTime =
-                LocalTime.parse(req.getParameter("startTime"));
+			req.getRequestDispatcher("/Admin/edit.jsp").forward(req, res);
 
-            // ⏰ end = start + 2 hours
-            LocalTime endTime =
-                startTime.plusMinutes(Constants.DURATION_MINUTES);
+		} catch (Exception e) {
+			e.printStackTrace();
+			res.sendRedirect(req.getContextPath() + "/admin");
+		}
+	}
 
-            int adult = Integer.parseInt(req.getParameter("adult"));
-            int child = Integer.parseInt(req.getParameter("child"));
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse res)
+			throws ServletException, IOException {
 
-            String name = req.getParameter("customerName");
-            String email = req.getParameter("customerEmail");
+		try {
+			// ===== SAFE ID PARSE =====
+			String idParam = req.getParameter("reservationId");
+			if (idParam == null || idParam.isBlank()) {
+				throw new IllegalArgumentException("予約IDが不正です");
+			}
 
-            String[] tableIds =
-                req.getParameterValues("tableIds");
+			int reservationId = Integer.parseInt(idParam);
 
-            Reservation r = new Reservation();
-            r.setReservationId(reservationId);
-            r.setReservationDate(date);
-            r.setStartTime(startTime);
-            r.setEndTime(endTime);
-            r.setAdultCount(adult);
-            r.setChildCount(child);
-            r.setCustomerName(name);
-            r.setCustomerEmail(email);
-            r.setTableIds(Arrays.asList(tableIds));
+			ReservationDao dao = new ReservationDao();
+			Reservation r = dao.findById(reservationId);
 
-            ReservationDao dao = new ReservationDao();
-            dao.update(r);
+			if (r == null) {
+				throw new IllegalArgumentException("予約が存在しません");
+			}
 
-            res.sendRedirect(req.getContextPath() + "/admin");
+			// ===== BASIC INFO =====
+			r.setReservationDate(LocalDate.parse(req.getParameter("date")));
+			r.setStartTime(LocalTime.parse(req.getParameter("startTime")));
+			r.setEndTime(r.getStartTime().plusMinutes(120));
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            req.setAttribute("error", e.getMessage());
-            req.getRequestDispatcher("/Admin/edit.jsp")
-               .forward(req, res);
-        }
-    }
+			r.setAdultCount(Integer.parseInt(req.getParameter("adult")));
+			r.setChildCount(Integer.parseInt(req.getParameter("child")));
+
+			r.setCustomerName(req.getParameter("customerName")); // ✅ FIXED
+			r.setCustomerEmail(req.getParameter("customerEmail")); // ✅ FIXED
+			r.setCustomerPhone(req.getParameter("phone"));
+
+			// ===== TABLES =====
+			String[] tables = req.getParameterValues("tableIds");
+			if (tables == null || tables.length == 0) {
+				throw new IllegalArgumentException("テーブルを選択してください");
+			}
+			r.setTableIds(Arrays.asList(tables));
+
+			// ===== COURSE =====
+			String courseParam = req.getParameter("courseId");
+			if (courseParam == null || courseParam.equals("0")) {
+				r.setCourseId(null);
+			} else {
+				r.setCourseId(Integer.parseInt(courseParam));
+			}
+
+			dao.update(r);
+
+			String backDate = r.getReservationDate().toString();
+
+			if (backDate != null && !backDate.isBlank()) {
+				res.sendRedirect(req.getContextPath()
+						+ "/adminreservation/list?date=" + backDate);
+			} else {
+				res.sendRedirect(req.getContextPath() + "/admin");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			try {
+				String idParam = req.getParameter("reservationId");
+				if (idParam != null && !idParam.isBlank()) {
+					int id = Integer.parseInt(idParam);
+
+					ReservationDao dao = new ReservationDao();
+					MenuDao mdao = new MenuDao();
+
+					req.setAttribute("res", dao.findById(id));
+					req.setAttribute("courseList", mdao.findAll());
+				}
+
+				req.setAttribute("error", e.getMessage());
+				req.getRequestDispatcher("/Admin/edit.jsp").forward(req, res);
+
+			} catch (Exception ex) {
+				res.sendRedirect(req.getContextPath() + "/admin");
+			}
+		}
+	}
 }

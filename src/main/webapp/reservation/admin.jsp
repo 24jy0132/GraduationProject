@@ -4,9 +4,9 @@
 
 <%
 // 1. DATA RETRIEVAL
+boolean isAll = "true".equals(request.getParameter("all"));
 Staff admin = (Staff) session.getAttribute("admin");
 
-// --- DATE LOGIC ---
 String dateParam = request.getParameter("date");
 LocalDate selectedDate = null;
 if (dateParam != null && !dateParam.isEmpty()) {
@@ -22,14 +22,10 @@ if (selectedDate == null) {
 	selectedDate = LocalDate.now();
 }
 
-// Current View Month
 YearMonth currentYm = YearMonth.from(selectedDate);
-
-// Arrow Navigation Dates (1st of prev/next month)
 LocalDate prevMonthDate = selectedDate.minusMonths(1).withDayOfMonth(1);
 LocalDate nextMonthDate = selectedDate.plusMonths(1).withDayOfMonth(1);
 
-// Reservation Data
 List<Reservation> list = (List<Reservation>) request.getAttribute("list");
 Map<LocalDate, Integer> monthCount = (Map<LocalDate, Integer>) request.getAttribute("monthCount");
 if (monthCount == null)
@@ -38,9 +34,8 @@ if (monthCount == null)
 // 2. SETUP TABLES
 String[] tableOrder = {"A1", "A2", "T1", "T2", "T3", "T4", "Z1", "Z2", "Z3", "Z4"};
 Map<String, List<Reservation>> tableMap = new LinkedHashMap<>();
-for (String t : tableOrder) {
+for (String t : tableOrder)
 	tableMap.put(t, new ArrayList<>());
-}
 
 // 3. MAP RESERVATIONS
 if (list != null) {
@@ -48,9 +43,8 @@ if (list != null) {
 		if (r.getTableIds() == null)
 	continue;
 		for (String tid : r.getTableIds()) {
-	if (tableMap.containsKey(tid)) {
+	if (tableMap.containsKey(tid))
 		tableMap.get(tid).add(r);
-	}
 		}
 	}
 }
@@ -60,16 +54,15 @@ LocalTime OPEN = LocalTime.of(17, 0);
 LocalTime CLOSE = LocalTime.of(22, 0);
 long TOTAL_MIN = Duration.between(OPEN, CLOSE).toMinutes();
 
-// Calendar Helper
 LocalDate firstDayOfGrid = currentYm.atDay(1);
 int startDayOfWeek = firstDayOfGrid.getDayOfWeek().getValue();
 %>
 
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>予約管理システム</title>
+<title>MHP Admin Dashboard</title>
 
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -86,7 +79,7 @@ body {
 	color: #333;
 }
 
-/* ===== USER CARD & NAV ===== */
+/* ===== USER CARD ===== */
 .topcontainer {
 	display: flex;
 	justify-content: flex-end;
@@ -95,9 +88,9 @@ body {
 
 .user-card {
 	display: inline-flex;
-	align-items: center; /* Changed to center for better alignment */
+	align-items: center;
 	background: white;
-	padding: 6px 15px 6px 8px; /* Adjusted padding */
+	padding: 6px 15px 6px 8px;
 	border-radius: 30px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 	gap: 12px;
@@ -152,12 +145,12 @@ body {
 	color: #1c1c1e;
 	margin-left: 10px;
 	box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
-	transition: .25s;
+	transition: .25s ease-in-out;
 }
 
 .buttons button:hover, .btn-frost:hover {
 	background: rgba(255, 255, 255, .9);
-	transform: translateY(-1px);
+	transform: translateY(-2px);
 }
 
 /* ===== SCHEDULER BOARD ===== */
@@ -166,8 +159,7 @@ body {
 	border: 1px solid #dcdfe3;
 	border-radius: 8px;
 	box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-	margin-bottom: 150px;
-	overflow: hidden;
+	margin-bottom: 50px;
 }
 
 .scheduler-header {
@@ -183,9 +175,7 @@ body {
 .grid-container {
 	position: relative;
 	overflow-x: auto;
-	overflow-y: visible;
-	padding-bottom: 10px;
-	min-height: 500px;
+	overflow-y: visible; /* Required for popups */
 }
 
 .grid-row {
@@ -193,6 +183,8 @@ body {
 	height: 70px;
 	border-bottom: 1px solid #eee;
 	position: relative;
+	overflow: visible !important;
+	/* Forces children to show outside bounds */
 }
 
 .row-header {
@@ -207,11 +199,10 @@ body {
 	justify-content: center;
 	font-weight: 800;
 	color: #495057;
-	z-index: 20;
+	z-index: 30;
 	box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
 }
 
-/* Time Header */
 .time-header-row {
 	display: flex;
 	height: 35px;
@@ -219,7 +210,7 @@ body {
 	color: #fff;
 	position: sticky;
 	top: 0;
-	z-index: 30;
+	z-index: 40;
 }
 
 .time-header-label {
@@ -239,22 +230,8 @@ body {
 .time-track {
 	flex-grow: 1;
 	position: relative;
-	min-width: 800px;
-}
-
-/* Grid Lines & Markers */
-.grid-guide {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	width: 1px;
-	background: #e9ecef;
-	z-index: 1;
-}
-
-.grid-guide.hour {
-	background: #dee2e6;
-	width: 1px;
+	min-width: 1400px;
+	overflow: visible;
 }
 
 .time-marker {
@@ -277,7 +254,7 @@ body {
 	transform: translateX(-100%);
 }
 
-/* ===== BLOCKS ===== */
+/* ===== RESERVATION BLOCKS ===== */
 .res-block {
 	position: absolute;
 	top: 10px;
@@ -291,19 +268,19 @@ body {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	overflow: visible;
 	white-space: nowrap;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	transition: 0.1s;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
 	z-index: 10;
 	border-left: 5px solid #999;
 	cursor: pointer;
 }
 
+/* Pop to front on hover */
 .res-block:hover {
-	z-index: 100;
+	z-index: 100 !important;
 	transform: scale(1.02);
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 .res-block.RESERVED {
@@ -327,26 +304,45 @@ body {
 	opacity: 0.7;
 }
 
-/* ===== POPUP ===== */
+.res-block.linked {
+	outline: 2px dashed #000;
+	outline-offset: -2px;
+}
+
+/* ===== DETAIL POPUP (FIXED) ===== */
 .detail-popup {
-	display: none;
+	visibility: hidden;
+	opacity: 0;
 	position: absolute;
-	top: 100%;
+	top: 90%;
 	left: 0;
-	width: 260px;
+	width: 280px;
 	background: #fff;
-	border: 1px solid #ccc;
-	border-radius: 8px;
+	border: 1px solid #dee2e6;
+	border-radius: 12px;
 	padding: 15px;
-	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 	z-index: 200;
 	text-align: left;
 	color: #333;
-	margin-top: 10px;
+	transition: all 0.3s ease;
+	transform: translateY(10px);
+	pointer-events: none; /* Prevents flashing when moving mouse */
 }
 
+/* Show popup on hover */
 .res-block:hover .detail-popup {
-	display: block;
+	visibility: visible;
+	opacity: 1;
+	transform: translateY(0);
+	pointer-events: auto; /* Re-enable clicks inside popup */
+}
+
+/* Adjust position for items near the right edge */
+.res-block[style*="left: 8"], .res-block[style*="left: 9"] .detail-popup
+	{
+	left: auto;
+	right: 0;
 }
 
 /* ===== CALENDAR MODAL ===== */
@@ -371,13 +367,6 @@ body {
 	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
-.cal-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 15px;
-}
-
 .cal-grid {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
@@ -392,16 +381,10 @@ body {
 	color: #333;
 	background: #f8f9fa;
 	font-size: 14px;
-	position: relative;
 	height: 50px;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	align-items: center;
-}
-
-.cal-cell:hover {
-	background: #e9ecef;
 }
 
 .cal-cell.active {
@@ -411,13 +394,8 @@ body {
 
 .cal-count {
 	font-size: 10px;
-	margin-top: 2px;
 	font-weight: bold;
 	color: #dc3545;
-}
-
-.cal-cell.active .cal-count {
-	color: white;
 }
 </style>
 </head>
@@ -425,7 +403,6 @@ body {
 <body>
 
 	<div class="container-fluid px-4 mt-4">
-
 		<h2 class="text-center fw-bold text-dark mb-4">MHP株式会社 営業サポートシステム</h2>
 
 		<div class="topcontainer">
@@ -452,19 +429,18 @@ body {
 		</div>
 
 		<div class="scheduler-wrapper">
-
 			<div class="scheduler-header">
 				<div class="d-flex align-items-center gap-3">
-					<h4 class="m-0 fw-bold text-dark"><%=selectedDate%></h4>
-
-					<button class="btn btn-sm btn-dark d-flex align-items-center gap-2"
-						onclick="openCalendar()">
+					<h4 class="m-0 fw-bold"><%=selectedDate%></h4>
+					<button class="btn btn-sm btn-dark px-3" onclick="openCalendar()">
 						<i class="fa-regular fa-calendar"></i> カレンダー
 					</button>
-
 					<a href="<%=request.getContextPath()%>/admin/list"
-						class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2">
-						<i class="fa-solid fa-list-check"></i> 予約履歴
+						class="btn btn-sm btn-outline-secondary px-3"> <i
+						class="fa-solid fa-list-check"></i> 予約履歴
+					</a> <a class="btn btn-sm btn-outline-secondary px-3"
+						href="<%=request.getContextPath()%>/reservation/adminReserveForm.jsp">
+						<i class="fa-solid fa-plus"></i> 新規予約登録
 					</a>
 				</div>
 				<div class="d-flex gap-2">
@@ -480,7 +456,6 @@ body {
 			</div>
 
 			<div class="grid-container">
-
 				<div class="time-header-row">
 					<div class="time-header-label">TABLE</div>
 					<div class="time-track">
@@ -490,8 +465,6 @@ body {
 							double left = m * 100.0 / TOTAL_MIN;
 							String align = (m == 0) ? "start" : (m == TOTAL_MIN ? "end" : "mid");
 						%>
-						<div class="grid-guide hour"
-							style="left: <%=left%>%; height: 2000px; background: rgba(255,255,255,0.1);"></div>
 						<span class="time-marker <%=align%>" style="left: <%=left%>%;"><%=t%></span>
 						<%
 						}
@@ -505,12 +478,11 @@ body {
 				<div class="grid-row">
 					<div class="row-header"><%=t%></div>
 					<div class="time-track h-100">
-
 						<%
 						for (int m = 60; m < TOTAL_MIN; m += 60) {
-							double left = m * 100.0 / TOTAL_MIN;
 						%>
-						<div class="grid-guide hour" style="left: <%=left%>%;"></div>
+						<div
+							style="position:absolute; left:<%=m * 100.0 / TOTAL_MIN%>%; top:0; bottom:0; width:1px; background:#e9ecef;"></div>
 						<%
 						}
 						%>
@@ -543,7 +515,7 @@ body {
 								</div>
 								<div class="mb-3">
 									<i class="fa-solid fa-users w-25"></i> <span><%=r.getAdultCount()%>名
-										/ 子<%=r.getChildCount()%></span>
+										/ 子<%=r.getChildCount()%>名</span>
 								</div>
 
 								<label class="small text-muted fw-bold">ステータス変更</label> <select
@@ -567,9 +539,9 @@ body {
 									<a
 										href="<%=request.getContextPath()%>/admin/edit?id=<%=r.getReservationId()%>"
 										class="btn btn-sm btn-outline-primary w-50">編集</a> <a
-										href="<%=request.getContextPath()%>/admin/delete?id=<%=r.getReservationId()%>"
+										href="<%=request.getContextPath()%>/admin/delete?id=<%=r.getReservationId()%><%=isAll ? "&all=true" : "&date=" + selectedDate%>"
 										class="btn btn-sm btn-outline-danger w-50"
-										onclick="return confirm('削除？')">削除</a>
+										onclick="return confirm('削除しますか？')">削除</a>
 								</div>
 							</div>
 						</div>
@@ -581,7 +553,6 @@ body {
 				<%
 				}
 				%>
-
 			</div>
 		</div>
 	</div>
@@ -589,20 +560,15 @@ body {
 	<div id="calModal" class="modal-calendar"
 		onclick="if(event.target===this)this.style.display='none'">
 		<div class="cal-content">
-			<div class="cal-header">
+			<div class="d-flex justify-content-between align-items-center mb-4">
 				<a href="?date=<%=prevMonthDate%>&calOpen=true"
-					class="btn btn-sm btn-outline-secondary"> <i
-					class="fa-solid fa-chevron-left"></i>
-				</a>
-
+					class="btn btn-sm btn-light border"><i
+					class="fa-solid fa-chevron-left"></i></a>
 				<h5 class="m-0 fw-bold"><%=currentYm%></h5>
-
 				<a href="?date=<%=nextMonthDate%>&calOpen=true"
-					class="btn btn-sm btn-outline-secondary"> <i
-					class="fa-solid fa-chevron-right"></i>
-				</a>
+					class="btn btn-sm btn-light border"><i
+					class="fa-solid fa-chevron-right"></i></a>
 			</div>
-
 			<div class="cal-grid">
 				<%
 				for (int i = 1; i < startDayOfWeek; i++) {
@@ -610,7 +576,6 @@ body {
 				<%
 				}
 				%>
-
 				<%
 				for (int d = 1; d <= currentYm.lengthOfMonth(); d++) {
 					LocalDate day = currentYm.atDay(d);
@@ -619,8 +584,8 @@ body {
 				%>
 				<a href="?date=<%=day%>" class="cal-cell <%=active%>"> <%=d%> <%
  if (count > 0) {
- %>
-					<span class="cal-count"><%=count%>件</span> <%
+ %><span
+					class="cal-count"><%=count%>件</span> <%
  }
  %>
 				</a>
@@ -628,29 +593,18 @@ body {
 				}
 				%>
 			</div>
-
 			<button class="btn btn-secondary w-100 mt-3"
 				onclick="document.getElementById('calModal').style.display='none'">閉じる</button>
 		</div>
 	</div>
 
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 	<script>
-	// 1. Check if calendar should be open on load
 	window.onload = function() {
 		const params = new URLSearchParams(window.location.search);
-		if(params.get('calOpen') === 'true') {
-			document.getElementById('calModal').style.display = 'flex';
-		}
+		if(params.get('calOpen') === 'true') document.getElementById('calModal').style.display = 'flex';
 	};
+	function openCalendar() { document.getElementById('calModal').style.display = 'flex'; }
 
-	function openCalendar() {
-		document.getElementById('calModal').style.display = 'flex';
-	}
-
-	// 2. Status Update AJAX
 	function updateStatus(id, status){
 		fetch("<%=request.getContextPath()%>/admin/status", {
 			method: "POST",
@@ -660,12 +614,20 @@ body {
 			document.querySelectorAll('[data-res="'+id+'"]').forEach(el => {
 				el.classList.remove("RESERVED", "ARRIVED", "BILL_REQUESTED", "FINISHED");
 				el.classList.add(status);
-				const sel = el.querySelector("select");
-				if(sel) sel.value = status;
 			});
-		}).catch(err => console.error(err));
+		});
 	}
-	</script>
 
+	document.addEventListener("mouseover", e => {
+		const b = e.target.closest(".res-block");
+		if(!b) return;
+		document.querySelectorAll('[data-res="'+b.dataset.res+'"]').forEach(x => x.classList.add("linked"));
+	});
+	document.addEventListener("mouseout", e => {
+		const b = e.target.closest(".res-block");
+		if(!b) return;
+		document.querySelectorAll('[data-res="'+b.dataset.res+'"]').forEach(x => x.classList.remove("linked"));
+	});
+	</script>
 </body>
 </html>

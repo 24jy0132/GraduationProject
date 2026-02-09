@@ -3,7 +3,9 @@ package controller;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,48 +18,74 @@ import service.Constants;
 @WebServlet("/admin/reserve")
 public class AdminReservationCreateServlet extends HttpServlet {
 
-	protected void doPost(HttpServletRequest req, HttpServletResponse res)
-			throws IOException {
+    private final ReservationDao dao = new ReservationDao();
 
-		LocalDate date = LocalDate.parse(req.getParameter("date"));
-		LocalTime start = LocalTime.parse(req.getParameter("startTime"));
-		LocalTime end = start.plusMinutes(Constants.DURATION_MINUTES);
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-		String[] tableIds = req.getParameterValues("tableIds");
-		if (tableIds == null || tableIds.length == 0) {
-			res.sendRedirect(req.getContextPath() + "/reservation/adminReserveForm.jsp");
-			return;
-		}
+        try {
+            String dateStr = request.getParameter("date");
+            String startStr = request.getParameter("startTime");
+            String name = request.getParameter("name");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            String courseIdStr = request.getParameter("courseId");
+            String[] tableIdsArray = request.getParameterValues("tableIds");
 
-		Reservation r = new Reservation();
-		r.setReservationDate(date);
-		r.setStartTime(start);
-		r.setEndTime(end);
-		r.setAdultCount(Integer.parseInt(req.getParameter("adult")));
-		r.setChildCount(Integer.parseInt(req.getParameter("child")));
-		r.setCustomerName(req.getParameter("name"));
-		r.setCustomerEmail(req.getParameter("email"));
-		r.setStatus("RESERVED");
+            int adultCount = Integer.parseInt(request.getParameter("adult"));
+            int childCount = Integer.parseInt(request.getParameter("child"));
 
-		ReservationDao dao = new ReservationDao();
+            Reservation res = new Reservation();
+            res.setCustomerName(name);
+            res.setCustomerEmail(email);
+            res.setCustomerPhone(phone);
 
-		try {
-			if (!dao.areTablesAvailable(date, start, end, tableIds)) {
-				res.sendRedirect(req.getContextPath()
-					+ "/reservation/adminReserveForm.jsp?error=table_taken");
-				return;
-			}
+            if (courseIdStr != null && !courseIdStr.isEmpty()) {
+                int courseId = Integer.parseInt(courseIdStr);
+                if (courseId > 0) {
+                    res.setCourseId(courseId);
+                }
+            }
 
-			dao.insertWithTables(r);
+            res.setReservationDate(LocalDate.parse(dateStr));
 
-			res.sendRedirect(req.getContextPath() + "/admin");
+            LocalTime startTime = LocalTime.parse(startStr);
+            res.setStartTime(startTime);
+            res.setEndTime(startTime.plusMinutes(Constants.DURATION_MINUTES));
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			res.sendRedirect(req.getContextPath()
-				+ "/reservation/adminReserveForm.jsp?error=system");
-		}
-	}
+            res.setAdultCount(adultCount);
+            res.setChildCount(childCount);
+            res.setStatus("RESERVED");
+            res.setReservationType("ADMIN");
+
+            if (tableIdsArray != null) {
+                res.setTableIds(Arrays.asList(tableIdsArray));
+            }
+
+            // 🔴 TIME CONFLICT CHECK
+            if (dao.hasTimeConflict(
+                    res.getReservationDate(),
+                    res.getStartTime(),
+                    res.getEndTime(),
+                    res.getTableIds())) {
+
+                request.setAttribute("error", "選択した時間帯・テーブルは既に予約があります。");
+                request.getRequestDispatcher("/Admin/reserve.jsp")
+                       .forward(request, response);
+                return;
+            }
+
+            dao.insertCustomerReservation(res);
+
+            response.sendRedirect(
+                request.getContextPath() + "/adminreservation/list?date=" + dateStr);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "予約登録中にエラーが発生しました。");
+            request.getRequestDispatcher("/Admin/reserve.jsp")
+                   .forward(request, response);
+        }
+    }
 }
-
-
