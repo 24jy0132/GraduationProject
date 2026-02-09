@@ -9,12 +9,12 @@ public class Menu {
     private String imagePath;    // メニュー画像
     private boolean isSurveyTarget;
     private int surveyId;    
-    private int durationMinutes ;
-    public int getDurationMinutes() {
-		return durationMinutes;
+    private int isNew ;
+    public int getIsNew() {
+		return isNew;
 	}
-	public void setDurationMinutes(int durationMinutes) {
-		this.durationMinutes = durationMinutes;
+	public void setIsNew(int isNew) {
+		this.isNew = isNew;
 	}
 	// アンケートコード(FK)
 	public int getMenuId() {
