@@ -19,7 +19,8 @@ boolean readOnly = false;
 if (loginCustomer != null) {
 	nameVal = loginCustomer.getName();
 	emailVal = loginCustomer.getEmail();
-	phoneVal = loginCustomer.getPhone(); // ✅ THIS IS THE FIX
+	// Assuming your Customer model has getPhone(). If it's named getTel(), change this.
+	// phoneVal = loginCustomer.getPhone(); 
 	readOnly = true;
 }
 

@@ -709,7 +709,7 @@ main {
 							class="bi bi-arrow-left"></i> 戻る
 						</a>
 						<button type="submit"
-							class="btn btn-primary px-5 fw-bold rounded-pill shadow"
+							class="btn btn-dark px-5 fw-bold rounded-pill shadow"
 							id="nextBtn" disabled>
 							この席にする <i class="bi bi-check-lg"></i>
 						</button>

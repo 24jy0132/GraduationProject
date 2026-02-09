@@ -133,7 +133,7 @@ Customer customer = (Customer) session.getAttribute("customer");
 						href="contact.jsp"> <i class="bi bi-telephone-fill me-1"></i>Contact
 					</a></li>
 					<li class="nav-item"><a class="nav-link text-white"
-						href="map.jsp"> <i class="bi bi-pin-map-fill me-1"></i>Map
+						href="<%=request.getContextPath()%>/MapServlet"> <i class="bi bi-pin-map-fill me-1"></i>Map
 					</a></li>
 					<li class="nav-item"><a class="nav-link text-white"
 						href="<%=request.getContextPath()%>/Customer_LogOut"> <i

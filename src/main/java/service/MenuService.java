@@ -88,9 +88,21 @@ public class MenuService {
 		dao.connectionClose();
 
 	}
-	public void updateMenu(int menuId, String menuName, String category, int price, String description) {
+	public void updateMenu(int menuId, String menuName, String category, int price, String description,String imagePath) {
 	    MenuDao dao = new MenuDao();
-	    dao.updateMenu(menuId, menuName, category, price, description);
+	    dao.updateMenu(menuId, menuName, category, price, description, imagePath);
+	    dao.connectionClose();
+	}
+
+	public void updateIsNew(int menuId, int isNew) {
+	    MenuDao dao = new MenuDao();
+
+	    dao.updateIsNew(menuId, isNew);
+	}
+
+	public void removeSurveyTarget(int menuId) {
+	    MenuDao dao = new MenuDao();
+	    dao.removeSurveyTarget(menuId);
 	    dao.connectionClose();
 	}
 
