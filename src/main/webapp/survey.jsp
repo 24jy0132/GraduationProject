@@ -244,21 +244,24 @@ body {
 							<div class="section-title">味の印象</div>
 							<div class="d-flex flex-wrap option-row">
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="taste"
-										value="とてもおいしかった" required> <label
-										class="form-check-label">とてもおいしかった</label>
+									<label class="form-check-label"><input
+										class="form-check-input" type="radio" name="taste"
+										value="とてもおいしかった" required> とてもおいしかった</label>
 								</div>
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="taste"
-										value="おいしかった"> <label class="form-check-label">おいしかった</label>
+									<label class="form-check-label"><input
+										class="form-check-input" type="radio" name="taste"
+										value="おいしかった"> おいしかった</label>
 								</div>
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="taste"
-										value="普通だった"> <label class="form-check-label">普通だった</label>
+									<label class="form-check-label"><input
+										class="form-check-input" type="radio" name="taste"
+										value="普通だった"> 普通だった</label>
 								</div>
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="taste"
-										value="あまり口に合わなかった"> <label class="form-check-label">あまり口に合わなかった</label>
+									<label class="form-check-label"><input
+										class="form-check-input" type="radio" name="taste"
+										value="あまり口に合わなかった"> あまり口に合わなかった</label>
 								</div>
 							</div>
 						</div>
@@ -268,16 +271,19 @@ body {
 							<div class="section-title">量の印象</div>
 							<div class="d-flex flex-wrap option-row">
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="volume"
-										value="少ない" required> <label class="form-check-label">少ない</label>
+									<label class="form-check-label"><input
+										class="form-check-input" type="radio" name="volume"
+										value="少ない" required> 少ない</label>
 								</div>
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="volume"
-										value="ちょうどいい"> <label class="form-check-label">ちょうどいい</label>
+									<label class="form-check-label"><input
+										class="form-check-input" type="radio" name="volume"
+										value="ちょうどいい"> ちょうどいい</label>
 								</div>
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="volume"
-										value="多い"> <label class="form-check-label">多い</label>
+									<label class="form-check-label"><input
+										class="form-check-input" type="radio" name="volume" value="多い">
+										多い</label>
 								</div>
 							</div>
 						</div>
@@ -287,16 +293,19 @@ body {
 							<div class="section-title">値段の印象</div>
 							<div class="d-flex flex-wrap option-row">
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="price"
-										value="やすい" required> <label class="form-check-label">やすい</label>
+									<label class="form-check-label"><input
+										class="form-check-input" type="radio" name="price" value="やすい"
+										required> やすい</label>
 								</div>
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="price"
-										value="妥当"> <label class="form-check-label">妥当</label>
+									<label class="form-check-label"><input
+										class="form-check-input" type="radio" name="price" value="妥当">
+										妥当</label>
 								</div>
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="price"
-										value="高い"> <label class="form-check-label">高い</label>
+									<label class="form-check-label"><input
+										class="form-check-input" type="radio" name="price" value="高い">
+										高い</label>
 								</div>
 							</div>
 						</div>

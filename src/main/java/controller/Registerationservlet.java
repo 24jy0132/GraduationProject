@@ -60,7 +60,7 @@ public class Registerationservlet extends HttpServlet {
 
 		// ▼ Furikana must be 全角カタカナ
 		if (!cs.isValidKanaName(furikana)) {
-			errors.add("フリガナは全角カタカナで入力してください。");
+			errors.add("フリガナは全角カタカナで入力してください。スペースは入力しないでください。");
 		}
 
 		// ▼ Email required

@@ -235,7 +235,7 @@ body {
 					<i class="fa-solid fa-utensils"></i>
 				</div>
 				<div class="dash-title">メニュー管理</div>
-				<div class="dash-desc">商品メニューの追加・編集・削除</div>
+				<div class="dash-desc">商品メニューの追加・編集・削除、アンケートの削除</div>
 			</a> <a href="<%=request.getContextPath()%>/admin/coupon/list"
 				class="dash-card">
 				<div class="dash-icon-box bg-red">

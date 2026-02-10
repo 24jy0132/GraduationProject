@@ -73,7 +73,7 @@ public class Registerinsertionservlet extends HttpServlet {
 			session.setAttribute("message", "Registered successfully!");
 			request.getRequestDispatcher("registerComplete.jsp").forward(request, response);
 		} else {
-			request.setAttribute("errors", List.of("Database error, registration failed."));
+			request.setAttribute("errors", List.of("各項目の入力形式をご確認ください。"));
 			request.getRequestDispatcher("registerForm.jsp").forward(request, response);
 		}
 	}

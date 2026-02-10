@@ -61,7 +61,7 @@ public class Registerconfirmationservlet extends HttpServlet {
 		if (username == null || username.isBlank())
 			errors.add("名前の入力は必須です");
 		if (furikana == null || !cs.isValidKanaName(furikana))
-			errors.add("フリガナは全角カタカナで入力してください。");
+			errors.add("フリガナは全角カタカナで入力してください。スペースは入力しないでください。");
 		if (usermail == null || usermail.isBlank())
 			errors.add("メールアドレスの入力は必須です");
 		if (cs.emailExists(usermail)) 
