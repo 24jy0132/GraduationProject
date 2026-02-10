@@ -253,9 +253,10 @@ body {
 					</div>
 
 					<div class="col-md-6">
-						<label class="form-label">画像パス</label> <input type="text"
-							name="imagePath" value="<%=c.getImagePath()%>"
-							class="form-control">
+						<label class="form-label">クーポン画像</label> <input type="file"
+							name="image" class="form-control" accept="image/*">
+						<div class="form-text small">※ jpg, png, gif
+							形式の画像をアップロードしてください</div>
 					</div>
 
 					<div

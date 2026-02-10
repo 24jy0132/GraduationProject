@@ -102,7 +102,27 @@ public class AdminEditServlet extends HttpServlet {
 			} else {
 				r.setCourseId(Integer.parseInt(courseParam));
 			}
+			boolean conflict = dao.hasTimeConflictForEdit(
+					r.getReservationDate(),
+					r.getStartTime(),
+					r.getEndTime(),
+					r.getTableIds(),
+					r.getReservationId());
 
+			if (conflict) {
+				// keep edited reservation in session
+				req.getSession().setAttribute("pendingEditReservation", r);
+
+				req.setAttribute("errorMessage",
+						"選択した時間帯・テーブルは既に予約があります。<br>このまま上書きしますか？");
+				req.setAttribute("forceAllowed", true);
+
+				req.getRequestDispatcher("/Admin/error.jsp")
+						.forward(req, res);
+				return;
+			}
+
+			// no conflict → normal update
 			dao.update(r);
 
 			String backDate = r.getReservationDate().toString();

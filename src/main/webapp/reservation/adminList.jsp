@@ -220,7 +220,7 @@ body {
 							<th>Time</th>
 							<th>Table</th>
 							<th>Customer</th>
-							<th>Phno</th>
+							<th>PhNumber</th>
 							<th>People</th>
 							<th>Course</th>
 							<th>Coupon</th>

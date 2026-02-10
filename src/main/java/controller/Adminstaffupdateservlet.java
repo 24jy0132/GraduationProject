@@ -1,3 +1,4 @@
+
 package controller;
 
 import java.io.IOException;
@@ -17,19 +18,20 @@ import model.Staff;
 @WebServlet("/Adminstaffupdateservlet")
 public class Adminstaffupdateservlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public Adminstaffupdateservlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Adminstaffupdateservlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
@@ -37,22 +39,23 @@ public class Adminstaffupdateservlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		Staff s = new Staff();
 
 		s.setStaffId(Integer.parseInt(request.getParameter("staffId")));
-        s.setStaffName(request.getParameter("staffName"));
-        s.setStaffNameFurigana(request.getParameter("staffNameFurigana"));
-        s.setStaffType(request.getParameter("staffType"));
-        s.setStaffPhone(request.getParameter("staffPhone"));
-        s.setStaffEmail(request.getParameter("staffEmail"));
-        s.setStaffAddress(request.getParameter("staffAddress"));
+		s.setStaffName(request.getParameter("staffName"));
+		s.setStaffNameFurigana(request.getParameter("staffNameFurigana"));
+		s.setStaffType(request.getParameter("staffType"));
+		s.setStaffPhone(request.getParameter("staffPhone"));
+		s.setStaffEmail(request.getParameter("staffEmail"));
+		s.setStaffAddress(request.getParameter("staffAddress"));
 
-        StaffDao dao = new StaffDao();
-        dao.updateStaff(s);
-        
-        response.sendRedirect(request.getContextPath() + "/Adminmanagementservlet");
+		StaffDao dao = new StaffDao();
+		dao.updateStaff(s);
+
+		response.sendRedirect(request.getContextPath() + "/Adminmanagementservlet");
 	}
 
 }

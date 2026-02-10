@@ -64,7 +64,7 @@ public class Staffconfirmationservlet extends HttpServlet {
 			errors.add("名前の入力は必須です");
 
 		if (staffnamefurigana == null || !ss.isValidKanaName(staffnamefurigana))
-			errors.add("フリガナは全角カタカナで入力してください");
+			errors.add("フリガナは全角カタカナで入力してください。スペースは入力しないでください。");
 
 		if (stafftype == null || stafftype.isBlank())
 			errors.add("スタッフ種別の入力は必須です");
@@ -75,9 +75,9 @@ public class Staffconfirmationservlet extends HttpServlet {
 		if (staffemail == null || staffemail.isBlank())
 			errors.add("メールアドレスの入力は必須です");
 
-		if (ss.mailexists(staffemail)) 
+		if (ss.emailExists(staffemail))
 			errors.add("入力されたメールアドレスは既に登録されています");
-		
+
 		if (staffaddress == null || staffaddress.isBlank())
 			errors.add("住所の入力は必須です");
 

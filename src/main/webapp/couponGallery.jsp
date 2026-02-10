@@ -125,13 +125,14 @@ main {
 
 <body>
 
-	<nav class="navbar navbar-expand-lg bg-danger py-3">
+	<nav class="navbar navbar-expand-lg bg-danger py-3　sticky-top">
 		<div class="container">
 			<a
 				class="navbar-brand d-flex align-items-center gap-3 fw-bold text-white"
 				href="<%=request.getContextPath()%>/index.jsp"> <img
 				src="<%=request.getContextPath()%>/img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png"
-				height="40" width="40" class="me-1" alt="Logo"> Welcome From Mesa <%
+				height="40" width="40" class="me-1" alt="Logo"> Welcome From
+				Mesa <%
  if (loginCustomer != null) {
  %>
 				<div class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill"
@@ -263,10 +264,7 @@ main {
 							<div class="action-area">
 								<span class="validity-text"> <i
 									class="bi bi-calendar3 me-1"></i> 有効期限: <%=c.getEndDate()%> まで
-								</span> <a href="<%=request.getContextPath()%>/reserve/form"
-									class="btn btn-dark w-100 rounded-pill fw-bold py-2 shadow-sm">
-									このクーポンを使って予約 </a>
-							</div>
+								</span> 							</div>
 						</div>
 					</div>
 				</div>

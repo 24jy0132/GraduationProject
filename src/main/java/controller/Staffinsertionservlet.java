@@ -18,52 +18,42 @@ import model.Staff;
  */
 @WebServlet("/Staffinsertionservlet")
 public class Staffinsertionservlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public Staffinsertionservlet() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
+
 		HttpSession session = request.getSession();
 		Staff temp = (Staff) session.getAttribute("tempStaff");
 
 		if (temp == null) {
-			response.sendRedirect("Admin/staffregisteration.jsp");
+			response.sendRedirect(request.getContextPath() + "/Admin/staffregisteration.jsp");
 			return;
 		}
 
 		StaffDao sd = new StaffDao();
 
-		int result = sd.insert(temp);
+		try {
+			int result = sd.insert(temp);
 
-		if (result == 1) {
-			session.removeAttribute("tempUser");
-			session.setAttribute("message", "従業員登録完了しました。");
-			request.getRequestDispatcher("Admin/staffregisterComplete.jsp").forward(request, response);
-		} else {
-			request.setAttribute("errors", List.of("データベースエラーです、登録に失敗しました"));
-			request.getRequestDispatcher("Admin/staffregisteration.jsp").forward(request, response);
+			if (result == 1) {
+				session.removeAttribute("tempStaff");
+				session.setAttribute("message", "従業員登録が完了しました。");
+				request.getRequestDispatcher("/Admin/staffregisterComplete.jsp")
+						.forward(request, response);
+			} else {
+				request.setAttribute("errors",
+						List.of("データベースエラーが発生しました。"));
+				request.getRequestDispatcher("/Admin/staffregisteration.jsp")
+						.forward(request, response);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("errors",
+					List.of("同じメールアドレスが既に登録されています。"));
+			request.getRequestDispatcher("/Admin/staffregisteration.jsp")
+					.forward(request, response);
 		}
-
 	}
-
 }

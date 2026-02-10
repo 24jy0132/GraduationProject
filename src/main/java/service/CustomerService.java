@@ -1,10 +1,13 @@
 package service;
 
 import dao.CustomerDao;
+import dao.StaffDao;
 import model.Customer;
+import model.Staff;
 
 public class CustomerService {
 	CustomerDao cd = new CustomerDao();
+	StaffDao sd = new StaffDao();
 
 	public boolean accountExists(String email, String password) {
 		Customer cus = cd.findByEmailAndPassword(email, password);
@@ -14,7 +17,6 @@ public class CustomerService {
 		}
 		return pass; // user exists
 	}
-	
 
 	public boolean isValidKanaName(String name) {
 		if (name == null)
@@ -22,38 +24,57 @@ public class CustomerService {
 		return name.matches("^[\\u30A0-\\u30FF]+$");
 	}
 
-	
 	public boolean isValidPassword(String password) {
 		if (password == null)
 			return false;
 		return password.matches("^(?=.*[0-9]).{8,}$");
 	}
 
-	
 	public boolean passwordsMatch(String password, String repassword) {
 		if (password == null || repassword == null)
 			return false;
 		return password.equals(repassword);
 	}
 
-	
-	public boolean mailexists(String mail) {
-		Customer cuss = cd.findByEmail(mail);
-		boolean pass = false;
-		if (cuss != null) {
-			pass = true;
+	public boolean emailExists(String email) {
+
+		if (email == null || email.isBlank()) {
+			return false;
 		}
-		return pass;
+
+		Customer customer = cd.findByEmail(email);
+		if (customer != null) {
+			return true;
+		}
+
+		Staff staff = sd.findByEmail(email);
+		if (staff != null) {
+			return true;
+		}
+
+		return false;
 	}
-	
+
 	public boolean mailExistsForOtherUser(String email, int currentUserId) {
-	    Customer found = cd.findByEmail(email);
 
-	    if (found == null) {
-	        return false; // email not used at all
-	    }
+		if (email == null || email.isBlank()) {
+			return false;
+		}
 
-	    return found.getUserId() != currentUserId;
+		// ❌ Staff always blocks customer email
+		Staff staff = sd.findByEmail(email);
+		if (staff != null) {
+			return true;
+		}
+
+		// Customer check
+		Customer found = cd.findByEmail(email);
+		if (found == null) {
+			return false;
+		}
+
+		// Same user → OK
+		return found.getUserId() != currentUserId;
 	}
 
 }

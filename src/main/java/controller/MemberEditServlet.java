@@ -58,8 +58,20 @@ public class MemberEditServlet extends HttpServlet {
 		// =========================
 		// VALIDATION (Profile)
 		// =========================
+		// =========================
+		// VALIDATION (Profile)
+		// =========================
 		if (name == null || name.isBlank() || email == null || email.isBlank()) {
 			req.setAttribute("errorMessage", "必須項目を入力してください。");
+			req.getRequestDispatcher("/member_edit.jsp").forward(req, res);
+			return;
+		}
+
+		// =========================
+		// VALIDATION (Phone)
+		// =========================
+		if (phone == null || !phone.matches("^\\d{10,11}$")) {
+			req.setAttribute("errorMessage", "電話番号は数字のみで10〜11桁で入力してください。");
 			req.getRequestDispatcher("/member_edit.jsp").forward(req, res);
 			return;
 		}
@@ -71,7 +83,7 @@ public class MemberEditServlet extends HttpServlet {
 		}
 
 		// =========================
-		// VALIDATION (Password) - Only if fields are not empty
+		// VALIDATION (Password)
 		// =========================
 		boolean isUpdatingPassword = (newPassword != null && !newPassword.isBlank());
 
@@ -89,18 +101,17 @@ public class MemberEditServlet extends HttpServlet {
 		}
 
 		try {
-			// Update basic profile
+			// ✅ Only AFTER all validation passed
 			customer.setName(name);
 			customer.setEmail(email);
 			customer.setPhone(phone);
+
 			dao.update(customer);
 
-			// Update password if requested
 			if (isUpdatingPassword) {
 				dao.updatePassword(customer.getUserId(), newPassword);
 			}
 
-			// Refresh session
 			Customer refreshed = dao.findById(customer.getUserId());
 			session.setAttribute("customer", refreshed);
 
@@ -110,7 +121,5 @@ public class MemberEditServlet extends HttpServlet {
 			e.printStackTrace();
 			req.setAttribute("errorMessage", "更新に失敗しました。");
 		}
-
-		req.getRequestDispatcher("/member_edit.jsp").forward(req, res);
 	}
 }
