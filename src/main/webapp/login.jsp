@@ -2,6 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -66,6 +67,18 @@ main {
 
 <body>
 
+<%
+String error = (String) request.getAttribute("error");
+if (error != null) {
+%>
+    <div class="alert alert-danger text-center">
+        <%= error %>
+    </div>
+<%
+}
+%>
+
+
 	<!-- ===== NAVBAR ===== -->
 	<nav class="navbar navbar-expand-lg bg-danger py-3">
 		<div class="container">
@@ -105,6 +118,7 @@ main {
 		</div>
 	</nav>
 
+
 	<!-- ===== MAIN ===== -->
 	<main>
 		<div class="glass-card">
@@ -131,9 +145,10 @@ main {
 			</form>
 
 			<div class="d-flex justify-content-between mt-4">
-				<a href="${pageContext.request.contextPath}/passwordResetMailForm.jsp" class="link text-muted">
-					パスワードを忘れた方 </a> <a href="registerForm.jsp" class="link fw-bold">
-					新規登録 </a>
+				<a
+					href="${pageContext.request.contextPath}/passwordResetMailForm.jsp"
+					class="link text-muted"> パスワードを忘れた方 </a> <a href="registerForm.jsp"
+					class="link fw-bold"> 新規登録 </a>
 			</div>
 
 		</div>

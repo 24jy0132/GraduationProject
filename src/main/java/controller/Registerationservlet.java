@@ -55,32 +55,32 @@ public class Registerationservlet extends HttpServlet {
 
 		// ▼ Name required
 		if (username == null || username.isEmpty()) {
-			errors.add("Name is required.");
+			errors.add("名前の入力は必須です");
 		}
 
 		// ▼ Furikana must be 全角カタカナ
 		if (!cs.isValidKanaName(furikana)) {
-			errors.add("Furikana must be full-width Katakana.");
+			errors.add("フリガナは全角カタカナで入力してください。");
 		}
 
 		// ▼ Email required
 		if (usermail == null || usermail.isEmpty()) {
-			errors.add("Email is required.");
+			errors.add("メールアドレスの入力は必須です");
 		}
 
 		// ▼ Phone required
 		if (usertel == null || usertel.isEmpty()) {
-			errors.add("Phone number is required.");
+			errors.add("電話番号の入力は必須です");
 		}
 
 		// ▼ Password strength
 		if (!cs.isValidPassword(userpass)) {
-			errors.add("Password must be at least 8 characters and contain a number.");
+			errors.add("パスワードは8文字以上で、少なくとも1つの数字を含めてください。");
 		}
 
 		// ▼ Passwords must match
 		if (!cs.passwordsMatch(userpass, repassword)) {
-			errors.add("Password and re-entered password do not match.");
+			errors.add("パスワードと確認用パスワードが一致していません。");
 		}
 
 		// ------------------------------

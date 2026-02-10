@@ -60,7 +60,7 @@ public class Staffinsertionservlet extends HttpServlet {
 			session.setAttribute("message", "従業員登録完了しました。");
 			request.getRequestDispatcher("Admin/staffregisterComplete.jsp").forward(request, response);
 		} else {
-			request.setAttribute("errors", List.of("Database error, registration failed."));
+			request.setAttribute("errors", List.of("データベースエラーです、登録に失敗しました"));
 			request.getRequestDispatcher("Admin/staffregisteration.jsp").forward(request, response);
 		}
 
