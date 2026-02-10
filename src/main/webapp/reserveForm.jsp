@@ -20,7 +20,7 @@ if (loginCustomer != null) {
 	nameVal = loginCustomer.getName();
 	emailVal = loginCustomer.getEmail();
 	// Assuming your Customer model has getPhone(). If it's named getTel(), change this.
-	// phoneVal = loginCustomer.getPhone(); 
+	phoneVal = loginCustomer.getPhone();
 	readOnly = true;
 }
 
@@ -163,13 +163,14 @@ main {
 
 <body>
 
-	<nav class="navbar navbar-expand-lg bg-danger py-3">
+	<nav class="navbar navbar-expand-lg bg-danger py-3 sticky-top">
 		<div class="container">
 			<a
 				class="navbar-brand d-flex align-items-center gap-3 fw-bold text-white"
 				href="<%=request.getContextPath()%>/index.jsp"> <img
 				src="<%=request.getContextPath()%>/img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png"
-				height="40" width="40" class="me-1" alt="Logo"> <%
+				height="40" width="40" class="me-1" alt="Logo"> Welcome From
+				Mesa<%
  if (loginCustomer != null) {
  %>
 				<div class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill"
@@ -179,15 +180,15 @@ main {
 						class="badge bg-light text-danger fw-bold position-relative"><%=loginCustomer.getPoint()%>
 						pt</span>
 				</div> <%
- } else {
- %> <span>Welcome From Mesa</span> <%
  }
  %>
 			</a>
+
 			<button class="navbar-toggler" type="button"
 				data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
 				<span class="navbar-toggler-icon"></span>
 			</button>
+
 			<div class="collapse navbar-collapse justify-content-end"
 				id="navbarSupportedContent">
 				<ul class="navbar-nav gap-4">
@@ -195,12 +196,52 @@ main {
 					if (loginCustomer == null) {
 					%>
 					<li class="nav-item"><a class="nav-link active text-white"
-						href="<%=request.getContextPath()%>/index.jsp">Home</a></li>
+						href="<%=request.getContextPath()%>/index.jsp"><i
+							class="bi bi-house-fill me-1"></i>Home</a></li>
 					<%
 					} else {
 					%>
 					<li class="nav-item"><a class="nav-link active text-white"
-						href="<%=request.getContextPath()%>/member_index.jsp">Home</a></li>
+						href="<%=request.getContextPath()%>/member_index.jsp"><i
+							class="bi bi-house-fill me-1"></i>Home</a></li>
+					<%
+					}
+					%>
+
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/MenuListServlet"><i
+							class="bi bi-menu-down me-1"></i>Menu</a></li>
+
+					<%
+					if (loginCustomer == null) {
+					%>
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/reserve/form"><i
+							class="bi bi-calendar-check me-1"></i>Reservation</a></li>
+					<%
+					}
+					%>
+
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/contact.jsp"><i
+							class="bi bi-telephone-fill me-1"></i>Contact</a></li>
+					<li class="nav-item"><a class="nav-link text-white"
+						href="<%=request.getContextPath()%>/map.jsp"><i
+							class="bi bi-pin-map-fill me-1"></i>Map</a></li>
+
+					<%
+					if (loginCustomer != null) {
+					%>
+					<li class="nav-item"><a class="nav-link text-white ms-lg-3"
+						href="<%=request.getContextPath()%>/Customer_LogOut"><i
+							class="bi bi-box-arrow-right me-1"></i>LogOut</a></li>
+					<%
+					} else {
+					%>
+					<li class="nav-item"><a
+						class="nav-link active text-white fw-bold ms-lg-3"
+						href="<%=request.getContextPath()%>/login.jsp"><i
+							class="bi bi-box-arrow-in-right me-1"></i>Login</a></li>
 					<%
 					}
 					%>
@@ -208,6 +249,7 @@ main {
 			</div>
 		</div>
 	</nav>
+
 
 	<main>
 		<div class="container">
@@ -280,10 +322,12 @@ main {
 				<div class="form-card">
 					<h3 class="fw-bold mb-4 text-center">ご予約情報の入力</h3>
 					<p class="text-muted text-center mb-5 small">ご希望の日時と人数を入力してください。</p>
+					<p class="text-muted text-center mb-5 small">会員はログインしてから予約をしてください</p>
+
+
 
 					<form method="post"
 						action="<%=request.getContextPath()%>/reserve/input">
-
 						<div class="row g-4 mb-4">
 							<div class="col-md-6">
 								<label class="section-label">予約日</label>
@@ -342,8 +386,7 @@ main {
 								<label class="section-label d-flex justify-content-between">
 									お名前 <%
 								if (readOnly) {
-								%> <span
-									class="badge bg-light text-muted border"><i
+								%> <span class="badge bg-light text-muted border"><i
 										class="bi bi-lock-fill"></i> 会員情報</span> <%
  }
  %>
@@ -360,8 +403,7 @@ main {
 								<label class="section-label d-flex justify-content-between">
 									電話番号 <%
 								if (readOnly && !phoneVal.isEmpty()) {
-								%> <span
-									class="badge bg-light text-muted border"><i
+								%> <span class="badge bg-light text-muted border"><i
 										class="bi bi-lock-fill"></i> 会員情報</span> <%
  }
  %>
@@ -381,8 +423,7 @@ main {
 								<label class="section-label d-flex justify-content-between">
 									メールアドレス <%
 								if (readOnly) {
-								%> <span
-									class="badge bg-light text-muted border"><i
+								%> <span class="badge bg-light text-muted border"><i
 										class="bi bi-lock-fill"></i> 会員情報</span> <%
  }
  %>
@@ -398,7 +439,7 @@ main {
 
 						<div class="text-end mt-5">
 							<button
-								class="btn btn-primary px-5 py-3 fw-bold rounded-pill shadow">
+								class="btn btn-dark px-5 py-3 fw-bold rounded-pill shadow">
 								次へ（席選択） <i class="bi bi-arrow-right ms-2"></i>
 							</button>
 						</div>
