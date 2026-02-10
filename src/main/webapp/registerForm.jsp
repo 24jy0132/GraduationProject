@@ -144,7 +144,7 @@ main {
 			<form action="Registerconfirmationservlet" method="post">
 
 				<div class="mb-3">
-					<label class="form-label">お名前</label> <input type="text"
+					<label class="form-label">お名前(姓と名の間のスペースは入れないでください)</label> <input type="text"
 						name="username" class="form-control"
 						value="<%=request.getAttribute("username") != null
 		? request.getAttribute("username")
@@ -153,7 +153,7 @@ main {
 				</div>
 
 				<div class="mb-3">
-					<label class="form-label">フリガナ</label> <input type="text"
+					<label class="form-label">フリガナ(姓と名の間のスペースは入れないでください)</label> <input type="text"
 						name="furikana" class="form-control"
 						value="<%=request.getAttribute("furikana") != null
 		? request.getAttribute("furikana")
@@ -171,7 +171,7 @@ main {
 				</div>
 
 				<div class="mb-3">
-					<label class="form-label">電話番号</label> <input type="tel"
+					<label class="form-label">電話番号(桁区切りの「-」は入力しないでください)</label> <input type="tel"
 						name="usertel" class="form-control"
 						value="<%=request.getAttribute("usertel") != null
 		? request.getAttribute("usertel")
