@@ -322,7 +322,7 @@ main {
 				<div class="form-card">
 					<h3 class="fw-bold mb-4 text-center">ご予約情報の入力</h3>
 					<p class="text-muted text-center mb-5 small">ご希望の日時と人数を入力してください。</p>
-					<p class="text-muted text-center mb-5 small">会員はログインしてから予約をしてください</p>
+					<p class="text-muted text-center mb-5 small">未ログインの会員／会員登録を希望する非会員はLoginボタンで手続きをしてから予約をしてください</p>
 
 
 
