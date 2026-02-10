@@ -1,6 +1,10 @@
 <%@ include file="header.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ page import="model.Customer"%>
+<%
+Customer loginCustomer = (Customer) session.getAttribute("customer");
+%>
 <title>Contact - Mesa</title>
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
@@ -33,39 +37,91 @@
 	<div class="container-fluid p-0">
 		<nav class="navbar navbar-expand-lg bg-danger py-3 sticky-top">
 			<div class="container">
-				<a class="navbar-brand fw-bold text-white" href="index.jsp"> <img
-					src="img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png" height="40"
-					width="40" alt="Logo" class="me-2"> Welcome From Mesa
+				<a
+					class="navbar-brand d-flex align-items-center gap-3 fw-bold text-white"
+					href="<%=request.getContextPath()%>/index.jsp"> <img
+					src="<%=request.getContextPath()%>/img/Gemini_Generated_Image_j4wab2j4wab2j4wa.png"
+					height="40" width="40" class="me-1" alt="Logo"> Welcome From
+					Mesa<%
+ if (loginCustomer != null) {
+ %>
+					<div class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill"
+						style="background: rgba(255, 255, 255, 0.15);">
+						<i class="bi bi-person-circle fs-5"></i> <span
+							class="small fw-semibold"><%=loginCustomer.getName()%></span> <span
+							class="badge bg-light text-danger fw-bold position-relative"><%=loginCustomer.getPoint()%>
+							pt</span>
+					</div> <%
+ }
+ %>
 				</a>
 
 				<button class="navbar-toggler" type="button"
-					data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-					aria-controls="navbarSupportedContent" aria-expanded="false"
-					aria-label="Toggle navigation">
+					data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
 					<span class="navbar-toggler-icon"></span>
 				</button>
 
 				<div class="collapse navbar-collapse justify-content-end"
 					id="navbarSupportedContent">
-					<ul class="navbar-nav mb-2 mb-lg-0 d-flex gap-4">
+					<ul class="navbar-nav gap-4">
+						<%
+						if (loginCustomer == null) {
+						%>
 						<li class="nav-item"><a class="nav-link active text-white"
-							href="#"><i class="bi bi-house-fill me-1"></i>Home</a></li>
-						<li class="nav-item"><a class="nav-link text-white"
-							href="Menucontrollers"><i class="bi bi-menu-down me-1"></i>Menu</a></li>
-						<li class="nav-item"><a class="nav-link text-white" href="#"><i
-								class="bi bi-calendar-check me-1"></i>Reservation</a></li>
-						<li class="nav-item"><a class="nav-link text-white"
-							href="contact.jsp"><i class="bi bi-telephone-fill me-1"></i>Contact</a></li>
-						<li class="nav-item"><a class="nav-link text-white"
-							href="map.jsp"><i class="bi bi-pin-map-fill me-1"></i>Map</a></li>
-					</ul>
+							href="<%=request.getContextPath()%>/index.jsp"><i
+								class="bi bi-house-fill me-1"></i>Home</a></li>
+						<%
+						} else {
+						%>
+						<li class="nav-item"><a class="nav-link active text-white"
+							href="<%=request.getContextPath()%>/member_index.jsp"><i
+								class="bi bi-house-fill me-1"></i>Home</a></li>
+						<%
+						}
+						%>
 
-					<a class="nav-link active text-white fw-bold ms-lg-3 mt-2 mt-lg-0"
-						href="login.jsp"> <i class="bi bi-box-arrow-in-right me-1"></i>Login
-					</a>
+						<li class="nav-item"><a class="nav-link text-white"
+							href="<%=request.getContextPath()%>/MenuListServlet"><i
+								class="bi bi-menu-down me-1"></i>Menu</a></li>
+
+						<%
+						if (loginCustomer == null) {
+						%>
+						<li class="nav-item"><a class="nav-link text-white"
+							href="<%=request.getContextPath()%>/reserve/form"><i
+								class="bi bi-calendar-check me-1"></i>Reservation</a></li>
+						<%
+						}
+						%>
+
+						<li class="nav-item"><a class="nav-link text-white"
+							href="<%=request.getContextPath()%>/contact.jsp"><i
+								class="bi bi-telephone-fill me-1"></i>Contact</a></li>
+						<li class="nav-item"><a class="nav-link text-white"
+							href="<%=request.getContextPath()%>/map.jsp"><i
+								class="bi bi-pin-map-fill me-1"></i>Map</a></li>
+
+						<%
+						if (loginCustomer != null) {
+						%>
+						<li class="nav-item"><a class="nav-link text-white ms-lg-3"
+							href="<%=request.getContextPath()%>/Customer_LogOut"><i
+								class="bi bi-box-arrow-right me-1"></i>LogOut</a></li>
+						<%
+						} else {
+						%>
+						<li class="nav-item"><a
+							class="nav-link active text-white fw-bold ms-lg-3"
+							href="<%=request.getContextPath()%>/login.jsp"><i
+								class="bi bi-box-arrow-in-right me-1"></i>Login</a></li>
+						<%
+						}
+						%>
+					</ul>
 				</div>
 			</div>
 		</nav>
+
 		<div>
 			<img src="img/mesa_exterior.jpg" alt="Mesa Restaurant Exterior"
 				class="contact-banner shadow-sm">
