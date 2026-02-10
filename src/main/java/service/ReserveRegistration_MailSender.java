@@ -51,6 +51,11 @@ public class ReserveRegistration_MailSender {
 			        + "  予約時間：" + r.getStartTime() + "\n"
 			        + "人数　大人：" + r.getAdultCount() + "名　子供：" + r.getChildCount() + "名 \n"
 			        + "予約タイプ：" + rt + "\n";
+			
+			if (r.getTableIds() != null && !r.getTableIds().isEmpty()) {
+			    body += "予約テーブル：" + String.join("、", r.getTableIds()) + " 卓\n";
+			}
+
 
 			if ("COURSE".equals(rt)) {
 			    int menuId = r.getCourseId();

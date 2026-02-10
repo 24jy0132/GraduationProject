@@ -59,19 +59,19 @@ public class Registerconfirmationservlet extends HttpServlet {
 
 		// Validation
 		if (username == null || username.isBlank())
-			errors.add("Name is required.");
+			errors.add("名前の入力は必須です");
 		if (furikana == null || !cs.isValidKanaName(furikana))
-			errors.add("Furikana must be full-width Katakana.");
+			errors.add("フリガナは全角カタカナで入力してください。");
 		if (usermail == null || usermail.isBlank())
-			errors.add("Email is required.");
+			errors.add("メールアドレスの入力は必須です");
 		if (cs.mailexists(usermail)) 
-			errors.add("Email already exists");
+			errors.add("入力されたメールアドレスは既に登録されています");
 		if (usertel == null || usertel.isBlank())
-			errors.add("Phone is required.");
+			errors.add("電話番号の入力は必須です");
 		if (!cs.isValidPassword(userpass))
-			errors.add("Password must be at least 8 chars and contain a number.");
+			errors.add("パスワードは8文字以上で、少なくとも1つの数字を含めてください。");
 		if (!cs.passwordsMatch(userpass, repassword))
-			errors.add("Passwords do not match.");
+			errors.add("パスワードと確認用パスワードが一致していません。");
 
 		if (!errors.isEmpty()) {
 			request.setAttribute("errors", errors);

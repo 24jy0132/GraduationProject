@@ -55,7 +55,7 @@ public class Userloginservlet extends HttpServlet {
 			session.setAttribute("customer", customer);
 			request.getRequestDispatcher("member_index.jsp").forward(request, response);
 		} else {
-			request.setAttribute("error", "メールアドレスまたはパスワードが正しくありません");
+			request.setAttribute("error", "入力項目を確認してください");
 		    request.getRequestDispatcher("login.jsp")
 		           .forward(request, response);
 		}

@@ -17,6 +17,7 @@ String message = (String) session.getAttribute("message");
 
 
 
+
 <style>
 :root {
 	--bg: #f6f2fb;

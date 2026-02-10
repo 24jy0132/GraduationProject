@@ -61,28 +61,28 @@ public class Staffconfirmationservlet extends HttpServlet {
 
 		// Validation
 		if (staffname == null || staffname.isBlank())
-			errors.add("Name is required.");
+			errors.add("名前の入力は必須です");
 
 		if (staffnamefurigana == null || !ss.isValidKanaName(staffnamefurigana))
-			errors.add("Furigana must be full-width Katakana.");
+			errors.add("フリガナは全角カタカナで入力してください");
 
 		if (stafftype == null || stafftype.isBlank())
-			errors.add("Staff Type is required.");
+			errors.add("スタッフ種別の入力は必須です");
 
 		if (staffphone == null || staffphone.isBlank())
-			errors.add("Phone is required.");
+			errors.add("電話番号の入力は必須です");
 
 		if (staffemail == null || staffemail.isBlank())
-			errors.add("Email is required.");
+			errors.add("メールアドレスの入力は必須です");
 
 		if (ss.mailexists(staffemail)) 
-			errors.add("Email already exists");
+			errors.add("入力されたメールアドレスは既に登録されています");
 		
 		if (staffaddress == null || staffaddress.isBlank())
-			errors.add("Address is required.");
+			errors.add("住所の入力は必須です");
 
 		if (!ss.isValidPassword(staffpassword))
-			errors.add("Password must be at least 8 characters and contain a number.");
+			errors.add("パスワードは8文字以上で、少なくとも1つの数字を含めてください。");
 
 		if (!errors.isEmpty()) {
 			request.setAttribute("errors", errors);

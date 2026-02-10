@@ -55,7 +55,7 @@ public class passwordResetMailServlet extends HttpServlet {
 	        // トークン生成
 	        String token = UUID.randomUUID().toString();
 
-	        // トークン保存（★ここが修正点）
+	        // トークン保存
 	        PasswordResetTokenDao tokenDao = new PasswordResetTokenDao();
 	        tokenDao.saveResetToken(customer.getUserId(), token);
 
