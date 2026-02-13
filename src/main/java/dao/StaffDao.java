@@ -22,13 +22,13 @@ public class StaffDao {
 		}
 
 		try {
-					connection = DriverManager.getConnection(
-								"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
-								"24jy0234",
-								"24jy0234");
-					//			connection = DriverManager.getConnection(
-					//					"jdbc:mysql://127.0.0.1:3306/" + "myrestaurant?characterEncoding=UTF-8",
-					//					"root", "shadowseeker");
+			connection = DriverManager.getConnection(
+					"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
+					"24jy0234",
+					"24jy0234");
+			//			connection = DriverManager.getConnection(
+			//					"jdbc:mysql://127.0.0.1:3306/" + "myrestaurant?characterEncoding=UTF-8",
+			//					"root", "shadowseeker");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -131,6 +131,23 @@ public class StaffDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public Staff findByEmail(String email) {
+		String sql = "SELECT * FROM staff WHERE staffemail = ?";
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
+			ps.setString(1, email);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				Staff staff = new Staff();
+				staff.setStaffId(rs.getInt("staffId"));
+				staff.setStaffEmail(rs.getString("staffemail"));
+				return staff;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public List<Staff> getAllStaff() {

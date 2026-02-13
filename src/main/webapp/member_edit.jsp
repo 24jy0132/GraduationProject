@@ -168,8 +168,8 @@ main {
 				<form method="post"
 					action="<%=request.getContextPath()%>/member/edit">
 					<div class="mb-3">
-						<label class="form-label label">お名前</label> <input type="text"
-							name="name" class="form-control"
+						<label class="form-label label">お名前(姓と名の間のスペースは入れないでください)</label>
+						<input type="text" name="name" class="form-control"
 							value="<%=loginCustomer.getName()%>" required>
 					</div>
 					<div class="mb-3">
@@ -178,8 +178,8 @@ main {
 							value="<%=loginCustomer.getEmail()%>" required>
 					</div>
 					<div class="mb-4">
-						<label class="form-label label">電話番号</label> <input type="text"
-							name="phone" class="form-control"
+						<label class="form-label label">電話番号(桁区切りの「-」は入力しないでください)</label>
+						<input type="text" name="phone" class="form-control"
 							value="<%=loginCustomer.getPhone()%>" required>
 					</div>
 

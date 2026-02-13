@@ -228,6 +228,198 @@ public class ReservationDao {
 		}
 	}
 
+	public void insertCustomerReservationForce(Reservation r) throws SQLException {
+
+		// ⚠️ NO validateFutureReservation
+		// ⚠️ NO table conflict lock check
+
+		try (Connection con = getConn()) {
+			con.setAutoCommit(false);
+
+			String sql = """
+					    INSERT INTO reservations
+					    (customerId, reservationDate, startTime, endTime,
+					     adultCount, childCount, reservationType,
+					     courseId, couponId, customerEmail,
+					     customer_name, customer_phone, status)
+					    VALUES (?,?,?,?,?,?,?,?,?,?,?,?, 'RESERVED')
+					""";
+
+			int reservationId;
+
+			try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+				if (r.getCustomerId() != null)
+					ps.setInt(1, r.getCustomerId());
+				else
+					ps.setNull(1, Types.INTEGER);
+
+				ps.setDate(2, Date.valueOf(r.getReservationDate()));
+				ps.setTime(3, Time.valueOf(r.getStartTime()));
+				ps.setTime(4, Time.valueOf(r.getEndTime()));
+				ps.setInt(5, r.getAdultCount());
+				ps.setInt(6, r.getChildCount());
+				ps.setString(7, r.getReservationType());
+
+				if (r.getCourseId() != null)
+					ps.setInt(8, r.getCourseId());
+				else
+					ps.setNull(8, Types.INTEGER);
+
+				ps.setNull(9, Types.INTEGER); // coupon (optional)
+				ps.setString(10, r.getCustomerEmail());
+				ps.setString(11, r.getCustomerName());
+				ps.setString(12, r.getCustomerPhone());
+
+				ps.executeUpdate();
+
+				try (ResultSet rs = ps.getGeneratedKeys()) {
+					rs.next();
+					reservationId = rs.getInt(1);
+				}
+			}
+
+			String tableSql = "INSERT INTO reservation_table (reservationId, table_id) VALUES (?,?)";
+
+			try (PreparedStatement ps = con.prepareStatement(tableSql)) {
+				for (String t : r.getTableIds()) {
+					ps.setInt(1, reservationId);
+					ps.setString(2, t);
+					ps.addBatch();
+				}
+				ps.executeBatch();
+			}
+
+			con.commit();
+		}
+	}
+
+	public boolean hasTimeConflictForEdit(
+			LocalDate date,
+			LocalTime start,
+			LocalTime end,
+			List<String> tableIds,
+			int excludeReservationId) {
+
+		String placeholders = tableIds.stream()
+				.map(t -> "?")
+				.reduce((a, b) -> a + "," + b)
+				.orElse("");
+
+		String sql = """
+				    SELECT COUNT(*)
+				    FROM reservations r
+				    JOIN reservation_table rt ON r.reservationId = rt.reservationId
+				    WHERE r.reservationDate = ?
+				      AND rt.table_id IN (%s)
+				      AND NOT (r.endTime <= ? OR r.startTime >= ?)
+				      AND r.reservationId <> ?
+				      AND r.status NOT IN ('CANCELLED','FINISHED')
+				""".formatted(placeholders);
+
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+
+			int idx = 1;
+			ps.setDate(idx++, Date.valueOf(date));
+
+			for (String t : tableIds) {
+				ps.setString(idx++, t);
+			}
+
+			ps.setTime(idx++, Time.valueOf(start));
+			ps.setTime(idx++, Time.valueOf(end));
+			ps.setInt(idx, excludeReservationId);
+
+			ResultSet rs = ps.executeQuery();
+			rs.next();
+			return rs.getInt(1) > 0;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return true;
+		}
+	}
+
+	public void cancelConflictingReservationsForEdit(
+			LocalDate date,
+			LocalTime start,
+			LocalTime end,
+			List<String> tableIds,
+			int excludeReservationId) throws SQLException {
+
+		String placeholders = tableIds.stream()
+				.map(t -> "?")
+				.reduce((a, b) -> a + "," + b)
+				.orElse("");
+
+		String sql = """
+				    UPDATE reservations r
+				    JOIN reservation_table rt ON r.reservationId = rt.reservationId
+				    SET r.status = 'RESERVED'
+				    WHERE r.reservationDate = ?
+				      AND rt.table_id IN (%s)
+				      AND NOT (r.endTime <= ? OR r.startTime >= ?)
+				      AND r.reservationId <> ?
+				      AND r.status NOT IN ('CANCELLED','FINISHED')
+				""".formatted(placeholders);
+
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+
+			int idx = 1;
+			ps.setDate(idx++, Date.valueOf(date));
+
+			for (String t : tableIds) {
+				ps.setString(idx++, t);
+			}
+
+			ps.setTime(idx++, Time.valueOf(start));
+			ps.setTime(idx++, Time.valueOf(end));
+			ps.setInt(idx, excludeReservationId);
+
+			ps.executeUpdate();
+		}
+	}
+
+	public void cancelConflictingReservations(
+			LocalDate date,
+			LocalTime start,
+			LocalTime end,
+			List<String> tableIds) throws SQLException {
+
+		String placeholders = tableIds.stream()
+				.map(t -> "?")
+				.reduce((a, b) -> a + "," + b)
+				.orElse("");
+
+		String sql = """
+				    UPDATE reservations r
+				    JOIN reservation_table rt ON r.reservationId = rt.reservationId
+				    SET r.status = 'RESERVED'
+				    WHERE r.reservationDate = ?
+				      AND rt.table_id IN (%s)
+				      AND NOT (r.endTime <= ? OR r.startTime >= ?)
+				      AND r.status NOT IN ('RESERVED','FINISHED')
+				""".formatted(placeholders);
+
+		try (Connection con = getConn();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+
+			int idx = 1;
+			ps.setDate(idx++, Date.valueOf(date));
+
+			for (String t : tableIds) {
+				ps.setString(idx++, t);
+			}
+
+			ps.setTime(idx++, Time.valueOf(start));
+			ps.setTime(idx, Time.valueOf(end));
+
+			ps.executeUpdate();
+		}
+	}
+
 	public boolean isTableAvailable(
 			LocalDate date,
 			LocalTime start,
@@ -242,7 +434,7 @@ public class ReservationDao {
 				"AND r.startTime < ? " +
 				"AND r.endTime > ? " +
 				"AND r.reservationId <> ? " +
-				"AND r.status NOT IN ('CANCELLED','FINISHED')";
+				"AND r.status NOT IN ('RESERVED','FINISHED')";
 
 		try (var con = getConn();
 				var ps = con.prepareStatement(sql)) {

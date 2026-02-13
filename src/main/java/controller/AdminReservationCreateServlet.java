@@ -18,74 +18,93 @@ import service.Constants;
 @WebServlet("/admin/reserve")
 public class AdminReservationCreateServlet extends HttpServlet {
 
-    private final ReservationDao dao = new ReservationDao();
+	private final ReservationDao dao = new ReservationDao();
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        try {
-            String dateStr = request.getParameter("date");
-            String startStr = request.getParameter("startTime");
-            String name = request.getParameter("name");
-            String email = request.getParameter("email");
-            String phone = request.getParameter("phone");
-            String courseIdStr = request.getParameter("courseId");
-            String[] tableIdsArray = request.getParameterValues("tableIds");
+		Reservation res = null;
 
-            int adultCount = Integer.parseInt(request.getParameter("adult"));
-            int childCount = Integer.parseInt(request.getParameter("child"));
+		try {
+			String dateStr = request.getParameter("date");
+			String startStr = request.getParameter("startTime");
+			String name = request.getParameter("name");
+			String email = request.getParameter("email");
+			String phone = request.getParameter("phone");
+			String courseIdStr = request.getParameter("courseId");
+			String[] tableIdsArray = request.getParameterValues("tableIds");
 
-            Reservation res = new Reservation();
-            res.setCustomerName(name);
-            res.setCustomerEmail(email);
-            res.setCustomerPhone(phone);
+			int adultCount = Integer.parseInt(request.getParameter("adult"));
+			int childCount = Integer.parseInt(request.getParameter("child"));
 
-            if (courseIdStr != null && !courseIdStr.isEmpty()) {
-                int courseId = Integer.parseInt(courseIdStr);
-                if (courseId > 0) {
-                    res.setCourseId(courseId);
-                }
-            }
+			res = new Reservation();
+			res.setCustomerName(name);
+			res.setCustomerEmail(email);
+			res.setCustomerPhone(phone);
 
-            res.setReservationDate(LocalDate.parse(dateStr));
+			if (courseIdStr != null && !courseIdStr.isBlank()) {
+				int courseId = Integer.parseInt(courseIdStr);
+				if (courseId > 0) {
+					res.setCourseId(courseId);
+				}
+			}
 
-            LocalTime startTime = LocalTime.parse(startStr);
-            res.setStartTime(startTime);
-            res.setEndTime(startTime.plusMinutes(Constants.DURATION_MINUTES));
+			LocalDate date = LocalDate.parse(dateStr);
+			LocalTime startTime = LocalTime.parse(startStr);
 
-            res.setAdultCount(adultCount);
-            res.setChildCount(childCount);
-            res.setStatus("RESERVED");
-            res.setReservationType("ADMIN");
+			res.setReservationDate(date);
+			res.setStartTime(startTime);
+			res.setEndTime(startTime.plusMinutes(Constants.DURATION_MINUTES));
+			res.setAdultCount(adultCount);
+			res.setChildCount(childCount);
+			res.setStatus("RESERVED");
+			res.setReservationType("ADMIN");
 
-            if (tableIdsArray != null) {
-                res.setTableIds(Arrays.asList(tableIdsArray));
-            }
+			if (tableIdsArray == null || tableIdsArray.length == 0) {
+				throw new IllegalArgumentException("テーブルを選択してください");
+			}
+			res.setTableIds(Arrays.asList(tableIdsArray));
 
-            // 🔴 TIME CONFLICT CHECK
-            if (dao.hasTimeConflict(
-                    res.getReservationDate(),
-                    res.getStartTime(),
-                    res.getEndTime(),
-                    res.getTableIds())) {
+			// ✅ TABLE CONFLICT → FORCE FLOW
+			if (dao.hasTimeConflict(
+					res.getReservationDate(),
+					res.getStartTime(),
+					res.getEndTime(),
+					res.getTableIds())) {
 
-                request.setAttribute("error", "選択した時間帯・テーブルは既に予約があります。");
-                request.getRequestDispatcher("/Admin/reserve.jsp")
-                       .forward(request, response);
-                return;
-            }
+				request.getSession().setAttribute("pendingReservation", res);
 
-            dao.insertCustomerReservation(res);
+				request.setAttribute("errorMessage",
+						"選択した時間帯・テーブルは既に予約があります。<br>このまま予約を続行しますか？");
+				request.setAttribute("forceAllowed", true);
 
-            response.sendRedirect(
-                request.getContextPath() + "/adminreservation/list?date=" + dateStr);
+				request.getRequestDispatcher("/Admin/error.jsp")
+						.forward(request, response);
+				return;
+			}
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "予約登録中にエラーが発生しました。");
-            request.getRequestDispatcher("/Admin/reserve.jsp")
-                   .forward(request, response);
-        }
-    }
+			// ✅ NORMAL INSERT
+			dao.insertCustomerReservation(res);
+
+			response.sendRedirect(
+					request.getContextPath()
+							+ "/adminreservation/list?date=" + dateStr);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			String message = e.getMessage();
+			if (message == null || message.isBlank()) {
+				message = "予約登録中に予期しないエラーが発生しました";
+			}
+
+			request.setAttribute("errorMessage", message);
+			request.setAttribute("forceAllowed", false);
+
+			request.getRequestDispatcher("/Admin/error.jsp")
+					.forward(request, response);
+		}
+	}
 }

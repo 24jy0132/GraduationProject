@@ -12,17 +12,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import dao.CouponDao;
 import model.Coupon;
 
-/**
- * Servlet implementation class CouponInsertServlet
- */
 @WebServlet("/admin/coupon/insert")
 public class CouponInsertServlet extends HttpServlet {
 
+	private static final String DEFAULT_IMAGE = "default_coupon.png";
+
+	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 
 		try {
 			Coupon c = new Coupon();
+
 			c.setTitle(req.getParameter("title"));
 			c.setDescription(req.getParameter("description"));
 			c.setDiscountAmount(Integer.parseInt(req.getParameter("discountAmount")));
@@ -30,7 +31,9 @@ public class CouponInsertServlet extends HttpServlet {
 			c.setEndDate(LocalDate.parse(req.getParameter("endDate")));
 			c.setMinPoint(Integer.parseInt(req.getParameter("minPoint")));
 			c.setReservationType(req.getParameter("reservationType"));
-			c.setImagePath(req.getParameter("imagePath"));
+
+			// ✅ ALWAYS SET DEFAULT IMAGE (NO UPLOAD YET)
+			c.setImagePath(DEFAULT_IMAGE);
 
 			new CouponDao().insert(c);
 
@@ -40,4 +43,5 @@ public class CouponInsertServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 	}
+
 }
