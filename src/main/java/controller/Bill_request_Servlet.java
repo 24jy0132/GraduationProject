@@ -58,7 +58,7 @@ public class Bill_request_Servlet extends HttpServlet {
                    .forward(request, response);
         } else {
             request.setAttribute("error", "会計依頼に失敗しました。");
-            request.getRequestDispatcher("error.jsp")
+            request.getRequestDispatcher("/bill_request/bill_request_error.jsp")
                    .forward(request, response);
         }
     }
