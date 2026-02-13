@@ -424,13 +424,37 @@ public class MenuDao {
 	}
 
 	public void removeSurveyTarget(int menuId) {
-	    String sql = "UPDATE menu SET isSurveyTarget = 0 WHERE menuId = ?";
-	    try (PreparedStatement ps = con.prepareStatement(sql)) {
-	        ps.setInt(1, menuId);
-	        ps.executeUpdate();
+	    String updateMenuSql = "UPDATE menu SET isSurveyTarget = 0 WHERE menuId = ?";
+	    String deleteSurveyAnswerSql = "DELETE FROM survey_answer WHERE menuId = ?";
+
+	    try {
+	        con.setAutoCommit(false); // トランザクション開始
+
+	        try (PreparedStatement ps1 = con.prepareStatement(updateMenuSql);
+	             PreparedStatement ps2 = con.prepareStatement(deleteSurveyAnswerSql)) {
+
+	            ps1.setInt(1, menuId);
+	            ps1.executeUpdate();
+
+	            ps2.setInt(1, menuId);
+	            ps2.executeUpdate();
+
+	            con.commit(); // 正常終了ならコミット
+	        } catch (Exception e) {
+	            con.rollback(); // どちらか失敗したらロールバック
+	            e.printStackTrace();
+	        }
+
 	    } catch (Exception e) {
 	        e.printStackTrace();
+	    } finally {
+	        try {
+	            con.setAutoCommit(true); // 元に戻す
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
 	    }
 	}
+
 
 }
