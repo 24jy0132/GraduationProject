@@ -186,7 +186,7 @@ main {
 				<input type="hidden" name="token" value="${token}">
 
 				<div class="mb-4">
-					<label class="form-label">新しいパスワード</label>
+					<label class="form-label">新しいパスワード 「8文字以上、数字一つ以上」</label>
 					<div class="input-group input-group-lg">
 						<span class="input-group-text"><i class="bi bi-key"></i></span> <input
 							type="password" name="password" class="form-control"
@@ -209,7 +209,7 @@ main {
 
 				<div class="d-grid gap-2 mt-5">
 					<button type="submit"
-						class="btn btn-primary btn-lg rounded-pill shadow-sm btn-submit">
+						class="btn btn-dark btn-lg rounded-pill shadow-sm btn-submit">
 						パスワードを変更する</button>
 				</div>
 

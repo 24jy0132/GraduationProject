@@ -252,9 +252,9 @@ body {
 					</div>
 
 					<div class="col-md-6">
-						<label for="staffpassword" class="form-label">パスワード</label> <input
-							type="password" class="form-control" id="staffpassword"
-							name="staffpassword" required>
+						<label for="staffpassword" class="form-label">パスワード
+							「8文字以上、数字一つ以上」</label> <input type="password" class="form-control"
+							id="staffpassword" name="staffpassword" required>
 					</div>
 
 					<div class="col-md-6">

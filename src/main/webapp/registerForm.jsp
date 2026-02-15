@@ -180,7 +180,7 @@ main {
 				</div>
 
 				<div class="mb-3">
-					<label class="form-label">パスワード</label> <input type="password"
+					<label class="form-label">パスワード 「8文字以上、数字一つ以上」</label> <input type="password"
 						name="userpass" class="form-control" required>
 				</div>
 

@@ -42,10 +42,11 @@ public class AdminCouponSaveServlet extends HttpServlet {
 
 			String fileName = System.currentTimeMillis() + "_" +
 					Paths.get(filePart.getSubmittedFileName())
-							.getFileName().toString();
+							.getFileName()
+							.toString();
 
-			// WebContent/coupons
-			String uploadPath = getServletContext().getRealPath("/coupons");
+			// WebContent/coupon
+			String uploadPath = getServletContext().getRealPath("/coupon");
 
 			File uploadDir = new File(uploadPath);
 			if (!uploadDir.exists())
@@ -53,8 +54,8 @@ public class AdminCouponSaveServlet extends HttpServlet {
 
 			filePart.write(uploadPath + File.separator + fileName);
 
-			// Save relative path
-			c.setImagePath("coupons/" + fileName);
+			// Save relative path in DB
+			c.setImagePath("coupon/" + fileName);
 		}
 
 		try {

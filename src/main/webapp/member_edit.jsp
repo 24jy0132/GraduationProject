@@ -143,23 +143,29 @@ main {
 		String err = (String) request.getAttribute("errorMessage");
 		if (err != null) {
 		%>
-		<div class="alert alert-danger alert-dismissible fade show"><%=err%><button
-				type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		<div class="alert alert-danger alert-dismissible fade show">
+			<%=err%>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 		<%
 		}
-		%>
-		<%
-		String succ = (String) request.getAttribute("successMessage");
+
+		String succ = (String) session.getAttribute("successMessage");
 		if (succ != null) {
+		session.removeAttribute("successMessage");
 		%>
-		<div class="alert alert-success alert-dismissible fade show"><%=succ%><button
-				type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>
+		<script>
+			window.addEventListener('load', function() {
+				var successModal = new bootstrap.Modal(document
+						.getElementById('successModal'));
+				successModal.show();
+			});
+		</script>
 		<%
 		}
 		%>
 	</div>
+
 
 	<main>
 		<div class="container">
@@ -234,6 +240,45 @@ main {
 			</div>
 		</div>
 	</div>
+
+	<!-- 🔴 SUCCESS MODAL (RED HEADER + BLACK BUTTON) -->
+	<div class="modal fade" id="successModal" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content shadow-lg border-0 rounded-4">
+
+				<!-- 🔴 Header -->
+				<div class="modal-header bg-danger text-white">
+					<h5 class="modal-title fw-bold">更新完了</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal"></button>
+				</div>
+
+				<!-- ⚪ Body -->
+				<div class="modal-body text-center bg-white py-4">
+
+					<!-- ✔ Black Circle + White Check -->
+					<div class="d-flex justify-content-center mb-3">
+						<div
+							style="width: 70px; height: 70px; background: black; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+							<i class="bi bi-check-lg text-white fs-2"></i>
+						</div>
+					</div>
+
+					<p class="fw-bold text-dark fs-5 mb-0">会員情報を正常に更新しました。</p>
+				</div>
+
+				<!-- ⚫ Footer -->
+				<div class="modal-footer border-0 bg-white">
+					<button class="btn btn-dark w-100 fw-bold text-white"
+						data-bs-dismiss="modal">OK</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+
 	<%@ include file="footer.jsp"%>
 </body>
 </html>

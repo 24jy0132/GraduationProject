@@ -188,9 +188,12 @@ body {
 			%>
 
 			<form action="<%=request.getContextPath()%>/admin/coupon/update"
-				method="post">
+				method="post" enctype="multipart/form-data">
+
 
 				<input type="hidden" name="couponId" value="<%=c.getCouponId()%>">
+				<input type="hidden" name="oldImage" value="<%=c.getImagePath()%>">
+
 
 				<div class="row g-4">
 
@@ -253,11 +256,26 @@ body {
 					</div>
 
 					<div class="col-md-6">
-						<label class="form-label">クーポン画像</label> <input type="file"
-							name="image" class="form-control" accept="image/*">
+						<label class="form-label">クーポン画像</label>
+
+						<%
+						if (c.getImagePath() != null && !c.getImagePath().isEmpty()) {
+						%>
+						<div class="mb-2">
+							<img src="<%=request.getContextPath()%>/<%=c.getImagePath()%>"
+								style="max-height: 120px; border-radius: 8px;">
+						</div>
+						<%
+						}
+						%>
+
+						<input type="file" name="image" class="form-control"
+							accept="image/*">
+
 						<div class="form-text small">※ jpg, png, gif
 							形式の画像をアップロードしてください</div>
 					</div>
+
 
 					<div
 						class="col-12 text-center mt-5 d-flex justify-content-center gap-3">

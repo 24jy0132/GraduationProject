@@ -43,12 +43,10 @@ public class MemberEditServlet extends HttpServlet {
 			return;
 		}
 
-		// Existing fields
 		String name = req.getParameter("name");
 		String email = req.getParameter("email");
 		String phone = req.getParameter("phone");
 
-		// New Password fields
 		String newPassword = req.getParameter("newPassword");
 		String rePassword = req.getParameter("rePassword");
 
@@ -56,20 +54,16 @@ public class MemberEditServlet extends HttpServlet {
 		CustomerDao dao = new CustomerDao();
 
 		// =========================
-		// VALIDATION (Profile)
+		// PROFILE VALIDATION
 		// =========================
-		// =========================
-		// VALIDATION (Profile)
-		// =========================
-		if (name == null || name.isBlank() || email == null || email.isBlank()) {
+		if (name == null || name.isBlank() ||
+				email == null || email.isBlank()) {
+
 			req.setAttribute("errorMessage", "必須項目を入力してください。");
 			req.getRequestDispatcher("/member_edit.jsp").forward(req, res);
 			return;
 		}
 
-		// =========================
-		// VALIDATION (Phone)
-		// =========================
 		if (phone == null || !phone.matches("^\\d{10,11}$")) {
 			req.setAttribute("errorMessage", "電話番号は数字のみで10〜11桁で入力してください。");
 			req.getRequestDispatcher("/member_edit.jsp").forward(req, res);
@@ -83,16 +77,18 @@ public class MemberEditServlet extends HttpServlet {
 		}
 
 		// =========================
-		// VALIDATION (Password)
+		// PASSWORD VALIDATION
 		// =========================
-		boolean isUpdatingPassword = (newPassword != null && !newPassword.isBlank());
+		boolean isUpdatingPassword = newPassword != null && !newPassword.isBlank();
 
 		if (isUpdatingPassword) {
+
 			if (!service.isValidPassword(newPassword)) {
 				req.setAttribute("errorMessage", "パスワードは8文字以上で数字を含めてください。");
 				req.getRequestDispatcher("/member_edit.jsp").forward(req, res);
 				return;
 			}
+
 			if (!service.passwordsMatch(newPassword, rePassword)) {
 				req.setAttribute("errorMessage", "確認用パスワードが一致しません。");
 				req.getRequestDispatcher("/member_edit.jsp").forward(req, res);
@@ -101,7 +97,9 @@ public class MemberEditServlet extends HttpServlet {
 		}
 
 		try {
-			// ✅ Only AFTER all validation passed
+			// =========================
+			// UPDATE PROFILE
+			// =========================
 			customer.setName(name);
 			customer.setEmail(email);
 			customer.setPhone(phone);
@@ -112,14 +110,20 @@ public class MemberEditServlet extends HttpServlet {
 				dao.updatePassword(customer.getUserId(), newPassword);
 			}
 
+			// Refresh from DB
 			Customer refreshed = dao.findById(customer.getUserId());
+
 			session.setAttribute("customer", refreshed);
 
-			req.setAttribute("successMessage", "情報を更新しました。");
-
+			// ✅ PRG PATTERN (important)
+			session.setAttribute("successMessage", "情報を更新しました。");
+			res.sendRedirect(req.getContextPath() + "/member/edit");
+			return;
 		} catch (Exception e) {
 			e.printStackTrace();
 			req.setAttribute("errorMessage", "更新に失敗しました。");
+			req.getRequestDispatcher("/member_edit.jsp")
+					.forward(req, res);
 		}
 	}
 }

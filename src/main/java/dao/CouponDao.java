@@ -24,10 +24,10 @@ public class CouponDao {
 		}
 
 		try {
-						connection = DriverManager.getConnection(
-								"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
-								"24jy0234",
-								"24jy0234");
+									connection = DriverManager.getConnection(
+											"jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8",
+											"24jy0234",
+											"24jy0234");
 //			connection = DriverManager.getConnection(
 //					"jdbc:mysql://127.0.0.1:3306/" + "myrestaurant?characterEncoding=UTF-8",
 //					"root", "shadowseeker");
@@ -55,6 +55,12 @@ public class CouponDao {
 	}
 
 	public void insert(Coupon c) throws SQLException {
+
+		// ✅ DEFAULT IMAGE PROTECTION
+		if (c.getImagePath() == null || c.getImagePath().isBlank()) {
+			c.setImagePath("coupon/default_coupon.png");
+		}
+
 		String sql = """
 				    INSERT INTO coupon
 				    (title,description,discountAmount,startDate,endDate,
@@ -62,8 +68,7 @@ public class CouponDao {
 				    VALUES (?,?,?,?,?,?,?,?)
 				""";
 
-		try (
-				PreparedStatement ps = connection.prepareStatement(sql)) {
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
 			ps.setString(1, c.getTitle());
 			ps.setString(2, c.getDescription());
@@ -174,6 +179,11 @@ public class CouponDao {
 	}
 
 	public void update(Coupon c) throws SQLException {
+
+		// ✅ If no image selected → use default
+		if (c.getImagePath() == null || c.getImagePath().isBlank()) {
+			c.setImagePath("coupon/default_coupon.png");
+		}
 
 		String sql = """
 				    UPDATE coupon

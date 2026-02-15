@@ -22,6 +22,12 @@ import model.Reservation;
 import service.Constants;
 
 public class ReservationDao {
+	
+//	private static final String URL = "jdbc:mysql://127.0.0.1:3306/myrestaurant?serverTimezone=UTC";
+//
+//	private static final String USER = "root";
+//	private static final String PASS = "shadowseeker";
+
 
 	private static final String URL = "jdbc:mysql://10.64.144.5:3306/24jy0234?characterEncoding=UTF-8";
 

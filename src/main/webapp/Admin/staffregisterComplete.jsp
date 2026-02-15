@@ -201,7 +201,7 @@ body {
 			</p>
 
 			<div class="d-flex justify-content-center gap-3">
-				<a href="<%=request.getContextPath()%>/Admin/Admin_emp_manage.jsp"
+				<a href="<%=request.getContextPath()%>/Adminmanagementservlet"
 					class="btn btn-primary px-5 py-2 rounded-pill shadow-sm"> <i
 					class="fa-solid fa-users me-2"></i> 従業員一覧へ
 				</a> <a href="<%=request.getContextPath()%>/Admin/adminhome.jsp"
