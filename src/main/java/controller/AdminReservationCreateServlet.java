@@ -24,9 +24,12 @@ public class AdminReservationCreateServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		Reservation res = null;
-
 		try {
+
+			// ==============================
+			// 1. GET PARAMETERS
+			// ==============================
+
 			String dateStr = request.getParameter("date");
 			String startStr = request.getParameter("startTime");
 			String name = request.getParameter("name");
@@ -38,10 +41,59 @@ public class AdminReservationCreateServlet extends HttpServlet {
 			int adultCount = Integer.parseInt(request.getParameter("adult"));
 			int childCount = Integer.parseInt(request.getParameter("child"));
 
-			res = new Reservation();
-			res.setCustomerName(name);
+			// ==============================
+			// 2. BASIC VALIDATION
+			// ==============================
+
+			if (name == null || name.isBlank()) {
+				throw new IllegalArgumentException("お客様名を入力してください。");
+			}
+
+			if (phone == null || phone.isBlank()) {
+				throw new IllegalArgumentException("電話番号を入力してください。");
+			}
+
+			// ✅ STRICT PHONE VALIDATION
+			// Only 10-11 half-width digits allowed
+			if (!phone.matches("^[0-9]{10,11}$")) {
+				throw new IllegalArgumentException(
+						"電話番号は半角数字10〜11桁で入力してください（ハイフン・スペース不可）。");
+			}
+
+			// Optional Email Validation
+			if (email != null && !email.isBlank()) {
+				if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+					throw new IllegalArgumentException("メールアドレスの形式が正しくありません。");
+				}
+			}
+
+			if (tableIdsArray == null || tableIdsArray.length == 0) {
+				throw new IllegalArgumentException("テーブルを選択してください。");
+			}
+
+			// ==============================
+			// 3. BUILD RESERVATION OBJECT
+			// ==============================
+
+			Reservation res = new Reservation();
+
+			res.setCustomerName(name.trim());
 			res.setCustomerEmail(email);
 			res.setCustomerPhone(phone);
+
+			LocalDate date = LocalDate.parse(dateStr);
+			LocalTime startTime = LocalTime.parse(startStr);
+
+			res.setReservationDate(date);
+			res.setStartTime(startTime);
+			res.setEndTime(startTime.plusMinutes(Constants.DURATION_MINUTES));
+
+			res.setAdultCount(adultCount);
+			res.setChildCount(childCount);
+			res.setStatus("RESERVED");
+			res.setReservationType("ADMIN");
+
+			res.setTableIds(Arrays.asList(tableIdsArray));
 
 			if (courseIdStr != null && !courseIdStr.isBlank()) {
 				int courseId = Integer.parseInt(courseIdStr);
@@ -50,23 +102,10 @@ public class AdminReservationCreateServlet extends HttpServlet {
 				}
 			}
 
-			LocalDate date = LocalDate.parse(dateStr);
-			LocalTime startTime = LocalTime.parse(startStr);
+			// ==============================
+			// 4. TIME CONFLICT CHECK
+			// ==============================
 
-			res.setReservationDate(date);
-			res.setStartTime(startTime);
-			res.setEndTime(startTime.plusMinutes(Constants.DURATION_MINUTES));
-			res.setAdultCount(adultCount);
-			res.setChildCount(childCount);
-			res.setStatus("RESERVED");
-			res.setReservationType("ADMIN");
-
-			if (tableIdsArray == null || tableIdsArray.length == 0) {
-				throw new IllegalArgumentException("テーブルを選択してください");
-			}
-			res.setTableIds(Arrays.asList(tableIdsArray));
-
-			// ✅ TABLE CONFLICT → FORCE FLOW
 			if (dao.hasTimeConflict(
 					res.getReservationDate(),
 					res.getStartTime(),
@@ -84,7 +123,10 @@ public class AdminReservationCreateServlet extends HttpServlet {
 				return;
 			}
 
-			// ✅ NORMAL INSERT
+			// ==============================
+			// 5. INSERT
+			// ==============================
+
 			dao.insertCustomerReservation(res);
 
 			response.sendRedirect(
@@ -96,8 +138,9 @@ public class AdminReservationCreateServlet extends HttpServlet {
 			e.printStackTrace();
 
 			String message = e.getMessage();
+
 			if (message == null || message.isBlank()) {
-				message = "予約登録中に予期しないエラーが発生しました";
+				message = "予約登録中に予期しないエラーが発生しました。";
 			}
 
 			request.setAttribute("errorMessage", message);

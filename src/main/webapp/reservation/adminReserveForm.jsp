@@ -257,7 +257,7 @@ body {
 					<div class="col-md-6">
 						<label class="form-label"><i
 							class="fa-solid fa-phone me-2"></i>電話番号</label> <input type="tel"
-							name="phone" class="form-control" placeholder="090-0000-0000"
+							name="phone" class="form-control" placeholder="0000000000"
 							required>
 					</div>
 				</div>

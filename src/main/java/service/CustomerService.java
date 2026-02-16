@@ -42,11 +42,6 @@ public class CustomerService {
 			return false;
 		}
 
-		Customer customer = cd.findByEmail(email);
-		if (customer != null) {
-			return true;
-		}
-
 		Staff staff = sd.findByEmail(email);
 		if (staff != null) {
 			return true;
