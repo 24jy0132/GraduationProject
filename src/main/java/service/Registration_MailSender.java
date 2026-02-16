@@ -38,7 +38,7 @@ public class Registration_MailSender {
         try {
             // --- 4. メールメッセージ作成 ---
             Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress("t.h3733@gmail.com", "サイト運営者")); // 送信元
+            msg.setFrom(new InternetAddress("t.h3733@gmail.com", "MESA")); // 送信元
             msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to));        // 宛先
             msg.setSubject("【登録完了】ご登録ありがとうございます");// 件名
             String body = userName + " 様\n\n"

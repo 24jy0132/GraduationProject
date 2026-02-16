@@ -270,7 +270,7 @@ body {
 			</div>
 
 			<div class="d-flex justify-content-center gap-3 mt-5">
-				<a href="staffRegister.jsp"
+				<a href="<%=request.getContextPath()%>/Admin/staffregisteration.jsp"
 					class="btn btn-outline-secondary px-4 d-flex align-items-center">
 					<i class="fa-solid fa-arrow-left me-2"></i> 修正する
 				</a>

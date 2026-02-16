@@ -35,6 +35,22 @@ public class CustomerService {
 			return false;
 		return password.equals(repassword);
 	}
+	public boolean emailExists1(String email) {
+
+		if (email == null || email.isBlank()) {
+			return false;
+		}
+		Customer customer = cd.findByEmail(email);
+		if (customer!=null) {
+			return true;
+		}
+//		Staff staff = sd.findByEmail(email);
+//		if (staff != null) {
+//			return true;
+//		}
+
+		return false;
+	}
 
 	public boolean emailExists(String email) {
 
@@ -56,11 +72,11 @@ public class CustomerService {
 			return false;
 		}
 
-		// ❌ Staff always blocks customer email
-		Staff staff = sd.findByEmail(email);
-		if (staff != null) {
-			return true;
-		}
+//		// ❌ Staff always blocks customer email
+//		Staff staff = sd.findByEmail(email);
+//		if (staff != null) {
+//			return true;
+//		}
 
 		// Customer check
 		Customer found = cd.findByEmail(email);

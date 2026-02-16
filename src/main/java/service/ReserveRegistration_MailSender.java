@@ -40,7 +40,7 @@ public class ReserveRegistration_MailSender {
 		try {
 			// --- 4. メールメッセージ作成 ---
 			Message msg = new MimeMessage(session);
-			msg.setFrom(new InternetAddress("t.h3733@gmail.com", "サイト運営者")); // 送信元
+			msg.setFrom(new InternetAddress("t.h3733@gmail.com", "MESA")); // 送信元
 			msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to)); // 宛先
 			msg.setSubject("【予約完了】ご予約ありがとうございます");// 件名
 			String rt=r.getReservationType();
